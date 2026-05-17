@@ -1,25 +1,35 @@
-# 커스텀 수직 슬라이더 아키텍처 및 구현 계획
+# Plan 1: 점수 시스템 리팩토링 (Core / Logic)
 
-## 1. 개요
-브라우저별(WebKit) 렌더링 버그와 CSS `rotate(-90deg)` 변환으로 인해 발생하는 슬라이더 썸(Thumb)의 오프셋 및 핏팅 문제를 영구적으로 해결하기 위해, 기존 네이티브 `<input type="range">` 의존성을 완전히 폐기합니다.
-순수 DOM 엘리먼트와 Pointer Events API를 결합한 완전한 커스텀 수직 슬라이더를 밑바닥부터 새로 구축합니다.
+## 기능 목록
+1. 시간 관련 로직 완전 제거 (timeTaken, 시간 패널티)
+2. 점수 산정 공식 변경: accuracy² × 1000 × 난이도배율
+3. 난이도 배율 상수 추가 (Easy ×1.0, Normal ×1.2, Hard ×1.5)
+4. 3라운드 합산 방식으로 최종 점수 계산
+5. Ranking 모듈에 난이도 정보 포함
 
-## 2. 기능 목록
-- **CustomVerticalSlider 모듈화**: 슬라이더의 동작(드래그, 터치, 클릭)을 전담 처리하는 독립적인 클래스 구현.
-- **정밀한 상태 매핑**: Y축 픽셀 좌표를 0~360 (Hue) 및 0~100 (Sat/Light) 값으로 정확하게 변환.
-- **이벤트 기반 동기화**: 슬라이더 값이 변경될 때마다 이벤트 리스너를 통해 UI와 게임 상태를 실시간 업데이트.
+## 변경 파일
+- `src/utils/ColorUtils.js`: calculateAccuracy → calculateScore
+- `src/core/GameState.js`: timeTaken 제거, DIFFICULTY_MULTIPLIER 추가
+- `src/core/Ranking.js`: difficulty 포함 저장
+- `src/ui/UIManager.js`: 타이머 UI 제거, 점수 표시 변경
 
-## 3. 아키텍처 구조 및 실행 흐름
-1. `UIManager.js`가 초기화될 때, 기존 `<input>` 대신 커스텀 슬라이더 DOM 구조(`div.custom-slider`)를 생성합니다.
-2. 각 슬라이더 DOM에 `CustomVerticalSlider` 인스턴스를 바인딩합니다.
-3. 사용자가 슬라이더 영역을 터치(PointerDown)하거나 드래그(PointerMove)하면, 내부 좌표계산 로직이 `y / height` 비율을 계산하여 값을 업데이트하고 시각적 썸(Thumb)의 `top` 위치를 실시간 조정합니다.
-4. 값이 업데이트되면 콜백을 호출하여 배경색, 헥스코드, 게임 상태를 동기화합니다.
+## 점수 공식
+```
+deltaE = |Rdiff| + |Gdiff| + |Bdiff|
+accuracy = (765 - deltaE) / 765
+baseScore = accuracy² × 1000
+roundScore = floor(baseScore × multiplier)
+finalScore = sum(roundScores)
+```
 
-## 4. 파일 분리 전략 (BUILD 단계 대비)
-- `src/ui/CustomSlider.js`: 슬라이더 로직 전담 클래스 (새로 생성)
-- `src/ui/UIManager.js`: 커스텀 슬라이더 렌더링 및 연동 로직으로 전면 교체
-- `src/index.css`: 기존 `input[type=range]` 관련 코드 전면 삭제 및 커스텀 DOM 전용 스타일링 추가
+## 난이도 배율
+| 난이도 | 배율 | 라운드 만점 | 총점 만점 |
+|--------|------|-----------|----------|
+| Easy   | ×1.0 | 1,000     | 3,000    |
+| Normal | ×1.2 | 1,200     | 3,600    |
+| Hard   | ×1.5 | 1,500     | 4,500    |
 
-## 5. 테스트 전략
-- Pointer Events가 마우스 및 모바일 터치 환경 모두에서 쾌적하게 동작하는지 검증.
-- 컨테이너 크기가 변해도 썸(Thumb)의 라인이 100% 폭을 유지하며 중앙 정렬이 깨지지 않는지 반응형 검증.
+## 테스트 전략
+- calculateScore 단위 테스트 (정확 일치, 완전 불일치, 중간값)
+- 난이도 배율 적용 검증
+- 3라운드 합산 검증

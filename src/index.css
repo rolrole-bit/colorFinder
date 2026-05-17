@@ -32,6 +32,12 @@
 }
 @font-face {
   font-family: 'Paperlogy';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-7Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Paperlogy';
   src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-8ExtraBold.woff2') format('woff2');
   font-weight: 800;
   font-style: normal;
@@ -500,18 +506,22 @@ input[type="range"]::-webkit-slider-thumb:active {
   bottom: clamp(1rem, 5vh, 3rem);
   right: clamp(1rem, 5vw, 3rem);
   font-family: 'Paperlogy', sans-serif;
-  font-weight: 300;
-  font-size: clamp(1.2rem, 5vw, 2rem);
-  letter-spacing: clamp(1px, 1vw, 3px);
+  font-weight: 800;
+  font-size: clamp(1.1rem, 2.5vh, 1.4rem);
+  letter-spacing: 3px;
   color: #fff;
   background: #000; /* Will be overridden dynamically in JS */
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 1rem 2rem;
+  min-height: 56px;
   border-radius: 8px;
   cursor: pointer;
   z-index: 1001;
   text-transform: uppercase;
   transition: transform 0.1s, opacity 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .submit-minimal-btn:hover {
@@ -757,18 +767,22 @@ input[type="text"].minimal-input:focus {
 
 .magazine-start-btn {
   font-family: 'Paperlogy', sans-serif;
-  font-weight: 300;
-  font-size: clamp(1.2rem, 3vh, 2rem);
+  font-weight: 800;
+  font-size: clamp(1.1rem, 2.5vh, 1.4rem);
   color: #fff;
   background: #000;
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 1rem 2rem;
   border-radius: 8px;
   cursor: pointer;
   transition: transform 0.1s, opacity 0.3s;
   text-transform: uppercase;
   margin-top: max(1vh, 0.5rem);
   letter-spacing: 3px;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .magazine-start-btn:disabled {
@@ -815,9 +829,10 @@ input[type="text"].minimal-input:focus {
   }
   
   .magazine-start-btn {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     width: 100%;
-    padding: 1.2rem;
+    padding: 1rem 2rem;
+    min-height: 56px;
   }
   
   /* 모바일 세로 화면에서는 슬라이더들이 너무 많은 자리를 차지하지 않도록 폭만 줄여줍니다 (세로 UI 유지) */

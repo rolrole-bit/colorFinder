@@ -1,6 +1,7 @@
 /**
  * Ranking
  * LocalStorage를 활용하여 점수 데이터를 기록하고 순위 리스트를 반환하는 모듈
+ * 점수는 정수 기반 (0~4500점 범위)
  */
 
 const STORAGE_KEY = "colorFinder_rankings";
@@ -16,16 +17,18 @@ function getRecords() {
 
 /**
  * 새로운 게임 결과를 스토리지에 저장합니다.
- * @param {string} playerName 
- * @param {string} originGame 
- * @param {number} score 
+ * @param {string} playerName - 플레이어 이름
+ * @param {string} originGame - 출신 게임
+ * @param {number} score - 최종 점수 (정수)
+ * @param {string} difficulty - 난이도
  */
-export function saveRecord(playerName, originGame, score) {
+export function saveRecord(playerName, originGame, score, difficulty) {
   const records = getRecords();
   records.push({
     playerName,
     originGame,
     score,
+    difficulty,
     date: new Date().toISOString()
   });
   localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
@@ -78,7 +81,7 @@ export function getGameRankings() {
 
 /**
  * 전체 플레이어 순위를 반환합니다. (상위 5개)
- * @returns {Array} [{ playerName: '유저1', originGame: 'WOW', score: 99.1 }, ...]
+ * @returns {Array} [{ playerName: '유저1', originGame: 'WOW', score: 3200, difficulty: 'Normal' }, ...]
  */
 export function getPlayerRankings() {
   const records = getRecords();

@@ -16,32 +16,31 @@ export function getRandomColor() {
 }
 
 /**
- * 유클리디안 거리를 활용하여 두 RGB 색상 간의 정확도를 계산하고, 소요 시간을 반영하여 최종 점수를 반환합니다.
- * @param {{r: number, g: number, b: number}} target 
- * @param {{r: number, g: number, b: number}} user 
- * @param {number} timeTaken - 사용자가 추론하는 데 걸린 시간(초)
- * @returns {number} 0 ~ 100
+ * 두 RGB 색상 간의 정확도를 기반으로 점수를 계산합니다.
+ * 공식: accuracy² × 1000 (난이도 배율 적용 전 기본 점수)
+ * 
+ * @param {{r: number, g: number, b: number}} target - 목표 색상
+ * @param {{r: number, g: number, b: number}} user - 유저가 선택한 색상
+ * @returns {number} 0 ~ 1000 (정수)
+ * 
+ * 내부 동작:
+ *   1. RGB 각 채널 차이의 절대값 합산 (deltaE: 0~765)
+ *   2. 정확도 비율 계산 (accuracy: 0.0~1.0)
+ *   3. 제곱하여 고정밀 매칭에 큰 보상 부여
+ *   4. 1000을 곱해 최종 기본 점수 산출
  */
-export function calculateAccuracy(target, user, timeTaken = 0) {
+export function calculateScore(target, user) {
   const rDiff = Math.abs(target.r - user.r);
   const gDiff = Math.abs(target.g - user.g);
   const bDiff = Math.abs(target.b - user.b);
   
   const totalDiff = rDiff + gDiff + bDiff;
-  const maxDiff = 255 * 3;
+  const maxDiff = 255 * 3; // 765
   
-  let accuracy = ((maxDiff - totalDiff) / maxDiff) * 100;
+  const accuracy = (maxDiff - totalDiff) / maxDiff; // 0.0 ~ 1.0
+  const baseScore = Math.pow(accuracy, 2) * 1000;
   
-  // 시간 패널티 적용: 5초 초과 시 1초당 0.5점 차감 (최대 15점)
-  if (timeTaken > 5) {
-    const penalty = Math.min((timeTaken - 5) * 0.5, 15);
-    accuracy -= penalty;
-  }
-  
-  // 너무 낮은 점수는 보정 (마이너스 방지)
-  accuracy = Math.max(0, Math.min(100, accuracy));
-  
-  return Number(accuracy.toFixed(1));
+  return Math.floor(Math.max(0, Math.min(1000, baseScore)));
 }
 
 /**

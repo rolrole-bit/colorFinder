@@ -1,6 +1,6 @@
 import { MMO_GAMES } from '../utils/Constants.js';
-import { getRandomColor, calculateAccuracy, toRGBString, hslToRgb, rgbToHex, getContrastColor } from '../utils/ColorUtils.js';
-import { getState, setPlayerInfo, setTargetColor, setUserColor, setScore, resetGame, setDifficulty, setPhase, DIFFICULTY_TIME, setTimeTaken, addRoundResult, nextRound } from '../core/GameState.js';
+import { getRandomColor, calculateScore, toRGBString, hslToRgb, rgbToHex, getContrastColor } from '../utils/ColorUtils.js';
+import { getState, setPlayerInfo, setTargetColor, setUserColor, setScore, resetGame, setDifficulty, setPhase, DIFFICULTY_TIME, DIFFICULTY_MULTIPLIER, addRoundResult, nextRound } from '../core/GameState.js';
 import { saveRecord, getGameRankings, getPlayerRankings } from '../core/Ranking.js';
 import { CustomVerticalSlider } from './CustomSlider.js';
 
@@ -42,18 +42,18 @@ const scrambleTypingEffect = (element, text, duration = 1000) => {
   }, stepTime);
 };
 
-const animateValue = (element, start, end, duration) => {
+const animateValue = (element, start, end, duration, isInteger = false) => {
   let startTimestamp = null;
   const step = (timestamp) => {
     if (!startTimestamp) startTimestamp = timestamp;
     const progress = Math.min((timestamp - startTimestamp) / duration, 1);
     const easeProgress = progress * (2 - progress); // ease-out quad
-    const current = (start + (end - start) * easeProgress).toFixed(1);
-    element.innerHTML = current;
+    const current = start + (end - start) * easeProgress;
+    element.innerHTML = isInteger ? Math.floor(current).toLocaleString() : current.toFixed(1);
     if (progress < 1) {
       window.requestAnimationFrame(step);
     } else {
-      element.innerHTML = end.toFixed(1);
+      element.innerHTML = isInteger ? Math.floor(end).toLocaleString() : end.toFixed(1);
     }
   };
   window.requestAnimationFrame(step);
@@ -81,11 +81,11 @@ function renderEntryView(container) {
           <input type="text" id="player-name" class="minimal-input" placeholder="닉네임을 입력하세요" autocomplete="off" />
         </div>
         <div class="form-group difficulty-group">
-          <span class="diff-label">난이도 (기억 시간)</span>
+          <span class="diff-label">난이도 (기억 시간 / 점수 배율)</span>
           <div class="radio-group clean">
-            <label><input type="radio" name="difficulty" value="Easy"> 쉬움 (5초)</label>
-            <label><input type="radio" name="difficulty" value="Normal" checked> 보통 (3초)</label>
-            <label><input type="radio" name="difficulty" value="Hard"> 어려움 (1초)</label>
+            <label><input type="radio" name="difficulty" value="Easy"> 쉬움 (5초) ×1.0</label>
+            <label><input type="radio" name="difficulty" value="Normal" checked> 보통 (3초) ×1.2</label>
+            <label><input type="radio" name="difficulty" value="Hard"> 어려움 (1초) ×1.5</label>
           </div>
         </div>
         <button class="btn magazine-start-btn" id="start-btn" disabled>START</button>
@@ -234,7 +234,7 @@ function renderGameView(container) {
   const state = getState();
   
   container.innerHTML = `
-    <div style="position: absolute; top: 2rem; left: 2.5rem; font-size: 1.5rem; color: #fff; background-color: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 2px; z-index: 100;">
+    <div style="position: absolute; top: 1.2vh; left: 5vw; font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: #fff; background-color: rgba(0,0,0,0.5); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px; z-index: 100;">
       ROUND ${state.currentRound} / ${state.maxRounds}
     </div>
     <div class="full-screen-color" id="memorize-screen" style="background-color: ${rgbString}; display: flex; justify-content: center; align-items: center;">
@@ -267,7 +267,7 @@ function renderGameView(container) {
     const targetHsl = `hsl(${state.targetColor.h}, ${state.targetColor.s}%, ${state.targetColor.l}%)`;
     
     container.innerHTML = `
-      <div style="position: absolute; top: 2rem; left: 2.5rem; font-size: 1.5rem; color: #fff; background-color: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 2px; z-index: 100;">
+      <div style="position: absolute; top: 1.2vh; left: 5vw; font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: #fff; background-color: rgba(0,0,0,0.5); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px; z-index: 100;">
         ROUND ${state.currentRound} / ${state.maxRounds}
       </div>
       <div class="animated-gradient-bg"></div>
@@ -276,9 +276,6 @@ function renderGameView(container) {
         <div id="guess-bg" class="split-bg" style="background-color: hsl(180, 50%, 50%);"></div>
         
         <div style="position: absolute; top: 2rem; right: 2rem; display: flex; gap: 1rem; z-index: 10;">
-          <div id="timer-display" style="font-family: 'Paperlogy', sans-serif; font-size: 2rem; font-weight: 300; letter-spacing: 3px; padding: 0.5rem 1rem; border-radius: 8px;">
-            0.0s
-          </div>
           <div id="hex-display" style="font-family: 'Paperlogy', sans-serif; font-size: 2rem; font-weight: 300; letter-spacing: 3px; padding: 0.5rem 1rem; border-radius: 8px;">
             #000000
           </div>
@@ -302,7 +299,7 @@ function renderGameView(container) {
           </div>
         </div>
         
-        <button id="submit-btn" class="submit-minimal-btn">SEND</button>
+        <button id="submit-btn" class="submit-minimal-btn">결정</button>
       </div>
     `;
 
@@ -312,7 +309,6 @@ function renderGameView(container) {
     const satWrapper = document.getElementById('sat-wrapper');
     const lightWrapper = document.getElementById('l-wrapper');
     const hexDisplay = document.getElementById('hex-display');
-    const timerDisplay = document.getElementById('timer-display');
     
     let currentDisplayedRGB = hslToRgb(180, 50, 50);
     let hexAnimFrame = null;
@@ -321,19 +317,7 @@ function renderGameView(container) {
     let currentS = 50;
     let currentL = 50;
     
-    const guessStartTime = performance.now();
     let isGuessing = true;
-    
-    const updateGameTimer = () => {
-      if (!isGuessing) return;
-      const now = performance.now();
-      const elapsed = (now - guessStartTime) / 1000;
-      if (timerDisplay) {
-        timerDisplay.textContent = elapsed.toFixed(1) + 's';
-      }
-      requestAnimationFrame(updateGameTimer);
-    };
-    requestAnimationFrame(updateGameTimer);
 
     const updateColor = () => {
       const targetRGB = hslToRgb(currentH, currentS, currentL);
@@ -368,10 +352,7 @@ function renderGameView(container) {
           hexDisplay.style.color = rgbString;
           hexDisplay.style.backgroundColor = contrastBg;
           
-          if (timerDisplay) {
-            timerDisplay.style.color = rgbString;
-            timerDisplay.style.backgroundColor = contrastBg;
-          }
+
           
           if (submitBtn) {
             submitBtn.style.color = rgbString;
@@ -400,10 +381,7 @@ function renderGameView(container) {
           hexDisplay.style.color = rgbString;
           hexDisplay.style.backgroundColor = contrastBg;
         }
-        if (timerDisplay) {
-          timerDisplay.style.color = rgbString;
-          timerDisplay.style.backgroundColor = contrastBg;
-        }
+
         if (submitBtn) {
           submitBtn.style.color = rgbString;
           submitBtn.style.backgroundColor = contrastBg;
@@ -435,14 +413,14 @@ function renderGameView(container) {
 
     submitBtn.addEventListener('click', () => {
       isGuessing = false;
-      const elapsedSec = (performance.now() - guessStartTime) / 1000;
-      setTimeTaken(elapsedSec);
       
       const state = getState();
-      const accuracy = calculateAccuracy(state.targetColor, state.userColor, elapsedSec);
+      const baseScore = calculateScore(state.targetColor, state.userColor);
+      const multiplier = DIFFICULTY_MULTIPLIER[state.difficulty];
+      const roundScore = Math.floor(baseScore * multiplier);
       
-      addRoundResult(accuracy, elapsedSec, state.targetColor, state.userColor);
-      setScore(accuracy);
+      addRoundResult(roundScore, state.targetColor, state.userColor);
+      setScore(roundScore);
       
       const panel = document.querySelector('.vertical-sliders-container');
       const btn = document.getElementById('submit-btn');
@@ -476,8 +454,8 @@ function renderInterimResultView(container) {
       <div class="magazine-overlay">
         
         <!-- 상단 라운드 표시 (좌측 고정) -->
-        <div style="display: flex; justify-content: flex-start; width: 100%; flex-shrink: 0; margin-bottom: auto;">
-          <div style="font-size: clamp(1rem, 2vw, 1.5rem); color: #fff; background-color: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 2px;">
+        <div style="display: flex; justify-content: flex-start; width: 100%; flex-shrink: 0; margin-bottom: auto; padding-left: 2vw;">
+          <div style="font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: #fff; background-color: rgba(0,0,0,0.5); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px;">
             ROUND ${state.currentRound} / ${state.maxRounds}
           </div>
         </div>
@@ -494,9 +472,9 @@ function renderInterimResultView(container) {
           </div>
           
           <div class="magazine-score" style="background: linear-gradient(to right, ${leftContrast} 50%, ${rightContrast} 50%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            <span class="animated-score" data-target="${state.score}">0.0</span>%
+            <span class="animated-score" data-target="${state.score}">0</span>점
             <div style="font-size: 0.25em; font-weight: 300; opacity: 0.8; letter-spacing: 1px; margin-top: 0.5rem;">
-              (${state.timeTaken.toFixed(1)}s)
+              ×${DIFFICULTY_MULTIPLIER[state.difficulty]}
             </div>
           </div>
         </div>
@@ -510,8 +488,8 @@ function renderInterimResultView(container) {
 
   const animatedScore = container.querySelector('.animated-score');
   if (animatedScore) {
-    const target = parseFloat(animatedScore.getAttribute('data-target'));
-    animateValue(animatedScore, 0, target, 1200);
+    const target = parseInt(animatedScore.getAttribute('data-target'));
+    animateValue(animatedScore, 0, target, 1200, true);
   }
 
   document.getElementById('next-round-btn').addEventListener('click', () => {
@@ -524,18 +502,13 @@ function renderInterimResultView(container) {
         renderGameView(container);
       } else {
         let totalScore = 0;
-        let totalTime = 0;
         state.roundResults.forEach(r => {
           totalScore += r.score;
-          totalTime += r.timeTaken;
         });
-        const avgScore = totalScore / state.maxRounds;
-        const avgTime = totalTime / state.maxRounds;
         
-        setScore(Math.round(avgScore * 10) / 10);
-        setTimeTaken(Math.round(avgTime * 10) / 10);
+        setScore(totalScore);
         
-        saveRecord(state.playerName, state.originGame, state.score);
+        saveRecord(state.playerName, state.originGame, state.score, state.difficulty);
         renderScoreBoardView(container);
       }
     }, 400);
@@ -551,7 +524,7 @@ function renderScoreBoardView(container) {
     <li class="rank-item" style="color: #fff; border-color: rgba(255,255,255,0.2);">
       <span class="rank-num" style="color: #fff;">${i + 1}</span>
       <span class="rank-name">${r.game}</span>
-      <span class="rank-score" style="color: #fff;">${r.score}%</span>
+      <span class="rank-score" style="color: #fff;">${r.score.toLocaleString()}점</span>
     </li>
   `).join('');
 
@@ -561,7 +534,7 @@ function renderScoreBoardView(container) {
     <li class="rank-item" style="color: #fff; border-color: rgba(255,255,255,0.2);">
       <span class="rank-num" style="color: #fff;">${i + 1}</span>
       <span class="rank-name">[${r.originGame}] ${r.playerName}</span>
-      <span class="rank-score" style="color: #fff;">${r.score}%</span>
+      <span class="rank-score" style="color: #fff;">${r.score.toLocaleString()}점</span>
     </li>
   `).join('');
 
@@ -589,7 +562,7 @@ function renderScoreBoardView(container) {
   if (state.roundResults && state.roundResults.length > 0) {
     breakdownHTML = `
       <div style="display: flex; flex-direction: column; gap: 0.5rem; text-align: left; font-size: clamp(1rem, 1.5vw, 1.3rem); font-weight: 300; color: rgba(255,255,255,0.9); letter-spacing: 1px;">
-        ${state.roundResults.map((r, i) => `<div>${i + 1}라운드 &nbsp;&nbsp;<span style="font-weight:500;">${r.score}%</span></div>`).join('')}
+        ${state.roundResults.map((r, i) => `<div>${i + 1}라운드 &nbsp;&nbsp;<span style="font-weight:500;">${r.score.toLocaleString()}점</span></div>`).join('')}
       </div>
     `;
   }
@@ -613,9 +586,9 @@ function renderScoreBoardView(container) {
             
             <div style="display: flex; flex-direction: column; text-align: center;">
               <div class="magazine-score" style="background: linear-gradient(to right, ${leftContrast} 50%, ${rightContrast} 50%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0;">
-                <span class="animated-score" data-target="${state.score}">0.0</span>%
+                <span class="animated-score" data-target="${state.score}">0</span>점
                 <span style="font-size: 0.3em; font-weight: 300; opacity: 0.8; letter-spacing: 1px; white-space: nowrap; display: block; margin-top: -1rem;">
-                  (${state.timeTaken.toFixed(1)}s)
+                  ${state.difficulty} ×${DIFFICULTY_MULTIPLIER[state.difficulty]}
                 </span>
               </div>
             </div>
@@ -647,10 +620,10 @@ function renderScoreBoardView(container) {
     </div>
   `;
 
-  const animatedScore = container.querySelector('.animated-score');
-  if (animatedScore) {
-    const target = parseFloat(animatedScore.getAttribute('data-target'));
-    animateValue(animatedScore, 0, target, 1200);
+  const animatedScoreFinal = container.querySelector('.animated-score');
+  if (animatedScoreFinal) {
+    const target = parseInt(animatedScoreFinal.getAttribute('data-target'));
+    animateValue(animatedScoreFinal, 0, target, 1200, true);
   }
 
   document.getElementById('retry-btn').addEventListener('click', () => {
