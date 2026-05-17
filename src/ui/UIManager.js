@@ -572,13 +572,13 @@ function renderScoreBoardView(container) {
   }
 
   container.innerHTML = `
-    <div class="split-screen-result" id="score-panel">
-      <!-- 50:50 분할 배경 -->
-      <div class="split-screen-half" style="background: ${targetGradient};"></div>
-      <div class="split-screen-half" style="background: ${userGradient};"></div>
+    <div class="split-screen-result" id="score-panel" style="overflow-y: auto;">
+      <!-- 50:50 분할 배경 (고정) -->
+      <div class="split-screen-half" style="background: ${targetGradient}; position: fixed; top: 0; left: 0; width: 50vw; height: 100vh;"></div>
+      <div class="split-screen-half" style="background: ${userGradient}; position: fixed; top: 0; right: 0; width: 50vw; height: 100vh;"></div>
       
       <!-- 매거진 오버레이 -->
-      <div class="magazine-overlay">
+      <div class="magazine-overlay" style="position: relative; justify-content: flex-start; height: auto; min-height: 100vh; padding-top: 3rem; gap: 2rem;">
         
 
 
