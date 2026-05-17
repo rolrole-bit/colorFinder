@@ -232,7 +232,7 @@ function renderEntryView(container) {
       setTimeout(() => {
         if (introText) {
           scrambleTypingEffect(introText, '선수 입장!', 1000);
-          playGoSound();
+          playReadySound();
         }
         
         setTimeout(() => {
@@ -264,6 +264,8 @@ function renderGameView(container) {
       </div>
     </div>
   `;
+  
+  playGoSound();
   
   const displayTime = getDifficultyTime(state.difficulty);
   const startTime = performance.now();
@@ -549,7 +551,7 @@ function getEvaluationMessage(score) {
   if (score === 0) return "버그인가요? 아니면 고의인가요?";
   if (score < 100) return "모니터가 흑백인가요? 안과 검진을 추천합니다.";
   if (score < 200) return "고양이가 대신 마우스를 클릭한 게 확실합니다.";
-  if (score < 300) return "색맹 테스트를 조심스럽게 권유해 봅니다.";
+  if (score < 300) return "안과 관련 건강검진을 조심스럽게 추천 드립니다.";
   if (score < 400) return "이 정도면 나쁘지 않...긴 개뿔 분발하세요!";
   if (score < 500) return "평범한 머글의 시력을 가지셨군요!";
   if (score < 600) return "동네 화방에서 물감 좀 만져보신 솜씨!";
