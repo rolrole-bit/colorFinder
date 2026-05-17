@@ -472,7 +472,7 @@ function renderInterimResultView(container) {
           </div>
           
           <div class="magazine-score" style="background: linear-gradient(to right, ${leftContrast} 50%, ${rightContrast} 50%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            <span class="animated-score" data-target="${state.score}">0</span>점
+            <span class="animated-score" data-target="${state.score}">0</span>
             <div style="font-size: 0.25em; font-weight: 300; opacity: 0.8; letter-spacing: 1px; margin-top: 0.5rem;">
               ×${DIFFICULTY_MULTIPLIER[state.difficulty]}
             </div>
@@ -524,7 +524,7 @@ function renderScoreBoardView(container) {
     <li class="rank-item" style="color: #fff; border-color: rgba(255,255,255,0.2);">
       <span class="rank-num" style="color: #fff;">${i + 1}</span>
       <span class="rank-name">${r.game}</span>
-      <span class="rank-score" style="color: #fff;">${r.score.toLocaleString()}점</span>
+      <span class="rank-score" style="color: #fff;">${r.score.toLocaleString()}</span>
     </li>
   `).join('');
 
@@ -534,7 +534,7 @@ function renderScoreBoardView(container) {
     <li class="rank-item" style="color: #fff; border-color: rgba(255,255,255,0.2);">
       <span class="rank-num" style="color: #fff;">${i + 1}</span>
       <span class="rank-name">${r.playerName} [${r.originGame}]</span>
-      <span class="rank-score" style="color: #fff;">${r.score.toLocaleString()}점</span>
+      <span class="rank-score" style="color: #fff;">${r.score.toLocaleString()}</span>
     </li>
   `).join('');
 
@@ -562,7 +562,7 @@ function renderScoreBoardView(container) {
   if (state.roundResults && state.roundResults.length > 0) {
     breakdownHTML = `
       <div style="display: flex; flex-direction: column; gap: 0.5rem; text-align: left; font-size: clamp(1rem, 1.5vw, 1.3rem); font-weight: 300; color: rgba(255,255,255,0.9); letter-spacing: 1px;">
-        ${state.roundResults.map((r, i) => `<div>${i + 1}라운드 &nbsp;&nbsp;<span style="font-weight:500;">${r.score.toLocaleString()}점</span></div>`).join('')}
+        ${state.roundResults.map((r, i) => `<div>${i + 1}라운드 &nbsp;&nbsp;<span style="font-weight:500;">${r.score.toLocaleString()}</span></div>`).join('')}
       </div>
     `;
   }
@@ -586,7 +586,7 @@ function renderScoreBoardView(container) {
             
             <div style="display: flex; flex-direction: column; text-align: center;">
               <div class="magazine-score" style="background: linear-gradient(to right, ${leftContrast} 50%, ${rightContrast} 50%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0;">
-                <span class="animated-score" data-target="${state.score}">0</span>점
+                <span class="animated-score" data-target="${state.score}">0</span>
                 <span style="font-size: 0.3em; font-weight: 300; opacity: 0.8; letter-spacing: 1px; white-space: nowrap; display: block; margin-top: -1rem;">
                   ${state.difficulty} ×${DIFFICULTY_MULTIPLIER[state.difficulty]}
                 </span>
