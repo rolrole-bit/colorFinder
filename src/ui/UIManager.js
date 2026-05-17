@@ -10,7 +10,8 @@ import {
   playScoreImpactSound,
   playEvaluationSound,
   playReadySound,
-  playGoSound
+  playGoSound,
+  playSubmitSound
 } from '../utils/SoundUtils.js';
 
 // Helper to calculate best contrast (Black or White) based on background luminance
@@ -443,6 +444,7 @@ function renderGameView(container) {
     updateColor();
 
     submitBtn.addEventListener('click', () => {
+      playSubmitSound();
       isGuessing = false;
       
       const state = getState();
