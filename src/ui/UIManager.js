@@ -74,8 +74,6 @@ function renderEntryView(container) {
   container.innerHTML = `
     <div class="animated-gradient-bg" id="entry-bg" style="position: fixed;"></div>
     
-    <div id="entry-scroll-container">
-      <!-- 1st Page (100vh) -->
       <div class="magazine-entry" id="entry-panel" style="min-height: 100vh;">
         <h1 class="magazine-title">DYE<br/>MASTER</h1>
         
@@ -100,28 +98,6 @@ function renderEntryView(container) {
           <button class="btn magazine-start-btn" id="start-btn" disabled>START</button>
         </div>
       </div>
-      
-      <!-- 2nd Page (Scoreboards) -->
-      <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 4rem 2rem; position: relative; z-index: 10; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);">
-        <h2 style="font-size: 2.5rem; font-weight: 800; letter-spacing: 2px; margin-bottom: 3rem; color: #fff; font-family: 'Paperlogy', sans-serif;">명예의 전당</h2>
-        
-        <div class="magazine-scoreboard" style="width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 3rem; background: none; border: none; padding: 0;">
-          <div class="score-card" style="background: none; border: none; padding: 0;">
-            <h3 style="color: #fff; border-bottom: 2px solid #fff; padding-bottom: 0.5rem; margin-bottom: 1rem; font-size: 1.5rem;">플레이어 랭킹</h3>
-            <ul class="rank-list" style="color: #fff;">
-              ${playerRanksHTML}
-            </ul>
-          </div>
-          
-          <div class="score-card" style="background: none; border: none; padding: 0;">
-            <h3 style="color: #fff; border-bottom: 2px solid #fff; padding-bottom: 0.5rem; margin-bottom: 1rem; font-size: 1.5rem;">게임별 랭킹</h3>
-            <ul class="rank-list" style="color: #fff;">
-              ${gameRanksHTML}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
   `;
 
   const playerNameInput = document.getElementById('player-name');
