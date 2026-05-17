@@ -228,8 +228,7 @@ function renderGameView(container) {
   setPhase("MEMORIZE");
   const rgbString = toRGBString(targetColor);
   
-  const targetRGB = hslToRgb(targetColor.h, targetColor.s, targetColor.l);
-  const contrastYIQ = getContrastYIQ(targetRGB.r, targetRGB.g, targetRGB.b);
+  const contrastYIQ = getContrastYIQ(targetColor.r, targetColor.g, targetColor.b);
   
   const state = getState();
   
