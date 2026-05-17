@@ -31,12 +31,12 @@ export const DIFFICULTY_TIME = {
  * 난이도별 점수 배율
  * Easy: 기본 점수 그대로 (×1.0)
  * Normal: 20% 보너스 (×1.2)
- * Hard: 50% 보너스 (×1.5)
+ * Hard: 30% 보너스 (×1.3)
  */
 export const DIFFICULTY_MULTIPLIER = {
   "Easy": 1.0,
   "Normal": 1.2,
-  "Hard": 1.5
+  "Hard": 1.3
 };
 
 export function setPlayerInfo(name, game) {
