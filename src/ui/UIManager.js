@@ -84,8 +84,8 @@ function renderEntryView(container) {
           <span class="diff-label">난이도 (기억 시간 / 점수 배율)</span>
           <div class="radio-group clean">
             <label><input type="radio" name="difficulty" value="Easy"> 쉬움 (5초) ×1.0</label>
-            <label><input type="radio" name="difficulty" value="Normal" checked> 보통 (3초) ×1.2</label>
-            <label><input type="radio" name="difficulty" value="Hard"> 어려움 (1초) ×1.5</label>
+            <label><input type="radio" name="difficulty" value="Normal" checked> 보통 (2초) ×1.2</label>
+            <label><input type="radio" name="difficulty" value="Hard"> 어려움 (0.5초) ×1.5</label>
           </div>
         </div>
         <button class="btn magazine-start-btn" id="start-btn" disabled>START</button>

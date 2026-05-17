@@ -23,8 +23,8 @@ const state = {
  */
 export const DIFFICULTY_TIME = {
   "Easy": 5000,
-  "Normal": 3000,
-  "Hard": 1000
+  "Normal": 2000,
+  "Hard": 500
 };
 
 /**
