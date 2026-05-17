@@ -76,11 +76,11 @@ function renderEntryView(container) {
     
     <div id="entry-scroll-container">
       <!-- 1st Page (100vh) -->
-      <div class="magazine-entry" id="entry-panel" style="position: relative; z-index: 10; min-height: 100vh;">
+      <div class="magazine-entry" id="entry-panel" style="min-height: 100vh;">
         <h1 class="magazine-title">DYE<br/>MASTER</h1>
         
         <div class="entry-form">
-          <div class="form-group dropdown-container" style="position: relative; z-index: 1000;">
+          <div class="form-group dropdown-container" style="position: relative;">
             <span class="diff-label">어느게임 출신이세요?</span>
             <input type="text" id="origin-game" class="minimal-input" placeholder="게임을 검색하거나 선택하세요" autocomplete="off" />
             <div class="dropdown-list hidden" id="game-dropdown" style="width: 100%;"></div>
@@ -91,7 +91,7 @@ function renderEntryView(container) {
           </div>
           <div class="form-group difficulty-group">
             <span class="diff-label">난이도 (기억 시간)</span>
-            <div class="radio-group clean">
+            <div class="radio-group clean" style="mix-blend-mode: difference; color: #fff;">
               <label><input type="radio" name="difficulty" value="Easy"> 쉬움 (5초)</label>
               <label><input type="radio" name="difficulty" value="Normal" checked> 보통 (3초)</label>
               <label><input type="radio" name="difficulty" value="Hard"> 어려움 (1초)</label>

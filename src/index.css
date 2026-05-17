@@ -62,7 +62,6 @@ body {
   background: linear-gradient(270deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb, #ffdfa0, #ffb3b3);
   background-size: 1200% 1200%;
   animation: gradientShift 30s ease infinite;
-  z-index: -1;
 }
 
 #app {
@@ -128,7 +127,6 @@ h1 {
 
 .form-group {
   margin-bottom: 1.5rem;
-  position: relative;
 }
 
 label {
@@ -166,26 +164,25 @@ input[type="text"]:focus {
   top: calc(100% + 2px); /* right below the border */
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 0;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
   max-height: 30vh;
   overflow-y: auto;
-  z-index: 1000;
-  margin-top: 0;
-  box-shadow: none;
-  mix-blend-mode: difference;
+  z-index: 100;
+  margin-top: 4px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
 .dropdown-item {
   padding: 1rem 1.5rem;
   cursor: pointer;
-  color: #fff;
+  color: #000;
   font-family: 'Paperlogy', sans-serif;
-  font-weight: 500;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 800;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   transition: all 0.2s;
 }
 
@@ -194,8 +191,8 @@ input[type="text"]:focus {
 }
 
 .dropdown-item:hover, .dropdown-item.active {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  background: rgba(0, 0, 0, 0.1);
+  color: #000;
 }
 
 .radio-group {
@@ -688,7 +685,8 @@ input[type="text"].minimal-input:focus {
   font-family: 'Paperlogy', sans-serif;
   font-weight: 300;
   font-size: clamp(0.9rem, 2vh, 1.2rem);
-  color: #000;
+  color: #fff;
+  mix-blend-mode: difference;
   margin-bottom: max(1vh, 0.5rem);
 }
 
