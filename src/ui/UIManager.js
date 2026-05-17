@@ -520,24 +520,24 @@ function renderScoreBoardView(container) {
   const playerRanks = getPlayerRankings();
 
   let gameRanksHTML = gameRanks.map((r, i) => `
-    <li class="rank-item" style="color: #fff; border-color: rgba(255,255,255,0.2);">
-      <span class="rank-num" style="color: #fff;">${i + 1}</span>
+    <li class="rank-item" style="color: ${boardContrast}; border-color: ${boardBorderColor};">
+      <span class="rank-num" style="color: ${boardContrast};">${i + 1}</span>
       <span class="rank-name">${r.game}</span>
-      <span class="rank-score" style="color: #fff;">${r.score.toLocaleString()}</span>
+      <span class="rank-score" style="color: ${boardContrast};">${r.score.toLocaleString()}</span>
     </li>
   `).join('');
 
-  if (gameRanks.length === 0) gameRanksHTML = '<li class="rank-item" style="color: #fff;">기록이 없습니다.</li>';
+  if (gameRanks.length === 0) gameRanksHTML = `<li class="rank-item" style="color: ${boardContrast};">기록이 없습니다.</li>`;
 
   let playerRanksHTML = playerRanks.map((r, i) => `
-    <li class="rank-item" style="color: #fff; border-color: rgba(255,255,255,0.2);">
-      <span class="rank-num" style="color: #fff;">${i + 1}</span>
+    <li class="rank-item" style="color: ${boardContrast}; border-color: ${boardBorderColor};">
+      <span class="rank-num" style="color: ${boardContrast};">${i + 1}</span>
       <span class="rank-name">${r.playerName} [${r.originGame}]</span>
-      <span class="rank-score" style="color: #fff;">${r.score.toLocaleString()}</span>
+      <span class="rank-score" style="color: ${boardContrast};">${r.score.toLocaleString()}</span>
     </li>
   `).join('');
 
-  if (playerRanks.length === 0) playerRanksHTML = '<li class="rank-item" style="color: #fff;">기록이 없습니다.</li>';
+  if (playerRanks.length === 0) playerRanksHTML = `<li class="rank-item" style="color: ${boardContrast};">기록이 없습니다.</li>`;
 
   const targetRGB = toRGBString(state.targetColor);
   const userRGB = toRGBString(state.userColor);
@@ -546,6 +546,13 @@ function renderScoreBoardView(container) {
   
   const leftContrast = getContrastYIQ(state.targetColor.r, state.targetColor.g, state.targetColor.b);
   const rightContrast = getContrastYIQ(state.userColor.r, state.userColor.g, state.userColor.b);
+
+  // 랭킹 영역 배경의 평균 대비색 계산
+  const avgR = Math.round((state.targetColor.r + state.userColor.r) / 2);
+  const avgG = Math.round((state.targetColor.g + state.userColor.g) / 2);
+  const avgB = Math.round((state.targetColor.b + state.userColor.b) / 2);
+  const boardContrast = getContrastYIQ(avgR, avgG, avgB);
+  const boardBorderColor = boardContrast === '#000000' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)';
 
   let targetGradient = targetRGB;
   let userGradient = userRGB;
@@ -560,7 +567,7 @@ function renderScoreBoardView(container) {
   let breakdownHTML = '';
   if (state.roundResults && state.roundResults.length > 0) {
     breakdownHTML = `
-      <div style="display: flex; flex-direction: column; gap: 0.5rem; text-align: left; font-size: clamp(1rem, 1.5vw, 1.3rem); font-weight: 300; color: rgba(255,255,255,0.9); letter-spacing: 1px;">
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; text-align: left; font-size: clamp(1rem, 1.5vw, 1.3rem); font-weight: 300; color: ${leftContrast}; opacity: 0.9; letter-spacing: 1px;">
         ${state.roundResults.map((r, i) => `<div>${i + 1}라운드 &nbsp;&nbsp;<span style="font-weight:500;">${r.score.toLocaleString()}</span></div>`).join('')}
       </div>
     `;
@@ -577,12 +584,9 @@ function renderScoreBoardView(container) {
         
 
 
-        <!-- 중앙 영역: 라운드 결과 + 최종 스코어 -->
+        <!-- 중앙 영역: 최종 스코어 (크게) + 라운드별 (작게 가로) -->
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 4rem; margin-top: 2rem;">
 
-          <div style="display: flex; align-items: center; justify-content: center; gap: clamp(2rem, 5vw, 4rem); flex-wrap: wrap;">
-            ${breakdownHTML}
-            
             <div style="display: flex; flex-direction: column; text-align: center;">
               <div class="magazine-score" style="background: linear-gradient(to right, ${leftContrast} 50%, ${rightContrast} 50%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0;">
                 <span class="animated-score" data-target="${state.score}">0</span>
@@ -591,20 +595,26 @@ function renderScoreBoardView(container) {
                 </span>
               </div>
             </div>
+
+            ${state.roundResults && state.roundResults.length > 0 ? `
+              <div style="display: flex; gap: clamp(1rem, 3vw, 2.5rem); margin-top: 1rem; font-size: clamp(0.85rem, 1.5vw, 1.1rem); font-weight: 300; color: ${leftContrast}; opacity: 0.85; letter-spacing: 1px;">
+                ${state.roundResults.map((r, i) => `<span>${i + 1}R <span style="font-weight:600;">${r.score.toLocaleString()}</span></span>`).join('')}
+              </div>
+            ` : ''}
           </div>
         </div>
         
-        <div class="magazine-scoreboard">
+        <div class="magazine-scoreboard" style="background: transparent; border: none; backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);">
           <div class="scoreboard-grid" style="margin-top: 0; padding-bottom: 5rem;">
             <div class="score-card" style="background: none; border: none; padding: 0;">
-              <h3>게임별 랭킹</h3>
+              <h3 style="color: ${boardContrast}; -webkit-text-fill-color: ${boardContrast}; border-bottom-color: ${boardBorderColor};">게임별 랭킹</h3>
               <ul class="rank-list">
                 ${gameRanksHTML}
               </ul>
             </div>
             
             <div class="score-card" style="background: none; border: none; padding: 0;">
-              <h3>플레이어 랭킹</h3>
+              <h3 style="color: ${boardContrast}; -webkit-text-fill-color: ${boardContrast}; border-bottom-color: ${boardBorderColor};">플레이어 랭킹</h3>
               <ul class="rank-list">
                 ${playerRanksHTML}
               </ul>
