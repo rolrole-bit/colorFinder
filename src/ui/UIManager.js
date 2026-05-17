@@ -8,7 +8,9 @@ import {
   playBonusBounceSound, 
   playScoreTickSound, 
   playScoreImpactSound,
-  playEvaluationSound
+  playEvaluationSound,
+  playReadySound,
+  playGoSound
 } from '../utils/SoundUtils.js';
 
 // Helper to calculate best contrast (Black or White) based on background luminance
@@ -224,11 +226,13 @@ function renderEntryView(container) {
       const introText = document.getElementById('intro-text');
       if (introText) {
         scrambleTypingEffect(introText, '준비하시고', 1000);
+        playReadySound();
       }
       
       setTimeout(() => {
         if (introText) {
           scrambleTypingEffect(introText, '선수 입장!', 1000);
+          playGoSound();
         }
         
         setTimeout(() => {
