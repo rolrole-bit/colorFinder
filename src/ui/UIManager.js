@@ -233,7 +233,7 @@ function renderGameView(container) {
   const state = getState();
   
   container.innerHTML = `
-    <div style="position: absolute; top: 1.2vh; left: 5vw; font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: #fff; background-color: rgba(0,0,0,0.5); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px; z-index: 100;">
+    <div style="position: absolute; top: 1.2vh; left: 5vw; font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: ${contrastYIQ}; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px; z-index: 100;">
       ROUND ${state.currentRound} / ${state.maxRounds}
     </div>
     <div class="full-screen-color" id="memorize-screen" style="background-color: ${rgbString}; display: flex; justify-content: center; align-items: center;">
@@ -266,7 +266,7 @@ function renderGameView(container) {
     const targetHsl = `hsl(${state.targetColor.h}, ${state.targetColor.s}%, ${state.targetColor.l}%)`;
     
     container.innerHTML = `
-      <div style="position: absolute; top: 1.2vh; left: 5vw; font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: #fff; background-color: rgba(0,0,0,0.5); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px; z-index: 100;">
+      <div id="round-text" style="position: absolute; top: 1.2vh; left: 5vw; font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: #fff; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px; z-index: 100;">
         ROUND ${state.currentRound} / ${state.maxRounds}
       </div>
       <div class="animated-gradient-bg"></div>
@@ -363,6 +363,11 @@ function renderGameView(container) {
             outerBg.style.background = rgbString;
           }
           
+          const roundText = document.getElementById('round-text');
+          if (roundText) {
+            roundText.style.color = contrastBg;
+          }
+          
           if (progress < 1) {
             hexAnimFrame = requestAnimationFrame(animate);
           }
@@ -454,7 +459,7 @@ function renderInterimResultView(container) {
         
         <!-- 상단 라운드 표시 (좌측 고정) -->
         <div style="display: flex; justify-content: flex-start; width: 100%; flex-shrink: 0; margin-bottom: auto; padding-left: 2vw;">
-          <div style="font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: #fff; background-color: rgba(0,0,0,0.5); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px;">
+          <div style="font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: ${leftContrast}; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px;">
             ROUND ${state.currentRound} / ${state.maxRounds}
           </div>
         </div>
@@ -519,38 +524,33 @@ function renderScoreBoardView(container) {
   const gameRanks = getGameRankings();
   const playerRanks = getPlayerRankings();
 
-  // 대비색 계산을 먼저 수행 (랭킹 HTML에서 참조하므로)
-  const leftContrast = getContrastYIQ(state.targetColor.r, state.targetColor.g, state.targetColor.b);
-  const rightContrast = getContrastYIQ(state.userColor.r, state.userColor.g, state.userColor.b);
-
-  const avgR = Math.round((state.targetColor.r + state.userColor.r) / 2);
-  const avgG = Math.round((state.targetColor.g + state.userColor.g) / 2);
-  const avgB = Math.round((state.targetColor.b + state.userColor.b) / 2);
-  const boardContrast = getContrastYIQ(avgR, avgG, avgB);
-  const boardBorderColor = boardContrast === '#000000' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)';
-
   let gameRanksHTML = gameRanks.map((r, i) => `
-    <li class="rank-item" style="color: ${boardContrast}; border-color: ${boardBorderColor};">
-      <span class="rank-num" style="color: ${boardContrast};">${i + 1}</span>
+    <li class="rank-item" style="color: #fff; border-color: rgba(255,255,255,0.2);">
+      <span class="rank-num" style="color: #fff;">${i + 1}</span>
       <span class="rank-name">${r.game}</span>
-      <span class="rank-score" style="color: ${boardContrast};">${r.score.toLocaleString()}</span>
+      <span class="rank-score" style="color: #fff;">${r.score.toLocaleString()}</span>
     </li>
   `).join('');
 
-  if (gameRanks.length === 0) gameRanksHTML = `<li class="rank-item" style="color: ${boardContrast};">기록이 없습니다.</li>`;
+  if (gameRanks.length === 0) gameRanksHTML = '<li class="rank-item" style="color: #fff;">기록이 없습니다.</li>';
 
   let playerRanksHTML = playerRanks.map((r, i) => `
-    <li class="rank-item" style="color: ${boardContrast}; border-color: ${boardBorderColor};">
-      <span class="rank-num" style="color: ${boardContrast};">${i + 1}</span>
+    <li class="rank-item" style="color: #fff; border-color: rgba(255,255,255,0.2);">
+      <span class="rank-num" style="color: #fff;">${i + 1}</span>
       <span class="rank-name">${r.playerName} [${r.originGame}]</span>
-      <span class="rank-score" style="color: ${boardContrast};">${r.score.toLocaleString()}</span>
+      <span class="rank-score" style="color: #fff;">${r.score.toLocaleString()}</span>
     </li>
   `).join('');
 
-  if (playerRanks.length === 0) playerRanksHTML = `<li class="rank-item" style="color: ${boardContrast};">기록이 없습니다.</li>`;
+  if (playerRanks.length === 0) playerRanksHTML = '<li class="rank-item" style="color: #fff;">기록이 없습니다.</li>';
 
   const targetRGB = toRGBString(state.targetColor);
   const userRGB = toRGBString(state.userColor);
+  const targetHex = rgbToHex(state.targetColor.r, state.targetColor.g, state.targetColor.b);
+  const userHex = rgbToHex(state.userColor.r, state.userColor.g, state.userColor.b);
+  
+  const leftContrast = getContrastYIQ(state.targetColor.r, state.targetColor.g, state.targetColor.b);
+  const rightContrast = getContrastYIQ(state.userColor.r, state.userColor.g, state.userColor.b);
 
   let targetGradient = targetRGB;
   let userGradient = userRGB;
@@ -565,54 +565,51 @@ function renderScoreBoardView(container) {
   let breakdownHTML = '';
   if (state.roundResults && state.roundResults.length > 0) {
     breakdownHTML = `
-      <div style="display: flex; flex-direction: column; gap: 0.5rem; text-align: left; font-size: clamp(1rem, 1.5vw, 1.3rem); font-weight: 300; color: ${leftContrast}; opacity: 0.9; letter-spacing: 1px;">
-        ${state.roundResults.map((r, i) => `<div>${i + 1}라운드 &nbsp;&nbsp;<span style="font-weight:500;">${r.score.toLocaleString()}</span></div>`).join('')}
+      <div style="display: flex; flex-direction: row; gap: 1rem; flex-wrap: wrap; justify-content: center; font-size: 1rem; font-weight: 300; color: rgba(255,255,255,0.9); letter-spacing: 1px; margin-top: 1rem;">
+        ${state.roundResults.map((r, i) => `<div>${i + 1}라운드 <span style="font-weight:500; color: #fff;">${r.score.toLocaleString()}</span></div>`).join('')}
       </div>
     `;
   }
 
   container.innerHTML = `
-    <div class="split-screen-result" id="score-panel" style="overflow-y: auto;">
-      <!-- 50:50 분할 배경 (고정) -->
-      <div class="split-screen-half" style="background: ${targetGradient}; position: fixed; top: 0; left: 0; width: 50vw; height: 100vh;"></div>
-      <div class="split-screen-half" style="background: ${userGradient}; position: fixed; top: 0; right: 0; width: 50vw; height: 100vh;"></div>
+    <div class="split-screen-result" id="score-panel">
+      <!-- 50:50 분할 배경 -->
+      <div class="split-screen-half" style="background: ${targetGradient};"></div>
+      <div class="split-screen-half" style="background: ${userGradient};"></div>
       
       <!-- 매거진 오버레이 -->
-      <div class="magazine-overlay" style="position: relative; justify-content: flex-start; height: auto; min-height: 100vh; padding-top: 3rem; gap: 2rem;">
+      <div class="magazine-overlay">
         
 
 
-        <!-- 중앙 영역: 최종 스코어 (크게) + 라운드별 (작게 가로) -->
+        <!-- 중앙 영역: 라운드 결과 + 최종 스코어 -->
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 4rem; margin-top: 2rem;">
 
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
             <div style="display: flex; flex-direction: column; text-align: center;">
-              <div class="magazine-score" style="background: linear-gradient(to right, ${leftContrast} 50%, ${rightContrast} 50%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0;">
+              <div style="font-size: 1.2rem; font-weight: 300; opacity: 0.8; letter-spacing: 2px; color: #fff; margin-bottom: -1rem;">종합 점수</div>
+              <div class="magazine-score" style="background: linear-gradient(to right, ${leftContrast} 50%, ${rightContrast} 50%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0; font-size: clamp(5rem, 18vw, 10rem);">
                 <span class="animated-score" data-target="${state.score}">0</span>
-                <span style="font-size: 0.3em; font-weight: 300; opacity: 0.8; letter-spacing: 1px; white-space: nowrap; display: block; margin-top: -1rem;">
+                <span style="font-size: 0.25em; font-weight: 300; opacity: 0.8; letter-spacing: 1px; white-space: nowrap; display: block; margin-top: -1rem;">
                   ${state.difficulty} ×${DIFFICULTY_MULTIPLIER[state.difficulty]}
                 </span>
               </div>
             </div>
-
-            ${state.roundResults && state.roundResults.length > 0 ? `
-              <div style="display: flex; gap: clamp(1rem, 3vw, 2.5rem); margin-top: 1rem; font-size: clamp(0.85rem, 1.5vw, 1.1rem); font-weight: 300; color: ${leftContrast}; opacity: 0.85; letter-spacing: 1px;">
-                ${state.roundResults.map((r, i) => `<span>${i + 1}R <span style="font-weight:600;">${r.score.toLocaleString()}</span></span>`).join('')}
-              </div>
-            ` : ''}
+            ${breakdownHTML}
           </div>
         </div>
         
-        <div class="magazine-scoreboard" style="background: transparent; border: none; backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);">
+        <div class="magazine-scoreboard">
           <div class="scoreboard-grid" style="margin-top: 0; padding-bottom: 5rem;">
             <div class="score-card" style="background: none; border: none; padding: 0;">
-              <h3 style="color: ${boardContrast}; -webkit-text-fill-color: ${boardContrast}; border-bottom-color: ${boardBorderColor};">게임별 랭킹</h3>
+              <h3>게임별 랭킹</h3>
               <ul class="rank-list">
                 ${gameRanksHTML}
               </ul>
             </div>
             
             <div class="score-card" style="background: none; border: none; padding: 0;">
-              <h3 style="color: ${boardContrast}; -webkit-text-fill-color: ${boardContrast}; border-bottom-color: ${boardBorderColor};">플레이어 랭킹</h3>
+              <h3>플레이어 랭킹</h3>
               <ul class="rank-list">
                 ${playerRanksHTML}
               </ul>
