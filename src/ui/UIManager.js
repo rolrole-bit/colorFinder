@@ -1,8 +1,8 @@
-import { MMO_GAMES } from '../utils/Constants.js';
-import { getRandomColor, calculateAccuracy, toRGBString, hslToRgb, rgbToHex, getContrastColor } from '../utils/ColorUtils.js';
-import { getState, setPlayerInfo, setTargetColor, setUserColor, setScore, resetGame, setDifficulty, setPhase, DIFFICULTY_TIME, setTimeTaken, addRoundResult, nextRound } from '../core/GameState.js';
-import { saveRecord, getGameRankings, getPlayerRankings, getAllGameRankings } from '../core/Ranking.js';
-import { CustomVerticalSlider } from './CustomSlider.js';
+import { MMO_GAMES } from '../utils/Constants.js?v=2';
+import { getRandomColor, calculateAccuracy, toRGBString, hslToRgb, rgbToHex, getContrastColor } from '../utils/ColorUtils.js?v=2';
+import { getState, setPlayerInfo, setTargetColor, setUserColor, setScore, resetGame, setDifficulty, setPhase, DIFFICULTY_TIME, setTimeTaken, addRoundResult, nextRound } from '../core/GameState.js?v=2';
+import { saveRecord, getGameRankings, getPlayerRankings, getAllGameRankings } from '../core/Ranking.js?v=2';
+import { CustomVerticalSlider } from './CustomSlider.js?v=2';
 
 // Helper to calculate best contrast (Black or White) based on background luminance
 const getContrastYIQ = (r, g, b) => {
