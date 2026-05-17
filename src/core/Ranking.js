@@ -31,27 +31,49 @@ export function saveRecord(playerName, originGame, score) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
 }
 
-/**
- * 게임별 정확도 순위를 계산하여 반환합니다. (상위 5개)
- * 각 게임별로 최고 점수(또는 평균)를 기준으로 할 수 있으나, 여기서는 해당 게임의 '최고 점수'를 기준으로 합니다.
- * @returns {Array} [{ game: '마비노기', score: 98.5 }, ...]
- */
 export function getGameRankings() {
   const records = getRecords();
-  const gameMap = {};
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const prevGameMap = {};
+  const currGameMap = {};
 
   records.forEach(r => {
-    if (!gameMap[r.originGame] || gameMap[r.originGame] < r.score) {
-      gameMap[r.originGame] = r.score;
+    const recordDate = new Date(r.date);
+    
+    if (!currGameMap[r.originGame] || currGameMap[r.originGame] < r.score) {
+      currGameMap[r.originGame] = r.score;
+    }
+    
+    if (recordDate < today) {
+      if (!prevGameMap[r.originGame] || prevGameMap[r.originGame] < r.score) {
+        prevGameMap[r.originGame] = r.score;
+      }
     }
   });
 
-  const sortedGames = Object.keys(gameMap).map(game => ({
-    game,
-    score: gameMap[game]
-  })).sort((a, b) => b.score - a.score);
+  const getSortedRanks = (map) => {
+    return Object.keys(map)
+      .map(game => ({ game, score: map[game] }))
+      .sort((a, b) => b.score - a.score)
+      .map((item, index) => ({ ...item, rank: index + 1 }));
+  };
 
-  return sortedGames.slice(0, 5);
+  const prevRanks = getSortedRanks(prevGameMap);
+  const currRanks = getSortedRanks(currGameMap);
+
+  return currRanks.slice(0, 10).map(curr => {
+    const prevItem = prevRanks.find(p => p.game === curr.game);
+    let trend = 0;
+    let isNew = false;
+    if (prevItem) {
+      trend = prevItem.rank - curr.rank; // Positive means rank went up
+    } else {
+      isNew = true;
+    }
+    return { ...curr, trend, isNew };
+  });
 }
 
 /**

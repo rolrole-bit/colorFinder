@@ -48,21 +48,30 @@ body {
   overflow-x: hidden;
 }
 
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+@keyframes rotateAurora {
+  from { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  to { transform: rotate(360deg) scale(1); }
 }
 
 .animated-gradient-bg {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: linear-gradient(270deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb, #ffdfa0, #ffb3b3);
-  background-size: 1200% 1200%;
-  animation: gradientShift 30s ease infinite;
+  top: -50vh;
+  left: -50vw;
+  width: 200vw;
+  height: 200vh;
+  /* 3가지 이상의 다채로운 색상 조합 */
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    #ff9a9e 0deg,
+    #c2e9fb 90deg,
+    #a1c4fd 180deg,
+    #fecfef 270deg,
+    #ff9a9e 360deg
+  );
+  filter: blur(120px);
+  animation: rotateAurora 25s linear infinite;
+  will-change: transform;
   z-index: -1;
 }
 
@@ -399,11 +408,11 @@ input[type="range"]::-webkit-slider-thumb:active {
 /* === NEW: Memorize Phase Text === */
 .memorize-hint {
   position: absolute;
-  top: 3rem;
-  right: 3rem;
+  top: clamp(1rem, 5vh, 3rem);
+  right: clamp(1rem, 5vw, 3rem);
   font-family: 'Paperlogy', sans-serif;
   font-weight: 300;
-  font-size: 3.5rem;
+  font-size: clamp(2rem, 8vw, 3.5rem);
   text-align: right;
   z-index: 1001;
   /* color will be set dynamically via JS */
@@ -444,7 +453,7 @@ input[type="range"]::-webkit-slider-thumb:active {
 }
 
 .custom-v-slider-wrapper {
-  width: 80px; /* Fixed width back to 80px as requested by design */
+  width: clamp(40px, 15vw, 80px); /* Responsive width to avoid breaking on vertical screens */
   height: 100%;
   position: relative;
   border-right: 1px solid rgba(0, 0, 0, 0.6);
@@ -488,12 +497,12 @@ input[type="range"]::-webkit-slider-thumb:active {
 
 .submit-minimal-btn {
   position: absolute;
-  bottom: 3rem;
-  right: 3rem;
+  bottom: clamp(1rem, 5vh, 3rem);
+  right: clamp(1rem, 5vw, 3rem);
   font-family: 'Paperlogy', sans-serif;
   font-weight: 300;
-  font-size: 2rem;
-  letter-spacing: 3px;
+  font-size: clamp(1.2rem, 5vw, 2rem);
+  letter-spacing: clamp(1px, 1vw, 3px);
   color: #fff;
   background: #000; /* Will be overridden dynamically in JS */
   border: none;
@@ -578,8 +587,9 @@ input[type="range"]::-webkit-slider-thumb:active {
 }
 
 .magazine-scoreboard {
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
   padding: clamp(1.5rem, 3vh, 2.5rem);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
@@ -810,41 +820,8 @@ input[type="text"].minimal-input:focus {
     padding: 1.2rem;
   }
   
-  .vertical-sliders-container {
-    width: 100%;
-    height: 150px;
-    flex-direction: column;
-    left: 0;
-    bottom: 0;
-    top: auto;
-    box-shadow: none;
-  }
-
-  .v-slider-wrapper {
-    width: 100vw;
-    height: 50px;
-    border-right: none;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-
-  .v-slider {
-    /* Unrotate for mobile */
-    transform: translate(-50%, -50%) rotate(0deg);
-    width: 100vw;
-    height: 50px;
-  }
-  
-  .v-slider::-webkit-slider-thumb {
-    width: 2px;
-    height: 50px;
-    margin-top: 0;
-    background-image: none;
-  }
-
-  /* Wait, if the slider is unrotated, background linear-gradients for wrappers need to change */
-  #hue-wrapper {
-    background: linear-gradient(to right, 
-      #ff0000 0%, #ffff00 17%, #00ff00 33%, 
-      #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+  /* 모바일 세로 화면에서는 슬라이더들이 너무 많은 자리를 차지하지 않도록 폭만 줄여줍니다 (세로 UI 유지) */
+  .custom-v-slider-wrapper {
+    width: clamp(20px, 8vw, 40px);
   }
 }

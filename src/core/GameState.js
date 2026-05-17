@@ -52,8 +52,8 @@ export function setTimeTaken(time) {
   state.timeTaken = time;
 }
 
-export function addRoundResult(score, timeTaken) {
-  state.roundResults.push({ score, timeTaken });
+export function addRoundResult(score, timeTaken, targetColor, userColor) {
+  state.roundResults.push({ score, timeTaken, targetColor, userColor });
 }
 
 export function nextRound() {

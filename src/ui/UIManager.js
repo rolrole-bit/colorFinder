@@ -42,6 +42,23 @@ const scrambleTypingEffect = (element, text, duration = 1000) => {
   }, stepTime);
 };
 
+const animateValue = (element, start, end, duration) => {
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    const easeProgress = progress * (2 - progress); // ease-out quad
+    const current = (start + (end - start) * easeProgress).toFixed(1);
+    element.innerHTML = current;
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    } else {
+      element.innerHTML = end.toFixed(1);
+    }
+  };
+  window.requestAnimationFrame(step);
+};
+
 export function initUI() {
   const app = document.getElementById('app');
   renderEntryView(app);
@@ -91,13 +108,20 @@ function renderEntryView(container) {
     gameDropdown.innerHTML = '';
     const ranks = getGameRankings();
     const rankMap = {};
-    ranks.forEach((r, i) => { rankMap[r.game] = i + 1; });
+    ranks.forEach(r => { 
+      rankMap[r.game] = { rank: r.rank, trend: r.trend, isNew: r.isNew }; 
+    });
 
-    let list = MMO_GAMES.map(g => ({
-      name: g,
-      rank: rankMap[g] || Infinity,
-      label: rankMap[g] ? `${g} [${rankMap[g]}위]` : g
-    }));
+    let list = MMO_GAMES.map(g => {
+      const data = rankMap[g];
+      return {
+        name: g,
+        rank: data ? data.rank : Infinity,
+        trend: data ? data.trend : 0,
+        isNew: data ? data.isNew : false,
+        label: g
+      };
+    });
 
     if (filterVal) {
       list = list.filter(item => item.name.toLowerCase().includes(filterVal));
@@ -112,7 +136,14 @@ function renderEntryView(container) {
       const div = document.createElement('div');
       div.className = 'dropdown-item';
       if (item.rank !== Infinity) {
-        div.innerHTML = `${item.name} <span style="font-weight: 600; opacity: 0.7; font-size: 0.9em; margin-left: 0.3rem;">[${item.rank}위]</span>`;
+        let trendStr = '';
+        if (item.isNew) trendStr = ' (NEW)';
+        else if (item.trend > 0) trendStr = ` (🔺${item.trend})`;
+        else if (item.trend < 0) trendStr = ` (🔻${Math.abs(item.trend)})`;
+        else trendStr = ' (-)';
+
+        const rankPrefix = item.rank === 1 ? '현재 ' : '';
+        div.innerHTML = `${item.name} <span style="font-weight: 600; opacity: 0.7; font-size: 0.9em; margin-left: 0.3rem;">[${rankPrefix}${item.rank}위${trendStr}]</span>`;
       } else {
         div.textContent = item.label;
       }
@@ -379,9 +410,8 @@ function renderGameView(container) {
         }
       }
       
-      const direction = window.innerWidth <= 768 ? 'to right' : 'to top';
-      satWrapper.style.background = `linear-gradient(${direction}, hsl(${currentH}, 0%, 50%) 0%, hsl(${currentH}, 100%, 50%) 100%)`;
-      lightWrapper.style.background = `linear-gradient(${direction}, #000 0%, hsl(${currentH}, ${currentS}%, 50%) 50%, #fff 100%)`;
+      satWrapper.style.background = `linear-gradient(to top, hsl(${currentH}, 0%, 50%) 0%, hsl(${currentH}, 100%, 50%) 100%)`;
+      lightWrapper.style.background = `linear-gradient(to top, #000 0%, hsl(${currentH}, ${currentS}%, 50%) 50%, #fff 100%)`;
     };
 
     // Initialize custom sliders
@@ -411,7 +441,7 @@ function renderGameView(container) {
       const state = getState();
       const accuracy = calculateAccuracy(state.targetColor, state.userColor, elapsedSec);
       
-      addRoundResult(accuracy, elapsedSec);
+      addRoundResult(accuracy, elapsedSec, state.targetColor, state.userColor);
       setScore(accuracy);
       
       const panel = document.querySelector('.vertical-sliders-container');
@@ -464,7 +494,7 @@ function renderInterimResultView(container) {
           </div>
           
           <div class="magazine-score" style="background: linear-gradient(to right, ${leftContrast} 50%, ${rightContrast} 50%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            ${state.score}%
+            <span class="animated-score" data-target="${state.score}">0.0</span>%
             <div style="font-size: 0.25em; font-weight: 300; opacity: 0.8; letter-spacing: 1px; margin-top: 0.5rem;">
               (${state.timeTaken.toFixed(1)}s)
             </div>
@@ -477,6 +507,12 @@ function renderInterimResultView(container) {
       </div>
     </div>
   `;
+
+  const animatedScore = container.querySelector('.animated-score');
+  if (animatedScore) {
+    const target = parseFloat(animatedScore.getAttribute('data-target'));
+    animateValue(animatedScore, 0, target, 1200);
+  }
 
   document.getElementById('next-round-btn').addEventListener('click', () => {
     const panel = document.getElementById('interim-panel');
@@ -539,6 +575,16 @@ function renderScoreBoardView(container) {
   const leftContrast = getContrastYIQ(state.targetColor.r, state.targetColor.g, state.targetColor.b);
   const rightContrast = getContrastYIQ(state.userColor.r, state.userColor.g, state.userColor.b);
 
+  let targetGradient = targetRGB;
+  let userGradient = userRGB;
+  if (state.roundResults && state.roundResults.length > 0) {
+    // Collect all valid colors from history
+    const tColors = state.roundResults.map(r => r.targetColor ? toRGBString(r.targetColor) : targetRGB).join(', ');
+    const uColors = state.roundResults.map(r => r.userColor ? toRGBString(r.userColor) : userRGB).join(', ');
+    targetGradient = `linear-gradient(to bottom, ${tColors})`;
+    userGradient = `linear-gradient(to bottom, ${uColors})`;
+  }
+
   let breakdownHTML = '';
   if (state.roundResults && state.roundResults.length > 0) {
     breakdownHTML = `
@@ -551,39 +597,23 @@ function renderScoreBoardView(container) {
   container.innerHTML = `
     <div class="split-screen-result" id="score-panel">
       <!-- 50:50 분할 배경 -->
-      <div class="split-screen-half" style="background-color: ${targetRGB};"></div>
-      <div class="split-screen-half" style="background-color: ${userRGB};"></div>
+      <div class="split-screen-half" style="background: ${targetGradient};"></div>
+      <div class="split-screen-half" style="background: ${userGradient};"></div>
       
       <!-- 매거진 오버레이 -->
       <div class="magazine-overlay">
         
-        <!-- 상단 라운드 표시 (좌측 고정) -->
-        <div style="display: flex; justify-content: flex-start; width: 100%; flex-shrink: 0;">
-          <div style="font-size: clamp(1rem, 2vw, 1.5rem); color: #fff; background-color: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 2px;">
-            ROUND ${state.currentRound} / ${state.maxRounds}
-          </div>
-        </div>
 
-        <!-- 중앙 영역: 헥스코드 + 스코어 -->
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-          <div style="display: flex; gap: 4rem; margin-bottom: 1.5rem;">
-            <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${targetRGB}; background-color: ${leftContrast}; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px;">
-              ${targetHex}
-            </div>
-            <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${userRGB}; background-color: ${rightContrast}; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px;">
-              ${userHex}
-            </div>
-          </div>
-          
-          <div style="display: flex; align-items: center; justify-content: center; gap: 4rem;">
+
+        <!-- 중앙 영역: 라운드 결과 + 최종 스코어 -->
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 4rem; margin-top: 2rem;">
+
+          <div style="display: flex; align-items: center; justify-content: center; gap: clamp(2rem, 5vw, 4rem); flex-wrap: wrap;">
             ${breakdownHTML}
             
             <div style="display: flex; flex-direction: column; text-align: center;">
-              <div style="font-size: clamp(1rem, 1.5vw, 1.3rem); color: rgba(255,255,255,0.9); font-weight: 300; letter-spacing: 4px; margin-bottom: -1rem; z-index: 1;">
-                평균
-              </div>
               <div class="magazine-score" style="background: linear-gradient(to right, ${leftContrast} 50%, ${rightContrast} 50%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0;">
-                ${state.score}%
+                <span class="animated-score" data-target="${state.score}">0.0</span>%
                 <span style="font-size: 0.3em; font-weight: 300; opacity: 0.8; letter-spacing: 1px; white-space: nowrap; display: block; margin-top: -1rem;">
                   (${state.timeTaken.toFixed(1)}s)
                 </span>
@@ -593,7 +623,7 @@ function renderScoreBoardView(container) {
         </div>
         
         <div class="magazine-scoreboard">
-          <div class="scoreboard-grid" style="margin-top: 0;">
+          <div class="scoreboard-grid" style="margin-top: 0; padding-bottom: 5rem;">
             <div class="score-card" style="background: none; border: none; padding: 0;">
               <h3>게임별 랭킹</h3>
               <ul class="rank-list">
@@ -608,13 +638,20 @@ function renderScoreBoardView(container) {
               </ul>
             </div>
           </div>
-          <div style="margin-top: 3rem; text-align: center;">
-            <button class="magazine-start-btn" id="retry-btn" style="width: 100%; margin-top: 2rem;">다시 하기</button>
-          </div>
         </div>
+      </div>
+      
+      <div style="position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); width: calc(100% - 4rem); max-width: 1000px; z-index: 3000; text-align: center;">
+        <button class="magazine-start-btn" id="retry-btn" style="width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">다시 하기</button>
       </div>
     </div>
   `;
+
+  const animatedScore = container.querySelector('.animated-score');
+  if (animatedScore) {
+    const target = parseFloat(animatedScore.getAttribute('data-target'));
+    animateValue(animatedScore, 0, target, 1200);
+  }
 
   document.getElementById('retry-btn').addEventListener('click', () => {
     resetGame();
