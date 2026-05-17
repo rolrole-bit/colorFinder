@@ -1,8 +1,8 @@
-import { MMO_GAMES } from '../utils/Constants.js?v=2';
-import { getRandomColor, calculateAccuracy, toRGBString, hslToRgb, rgbToHex, getContrastColor } from '../utils/ColorUtils.js?v=2';
-import { getState, setPlayerInfo, setTargetColor, setUserColor, setScore, resetGame, setDifficulty, setPhase, DIFFICULTY_TIME, setTimeTaken, addRoundResult, nextRound } from '../core/GameState.js?v=2';
-import { saveRecord, getGameRankings, getPlayerRankings, getAllGameRankings } from '../core/Ranking.js?v=2';
-import { CustomVerticalSlider } from './CustomSlider.js?v=2';
+import { MMO_GAMES } from '../utils/Constants.js';
+import { getRandomColor, calculateAccuracy, toRGBString, hslToRgb, rgbToHex, getContrastColor } from '../utils/ColorUtils.js';
+import { getState, setPlayerInfo, setTargetColor, setUserColor, setScore, resetGame, setDifficulty, setPhase, DIFFICULTY_TIME, setTimeTaken, addRoundResult, nextRound } from '../core/GameState.js';
+import { saveRecord, getGameRankings, getPlayerRankings } from '../core/Ranking.js';
+import { CustomVerticalSlider } from './CustomSlider.js';
 
 // Helper to calculate best contrast (Black or White) based on background luminance
 const getContrastYIQ = (r, g, b) => {
@@ -48,56 +48,32 @@ export function initUI() {
 }
 
 function renderEntryView(container) {
-  const gameRanks = getGameRankings();
-  const playerRanks = getPlayerRankings();
-
-  let gameRanksHTML = gameRanks.map((r, i) => `
-    <li class="rank-item" style="color: #fff; border-color: rgba(255,255,255,0.2);">
-      <span class="rank-num" style="color: #fff;">${i + 1}</span>
-      <span class="rank-name">${r.game}</span>
-      <span class="rank-score" style="color: #fff;">${r.score}%</span>
-    </li>
-  `).join('');
-
-  if (gameRanks.length === 0) gameRanksHTML = '<li class="rank-item" style="color: #fff;">기록이 없습니다.</li>';
-
-  let playerRanksHTML = playerRanks.map((r, i) => `
-    <li class="rank-item" style="color: #fff; border-color: rgba(255,255,255,0.2);">
-      <span class="rank-num" style="color: #fff;">${i + 1}</span>
-      <span class="rank-name">[${r.originGame}] ${r.playerName}</span>
-      <span class="rank-score" style="color: #fff;">${r.score}%</span>
-    </li>
-  `).join('');
-
-  if (playerRanks.length === 0) playerRanksHTML = '<li class="rank-item" style="color: #fff;">기록이 없습니다.</li>';
-
   container.innerHTML = `
-    <div class="animated-gradient-bg" id="entry-bg" style="position: fixed;"></div>
-    
-      <div class="magazine-entry" id="entry-panel" style="min-height: 100vh;">
-        <h1 class="magazine-title">DYE<br/>MASTER</h1>
-        
-        <div class="entry-form">
-          <div class="form-group dropdown-container" style="position: relative;">
-            <span class="diff-label">어느게임 출신이세요?</span>
-            <input type="text" id="origin-game" class="minimal-input" placeholder="게임을 검색하거나 선택하세요" autocomplete="off" />
-            <div class="dropdown-list hidden" id="game-dropdown" style="width: 100%;"></div>
-          </div>
-          <div class="form-group">
-            <span class="diff-label">당신의 이름은?</span>
-            <input type="text" id="player-name" class="minimal-input" placeholder="닉네임을 입력하세요" autocomplete="off" />
-          </div>
-          <div class="form-group difficulty-group">
-            <span class="diff-label">난이도 (기억 시간)</span>
-            <div class="radio-group clean" style="mix-blend-mode: difference; color: #fff;">
-              <label><input type="radio" name="difficulty" value="Easy"> 쉬움 (5초)</label>
-              <label><input type="radio" name="difficulty" value="Normal" checked> 보통 (3초)</label>
-              <label><input type="radio" name="difficulty" value="Hard"> 어려움 (1초)</label>
-            </div>
-          </div>
-          <button class="btn magazine-start-btn" id="start-btn" disabled>START</button>
+    <div class="animated-gradient-bg" id="entry-bg"></div>
+    <div class="magazine-entry" id="entry-panel">
+      <h1 class="magazine-title">DYE<br/>MASTER</h1>
+      
+      <div class="entry-form">
+        <div class="form-group dropdown-container" style="position: relative;">
+          <span class="diff-label">어느게임 출신이세요?</span>
+          <input type="text" id="origin-game" class="minimal-input" placeholder="게임을 검색하거나 선택하세요" autocomplete="off" />
+          <div class="dropdown-list hidden" id="game-dropdown" style="width: 100%;"></div>
         </div>
+        <div class="form-group">
+          <span class="diff-label">당신의 이름은?</span>
+          <input type="text" id="player-name" class="minimal-input" placeholder="닉네임을 입력하세요" autocomplete="off" />
+        </div>
+        <div class="form-group difficulty-group">
+          <span class="diff-label">난이도 (기억 시간)</span>
+          <div class="radio-group clean">
+            <label><input type="radio" name="difficulty" value="Easy"> 쉬움 (5초)</label>
+            <label><input type="radio" name="difficulty" value="Normal" checked> 보통 (3초)</label>
+            <label><input type="radio" name="difficulty" value="Hard"> 어려움 (1초)</label>
+          </div>
+        </div>
+        <button class="btn magazine-start-btn" id="start-btn" disabled>START</button>
       </div>
+    </div>
   `;
 
   const playerNameInput = document.getElementById('player-name');
@@ -111,70 +87,67 @@ function renderEntryView(container) {
 
   playerNameInput.addEventListener('input', validate);
   
-  const populateDropdown = (filterText = '') => {
+  const renderDropdownList = (filterVal = '') => {
     gameDropdown.innerHTML = '';
-    
-    const rankedGamesData = getAllGameRankings();
-    const rankedGameNames = rankedGamesData.map(r => r.game);
-    const unrankedGames = MMO_GAMES.filter(g => !rankedGameNames.includes(g));
-    let fullList = [...rankedGameNames, ...unrankedGames];
-    
-    if (filterText) {
-      fullList = fullList.filter(g => g.toLowerCase().includes(filterText.toLowerCase()));
+    const ranks = getGameRankings();
+    const rankMap = {};
+    ranks.forEach((r, i) => { rankMap[r.game] = i + 1; });
+
+    let list = MMO_GAMES.map(g => ({
+      name: g,
+      rank: rankMap[g] || Infinity,
+      label: rankMap[g] ? `${g} [${rankMap[g]}위]` : g
+    }));
+
+    if (filterVal) {
+      list = list.filter(item => item.name.toLowerCase().includes(filterVal));
     }
+
+    // Sort by rank ascending
+    list.sort((a, b) => a.rank - b.rank);
     
-    if (fullList.length === 0 && filterText !== '') {
-      fullList = ["기타 (직접 입력)"];
-    } else {
-      fullList.push("기타 (직접 입력)");
-    }
-    
-    fullList.forEach(g => {
+    list.push({ name: "기타 (직접 입력)", label: "기타 (직접 입력)", rank: Infinity });
+
+    list.forEach(item => {
       const div = document.createElement('div');
       div.className = 'dropdown-item';
-      
-      let displayText = g;
-      const rankIndex = rankedGameNames.indexOf(g);
-      if (rankIndex !== -1) {
-        displayText = `${g} [현재 ${rankIndex + 1}위]`;
+      if (item.rank !== Infinity) {
+        div.innerHTML = `${item.name} <span style="font-weight: 600; opacity: 0.7; font-size: 0.9em; margin-left: 0.3rem;">[${item.rank}위]</span>`;
+      } else {
+        div.textContent = item.label;
       }
       
-      div.textContent = displayText;
       div.addEventListener('click', () => {
-        if (g === "기타 (직접 입력)") {
+        if (item.name === "기타 (직접 입력)") {
           originGameInput.value = "";
           originGameInput.placeholder = "출신 게임을 직접 입력하세요";
           originGameInput.focus();
         } else {
-          originGameInput.value = g;
+          originGameInput.value = item.name;
         }
         gameDropdown.classList.add('hidden');
         validate();
       });
       gameDropdown.appendChild(div);
     });
-    
-    if (fullList.length > 0) {
-      gameDropdown.classList.remove('hidden');
-    } else {
-      gameDropdown.classList.add('hidden');
-    }
   };
 
   originGameInput.addEventListener('input', (e) => {
-    const val = e.target.value.trim();
+    const val = e.target.value.trim().toLowerCase();
     if (val === '') {
       gameDropdown.classList.add('hidden');
       validate();
       return;
     }
-    populateDropdown(val);
+    renderDropdownList(val);
+    gameDropdown.classList.remove('hidden');
     validate();
   });
 
   originGameInput.addEventListener('focus', () => {
     if (originGameInput.value.trim() === '') {
-      populateDropdown();
+      renderDropdownList('');
+      gameDropdown.classList.remove('hidden');
     }
   });
 
@@ -263,23 +236,20 @@ function renderGameView(container) {
     const targetHsl = `hsl(${state.targetColor.h}, ${state.targetColor.s}%, ${state.targetColor.l}%)`;
     
     container.innerHTML = `
+      <div style="position: absolute; top: 2rem; left: 2.5rem; font-size: 1.5rem; color: #fff; background-color: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 2px; z-index: 100;">
+        ROUND ${state.currentRound} / ${state.maxRounds}
+      </div>
       <div class="animated-gradient-bg"></div>
       <div id="game-box" class="game-box-container">
         <div id="target-bg" class="split-bg" style="background-color: ${targetHsl};"></div>
         <div id="guess-bg" class="split-bg" style="background-color: hsl(180, 50%, 50%);"></div>
         
-        <div style="position: absolute; top: 1.5rem; left: 0; right: 0; padding: 0 clamp(1rem, 5vw, 2.5rem); display: flex; justify-content: space-between; align-items: flex-start; z-index: 100; pointer-events: none;">
-          <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: #fff; background-color: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 2px;">
-            ROUND ${state.currentRound} / ${state.maxRounds}
+        <div style="position: absolute; top: 2rem; right: 2rem; display: flex; gap: 1rem; z-index: 10;">
+          <div id="timer-display" style="font-family: 'Paperlogy', sans-serif; font-size: 2rem; font-weight: 300; letter-spacing: 3px; padding: 0.5rem 1rem; border-radius: 8px;">
+            0.0s
           </div>
-          
-          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;">
-            <div id="timer-display" style="background-color: rgba(0,0,0,0.5); font-family: 'Paperlogy', sans-serif; font-size: clamp(1.2rem, 4vw, 2rem); font-weight: 300; letter-spacing: 3px; padding: 0.5rem 1rem; border-radius: 8px; color: #fff;">
-              0.0s
-            </div>
-            <div id="hex-display" style="background-color: rgba(0,0,0,0.5); font-family: 'Paperlogy', sans-serif; font-size: clamp(1.2rem, 4vw, 2rem); font-weight: 300; letter-spacing: 3px; padding: 0.5rem 1rem; border-radius: 8px; color: #fff;">
-              #000000
-            </div>
+          <div id="hex-display" style="font-family: 'Paperlogy', sans-serif; font-size: 2rem; font-weight: 300; letter-spacing: 3px; padding: 0.5rem 1rem; border-radius: 8px;">
+            #000000
           </div>
         </div>
         
@@ -572,30 +542,8 @@ function renderScoreBoardView(container) {
   let breakdownHTML = '';
   if (state.roundResults && state.roundResults.length > 0) {
     breakdownHTML = `
-      <div style="display: flex; width: 100vw; max-width: 1200px; align-items: center; margin-top: 2rem; margin-bottom: 3rem;">
-        
-        <!-- Left: Round breakdown -->
-        <div style="flex: 1; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 1rem; font-family: 'Paperlogy', sans-serif; font-size: clamp(1.2rem, 3vw, 2.2rem); font-weight: 300; letter-spacing: 2px; padding-right: clamp(1.5rem, 5vw, 4rem); color: ${leftContrast}; border-right: 2px solid ${leftContrast}40;">
-          ${state.roundResults.map((r, i) => `
-            <div>
-              ${i + 1}라운드 <span style="font-weight: 800; margin-left: 1rem;">${r.score}%</span>
-            </div>
-          `).join('')}
-        </div>
-
-        <!-- Right: Big Average Score -->
-        <div style="flex: 1; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-left: clamp(1.5rem, 5vw, 4rem); color: ${rightContrast};">
-          <div style="font-family: 'Paperlogy', sans-serif; font-size: clamp(1.2rem, 2.5vw, 2rem); font-weight: 800; letter-spacing: 4px; margin-bottom: -1rem; margin-left: 0.5rem;">
-            평균
-          </div>
-          <div class="magazine-score" style="margin: 0; font-size: clamp(5rem, 15vw, 15rem); color: inherit; text-align: left; background: none; -webkit-text-fill-color: initial;">
-            ${state.score}%
-            <div style="font-size: 0.2em; font-weight: 300; opacity: 0.8; letter-spacing: 2px; margin-top: -1rem; text-align: left; margin-left: 1rem;">
-              (${state.timeTaken.toFixed(1)}s)
-            </div>
-          </div>
-        </div>
-
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; text-align: left; font-size: clamp(1rem, 1.5vw, 1.3rem); font-weight: 300; color: rgba(255,255,255,0.9); letter-spacing: 1px;">
+        ${state.roundResults.map((r, i) => `<div>${i + 1}라운드 &nbsp;&nbsp;<span style="font-weight:500;">${r.score}%</span></div>`).join('')}
       </div>
     `;
   }
@@ -607,7 +555,7 @@ function renderScoreBoardView(container) {
       <div class="split-screen-half" style="background-color: ${userRGB};"></div>
       
       <!-- 매거진 오버레이 -->
-      <div class="magazine-overlay" style="align-items: center;">
+      <div class="magazine-overlay">
         
         <!-- 상단 라운드 표시 (좌측 고정) -->
         <div style="display: flex; justify-content: flex-start; width: 100%; flex-shrink: 0;">
@@ -617,23 +565,31 @@ function renderScoreBoardView(container) {
         </div>
 
         <!-- 중앙 영역: 헥스코드 + 스코어 -->
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
-          <div style="display: flex; justify-content: center; width: 100%; gap: 4rem; margin-bottom: 2rem;">
-            <!-- Left Hex -->
-            <div style="flex: 1; display: flex; justify-content: flex-end;">
-              <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${targetRGB}; background-color: ${leftContrast}; padding: 0.5rem 1.5rem; border-radius: 8px; font-weight: 800; letter-spacing: 3px;">
-                ${targetHex}
-              </div>
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <div style="display: flex; gap: 4rem; margin-bottom: 1.5rem;">
+            <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${targetRGB}; background-color: ${leftContrast}; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px;">
+              ${targetHex}
             </div>
-            <!-- Right Hex -->
-            <div style="flex: 1; display: flex; justify-content: flex-start;">
-              <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${userRGB}; background-color: ${rightContrast}; padding: 0.5rem 1.5rem; border-radius: 8px; font-weight: 800; letter-spacing: 3px;">
-                ${userHex}
-              </div>
+            <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${userRGB}; background-color: ${rightContrast}; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px;">
+              ${userHex}
             </div>
           </div>
           
-          ${breakdownHTML}
+          <div style="display: flex; align-items: center; justify-content: center; gap: 4rem;">
+            ${breakdownHTML}
+            
+            <div style="display: flex; flex-direction: column; text-align: center;">
+              <div style="font-size: clamp(1rem, 1.5vw, 1.3rem); color: rgba(255,255,255,0.9); font-weight: 300; letter-spacing: 4px; margin-bottom: -1rem; z-index: 1;">
+                평균
+              </div>
+              <div class="magazine-score" style="background: linear-gradient(to right, ${leftContrast} 50%, ${rightContrast} 50%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0;">
+                ${state.score}%
+                <span style="font-size: 0.3em; font-weight: 300; opacity: 0.8; letter-spacing: 1px; white-space: nowrap; display: block; margin-top: -1rem;">
+                  (${state.timeTaken.toFixed(1)}s)
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div class="magazine-scoreboard">

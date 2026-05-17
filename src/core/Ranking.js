@@ -73,25 +73,3 @@ export function getPlayerRankings() {
   const sortedPlayers = Object.values(playerMap).sort((a, b) => b.score - a.score);
   return sortedPlayers.slice(0, 5);
 }
-
-/**
- * 모든 게임의 순위를 반환합니다.
- * @returns {Array} [{ game: '마비노기', score: 98.5 }, ...]
- */
-export function getAllGameRankings() {
-  const records = getRecords();
-  const gameMap = {};
-
-  records.forEach(r => {
-    if (!gameMap[r.originGame] || gameMap[r.originGame] < r.score) {
-      gameMap[r.originGame] = r.score;
-    }
-  });
-
-  const sortedGames = Object.keys(gameMap).map(game => ({
-    game,
-    score: gameMap[game]
-  })).sort((a, b) => b.score - a.score);
-
-  return sortedGames;
-}

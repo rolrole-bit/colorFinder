@@ -1,4 +1,4 @@
-import { initUI } from './ui/UIManager.js?v=2';
+import { initUI } from './ui/UIManager.js';
 
 /**
  * 앱 진입점
