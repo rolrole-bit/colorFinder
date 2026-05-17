@@ -533,7 +533,7 @@ function renderScoreBoardView(container) {
   let playerRanksHTML = playerRanks.map((r, i) => `
     <li class="rank-item" style="color: #fff; border-color: rgba(255,255,255,0.2);">
       <span class="rank-num" style="color: #fff;">${i + 1}</span>
-      <span class="rank-name">[${r.originGame}] ${r.playerName}</span>
+      <span class="rank-name">${r.playerName} [${r.originGame}]</span>
       <span class="rank-score" style="color: #fff;">${r.score.toLocaleString()}점</span>
     </li>
   `).join('');
