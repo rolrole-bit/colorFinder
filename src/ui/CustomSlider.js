@@ -72,8 +72,16 @@ export class CustomVerticalSlider {
     this.value = this.max - (ratio * (this.max - this.min));
 
     // 정수형 반올림
-    this.value = Math.round(this.value);
+    const newValue = Math.round(this.value);
 
+    if (newValue !== this.lastValue) {
+      import('../utils/SoundUtils.js').then(module => {
+        module.playSliderTickSound();
+      });
+      this.lastValue = newValue;
+    }
+    
+    this.value = newValue;
     this.updateThumbPosition(ratio);
     this.onChange(this.value);
   }

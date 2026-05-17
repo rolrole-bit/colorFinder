@@ -16,29 +16,87 @@ export function getRandomColor() {
 }
 
 /**
- * 두 RGB 색상 간의 정확도를 기반으로 점수를 계산합니다.
- * 공식: accuracy² × 1000 (난이도 배율 적용 전 기본 점수)
+ * RGB 값을 HSB(HSV)로 변환합니다.
+ * @param {number} r (0-255)
+ * @param {number} g (0-255)
+ * @param {number} b (0-255)
+ * @returns {{h: number, s: number, b: number}} h: 0-360, s: 0-100, b: 0-100
+ */
+export function rgbToHsv(r, g, b) {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const d = max - min;
+  
+  let h = 0;
+  let s = (max === 0 ? 0 : d / max);
+  let v = max;
+  
+  if (max !== min) {
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  
+  return {
+    h: Math.round(h * 360),
+    s: Math.round(s * 100),
+    b: Math.round(v * 100)
+  };
+}
+
+/**
+ * 두 RGB 색상 간의 정확도를 HSB(HSV) 원뿔(Cone) 공간에서의 거리를 기반으로 점수를 계산합니다.
+ * 인간의 시각적 인지에 훨씬 가까운 유사도 점수를 산출합니다.
  * 
  * @param {{r: number, g: number, b: number}} target - 목표 색상
  * @param {{r: number, g: number, b: number}} user - 유저가 선택한 색상
  * @returns {number} 0 ~ 1000 (정수)
- * 
- * 내부 동작:
- *   1. RGB 각 채널 차이의 절대값 합산 (deltaE: 0~765)
- *   2. 정확도 비율 계산 (accuracy: 0.0~1.0)
- *   3. 제곱하여 고정밀 매칭에 큰 보상 부여
- *   4. 1000을 곱해 최종 기본 점수 산출
  */
 export function calculateScore(target, user) {
-  const rDiff = Math.abs(target.r - user.r);
-  const gDiff = Math.abs(target.g - user.g);
-  const bDiff = Math.abs(target.b - user.b);
+  const tHsv = rgbToHsv(target.r, target.g, target.b);
+  const uHsv = rgbToHsv(user.r, user.g, user.b);
   
-  const totalDiff = rDiff + gDiff + bDiff;
-  const maxDiff = 255 * 3; // 765
+  // Normalize values to 0.0 ~ 1.0
+  const h1 = tHsv.h / 360.0;
+  const s1 = tHsv.s / 100.0;
+  const v1 = tHsv.b / 100.0;
   
-  const accuracy = (maxDiff - totalDiff) / maxDiff; // 0.0 ~ 1.0
-  const baseScore = Math.pow(accuracy, 2) * 1000;
+  const h2 = uHsv.h / 360.0;
+  const s2 = uHsv.s / 100.0;
+  const v2 = uHsv.b / 100.0;
+  
+  // Convert polar HSV coordinates to Cartesian coordinates in the HSV Cone
+  // This inherently handles the fact that hue doesn't matter when saturation is 0,
+  // and neither hue nor saturation matter when brightness is 0.
+  const x1 = s1 * v1 * Math.cos(h1 * 2 * Math.PI);
+  const y1 = s1 * v1 * Math.sin(h1 * 2 * Math.PI);
+  const z1 = v1;
+  
+  const x2 = s2 * v2 * Math.cos(h2 * 2 * Math.PI);
+  const y2 = s2 * v2 * Math.sin(h2 * 2 * Math.PI);
+  const z2 = v2;
+  
+  const dx = x1 - x2;
+  const dy = y1 - y2;
+  const dz = z1 - z2;
+  
+  // Calculate Euclidean distance
+  const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+  // Maximum possible distance in this cone is 2.0 (e.g., Red (1,0,1) to Cyan (-1,0,1))
+  const maxDist = 2.0; 
+  
+  const accuracy = Math.max(0, (maxDist - dist) / maxDist); // 0.0 ~ 1.0
+  
+  // Apply a power curve to heavily penalize far colors and reward close matches
+  // Power of 4 gives a very satisfying, realistic human-perception curve
+  const baseScore = Math.pow(accuracy, 4) * 1000;
   
   return Math.floor(Math.max(0, Math.min(1000, baseScore)));
 }

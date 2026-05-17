@@ -29,15 +29,38 @@ export const DIFFICULTY_TIME = {
 
 /**
  * 난이도별 점수 배율
- * Easy: 기본 점수 그대로 (×1.0)
- * Normal: 20% 보너스 (×1.2)
- * Hard: 30% 보너스 (×1.3)
  */
 export const DIFFICULTY_MULTIPLIER = {
   "Easy": 1.0,
-  "Normal": 1.2,
-  "Hard": 1.3
+  "Normal": 1.1,
+  "Hard": 1.2
 };
+
+export function getDifficultyTime(diff) {
+  if (diff === "Hell") {
+    // 0.2초 ~ 0.3초 (200 ~ 300ms)
+    return Math.floor(Math.random() * 100) + 200;
+  }
+  return DIFFICULTY_TIME[diff] || 2000;
+}
+
+export function getDifficultyMultiplier(diff) {
+  if (diff === "Hell") {
+    // 1.25 ~ 1.30 (소수점 둘째자리까지)
+    return parseFloat((Math.random() * 0.05 + 1.25).toFixed(2));
+  }
+  return DIFFICULTY_MULTIPLIER[diff] || 1.0;
+}
+
+export function getDifficultyName(diff) {
+  switch(diff) {
+    case "Easy": return "일반";
+    case "Normal": return "어려움";
+    case "Hard": return "매우어려움";
+    case "Hell": return "지옥";
+    default: return diff;
+  }
+}
 
 export function setPlayerInfo(name, game) {
   state.playerName = name;
