@@ -8,7 +8,6 @@ import {
   playBonusBounceSound, 
   playScoreTickSound, 
   playScoreImpactSound,
-  playEvaluationSound,
   playReadySound,
   playGoSound,
   playSubmitSound
@@ -549,20 +548,6 @@ function renderInterimResultView(container) {
   });
 }
 
-function getEvaluationMessage(score) {
-  if (score === 0) return "버그인가요? 아니면 고의인가요?";
-  if (score < 100) return "모니터가 흑백인가요? 안과 검진을 추천합니다.";
-  if (score < 200) return "고양이가 대신 마우스를 클릭한 게 확실합니다.";
-  if (score < 300) return "안과 관련 건강검진을 조심스럽게 추천 드립니다.";
-  if (score < 400) return "이 정도면 나쁘지 않...긴 개뿔 분발하세요!";
-  if (score < 500) return "평범한 머글의 시력을 가지셨군요!";
-  if (score < 600) return "동네 화방에서 물감 좀 만져보신 솜씨!";
-  if (score < 700) return "당신의 눈썰미, 제법 쓸만할지도?";
-  if (score < 800) return "디자이너 준비생이신가요? 색감이 예사롭지 않군요!";
-  if (score < 900) return "인간 스포이드가 나타났다! 엄청난 색채 감각!";
-  return "당신은 빛의 마술사! 모니터 픽셀과 물아일체 되셨습니다!";
-}
-
 function renderScoreBoardView(container, appliedMultiplier = 1.0) {
   const state = getState();
   const gameRanks = getGameRankings();
@@ -608,16 +593,9 @@ function renderScoreBoardView(container, appliedMultiplier = 1.0) {
 
   let breakdownHTML = '';
   if (state.roundResults && state.roundResults.length > 0) {
-    const baseTotal = state.roundResults.reduce((acc, r) => acc + r.score, 0);
-    const avgBaseScore = baseTotal / state.roundResults.length;
-    const evalMessage = getEvaluationMessage(avgBaseScore);
-    
     breakdownHTML = `
       <div style="display: flex; flex-direction: row; gap: 1rem; flex-wrap: wrap; justify-content: center; font-size: 1.1rem; font-weight: 400; letter-spacing: 1px; margin-top: 1rem; color: #fff; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
         ${state.roundResults.map((r, i) => `<div>${i + 1}라운드 <span class="animated-gradient-text" style="font-weight:800; font-size: 1.2em; display: inline-block;">${r.score.toLocaleString()}</span></div>`).join('')}
-      </div>
-      <div id="evaluation-text" style="font-size: 1.4rem; font-weight: 700; opacity: 0; margin-top: 1.5rem; color: #fff; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); transition: opacity 1s ease; max-width: 80%; text-align: center; word-break: keep-all; line-height: 1.4;">
-        ${evalMessage}
       </div>
     `;
   }
@@ -694,23 +672,11 @@ function renderScoreBoardView(container, appliedMultiplier = 1.0) {
         setTimeout(() => {
           animatedScoreFinal.parentElement.classList.add('anim-score-impact');
           playScoreImpactSound();
-          animateValue(animatedScoreFinal, baseTotal, finalTarget, 1000, true, true).then(() => {
-            const evalText = document.getElementById('evaluation-text');
-            if (evalText) {
-              evalText.style.opacity = '1';
-              playEvaluationSound();
-            }
-          });
+          animateValue(animatedScoreFinal, baseTotal, finalTarget, 1000, true, true);
         }, 800);
       });
     } else {
-      animateValue(animatedScoreFinal, 0, finalTarget, 1200, true, true).then(() => {
-        const evalText = document.getElementById('evaluation-text');
-        if (evalText) {
-          evalText.style.opacity = '1';
-          playEvaluationSound();
-        }
-      });
+      animateValue(animatedScoreFinal, 0, finalTarget, 1200, true, true);
     }
   }
 
