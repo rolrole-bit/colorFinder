@@ -166,16 +166,17 @@ input[type="text"]:focus {
   top: calc(100% + 2px); /* right below the border */
   left: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0;
   max-height: 30vh;
   overflow-y: auto;
   z-index: 1000;
-  margin-top: 4px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  margin-top: 0;
+  box-shadow: none;
+  mix-blend-mode: difference;
 }
 
 .dropdown-item {
@@ -687,8 +688,7 @@ input[type="text"].minimal-input:focus {
   font-family: 'Paperlogy', sans-serif;
   font-weight: 300;
   font-size: clamp(0.9rem, 2vh, 1.2rem);
-  color: #fff;
-  mix-blend-mode: difference;
+  color: #000;
   margin-bottom: max(1vh, 0.5rem);
 }
 

@@ -91,7 +91,7 @@ function renderEntryView(container) {
           </div>
           <div class="form-group difficulty-group">
             <span class="diff-label">난이도 (기억 시간)</span>
-            <div class="radio-group clean" style="mix-blend-mode: difference; color: #fff;">
+            <div class="radio-group clean">
               <label><input type="radio" name="difficulty" value="Easy"> 쉬움 (5초)</label>
               <label><input type="radio" name="difficulty" value="Normal" checked> 보통 (3초)</label>
               <label><input type="radio" name="difficulty" value="Hard"> 어려움 (1초)</label>
