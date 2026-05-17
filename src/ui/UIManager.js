@@ -1,7 +1,7 @@
 import { MMO_GAMES } from '../utils/Constants.js';
 import { getRandomColor, calculateAccuracy, toRGBString, hslToRgb, rgbToHex, getContrastColor } from '../utils/ColorUtils.js';
 import { getState, setPlayerInfo, setTargetColor, setUserColor, setScore, resetGame, setDifficulty, setPhase, DIFFICULTY_TIME, setTimeTaken, addRoundResult, nextRound } from '../core/GameState.js';
-import { saveRecord, getGameRankings, getPlayerRankings } from '../core/Ranking.js';
+import { saveRecord, getGameRankings, getPlayerRankings, getAllGameRankings } from '../core/Ranking.js';
 import { CustomVerticalSlider } from './CustomSlider.js';
 
 // Helper to calculate best contrast (Black or White) based on background luminance
@@ -111,24 +111,35 @@ function renderEntryView(container) {
 
   playerNameInput.addEventListener('input', validate);
   
-  originGameInput.addEventListener('input', (e) => {
-    const val = e.target.value.trim().toLowerCase();
+  const populateDropdown = (filterText = '') => {
     gameDropdown.innerHTML = '';
     
-    if (val === '') {
-      gameDropdown.classList.add('hidden');
-      validate();
-      return;
-    }
-
-    const filtered = MMO_GAMES.filter(g => g.toLowerCase().includes(val));
+    const rankedGamesData = getAllGameRankings();
+    const rankedGameNames = rankedGamesData.map(r => r.game);
+    const unrankedGames = MMO_GAMES.filter(g => !rankedGameNames.includes(g));
+    let fullList = [...rankedGameNames, ...unrankedGames];
     
-    filtered.push("기타 (직접 입력)");
-
-    filtered.forEach(g => {
+    if (filterText) {
+      fullList = fullList.filter(g => g.toLowerCase().includes(filterText.toLowerCase()));
+    }
+    
+    if (fullList.length === 0 && filterText !== '') {
+      fullList = ["기타 (직접 입력)"];
+    } else {
+      fullList.push("기타 (직접 입력)");
+    }
+    
+    fullList.forEach(g => {
       const div = document.createElement('div');
       div.className = 'dropdown-item';
-      div.textContent = g;
+      
+      let displayText = g;
+      const rankIndex = rankedGameNames.indexOf(g);
+      if (rankIndex !== -1) {
+        displayText = `${g} [현재 ${rankIndex + 1}위]`;
+      }
+      
+      div.textContent = displayText;
       div.addEventListener('click', () => {
         if (g === "기타 (직접 입력)") {
           originGameInput.value = "";
@@ -142,33 +153,28 @@ function renderEntryView(container) {
       });
       gameDropdown.appendChild(div);
     });
+    
+    if (fullList.length > 0) {
+      gameDropdown.classList.remove('hidden');
+    } else {
+      gameDropdown.classList.add('hidden');
+    }
+  };
 
-    gameDropdown.classList.remove('hidden');
+  originGameInput.addEventListener('input', (e) => {
+    const val = e.target.value.trim();
+    if (val === '') {
+      gameDropdown.classList.add('hidden');
+      validate();
+      return;
+    }
+    populateDropdown(val);
     validate();
   });
 
   originGameInput.addEventListener('focus', () => {
     if (originGameInput.value.trim() === '') {
-      gameDropdown.innerHTML = '';
-      const list = [...MMO_GAMES, "기타 (직접 입력)"];
-      list.forEach(g => {
-        const div = document.createElement('div');
-        div.className = 'dropdown-item';
-        div.textContent = g;
-        div.addEventListener('click', () => {
-          if (g === "기타 (직접 입력)") {
-            originGameInput.value = "";
-            originGameInput.placeholder = "출신 게임을 직접 입력하세요";
-            originGameInput.focus();
-          } else {
-            originGameInput.value = g;
-          }
-          gameDropdown.classList.add('hidden');
-          validate();
-        });
-        gameDropdown.appendChild(div);
-      });
-      gameDropdown.classList.remove('hidden');
+      populateDropdown();
     }
   });
 
