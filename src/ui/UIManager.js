@@ -519,6 +519,16 @@ function renderScoreBoardView(container) {
   const gameRanks = getGameRankings();
   const playerRanks = getPlayerRankings();
 
+  // 대비색 계산을 먼저 수행 (랭킹 HTML에서 참조하므로)
+  const leftContrast = getContrastYIQ(state.targetColor.r, state.targetColor.g, state.targetColor.b);
+  const rightContrast = getContrastYIQ(state.userColor.r, state.userColor.g, state.userColor.b);
+
+  const avgR = Math.round((state.targetColor.r + state.userColor.r) / 2);
+  const avgG = Math.round((state.targetColor.g + state.userColor.g) / 2);
+  const avgB = Math.round((state.targetColor.b + state.userColor.b) / 2);
+  const boardContrast = getContrastYIQ(avgR, avgG, avgB);
+  const boardBorderColor = boardContrast === '#000000' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)';
+
   let gameRanksHTML = gameRanks.map((r, i) => `
     <li class="rank-item" style="color: ${boardContrast}; border-color: ${boardBorderColor};">
       <span class="rank-num" style="color: ${boardContrast};">${i + 1}</span>
@@ -541,18 +551,6 @@ function renderScoreBoardView(container) {
 
   const targetRGB = toRGBString(state.targetColor);
   const userRGB = toRGBString(state.userColor);
-  const targetHex = rgbToHex(state.targetColor.r, state.targetColor.g, state.targetColor.b);
-  const userHex = rgbToHex(state.userColor.r, state.userColor.g, state.userColor.b);
-  
-  const leftContrast = getContrastYIQ(state.targetColor.r, state.targetColor.g, state.targetColor.b);
-  const rightContrast = getContrastYIQ(state.userColor.r, state.userColor.g, state.userColor.b);
-
-  // 랭킹 영역 배경의 평균 대비색 계산
-  const avgR = Math.round((state.targetColor.r + state.userColor.r) / 2);
-  const avgG = Math.round((state.targetColor.g + state.userColor.g) / 2);
-  const avgB = Math.round((state.targetColor.b + state.userColor.b) / 2);
-  const boardContrast = getContrastYIQ(avgR, avgG, avgB);
-  const boardBorderColor = boardContrast === '#000000' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)';
 
   let targetGradient = targetRGB;
   let userGradient = userRGB;
