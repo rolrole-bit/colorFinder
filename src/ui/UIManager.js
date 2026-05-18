@@ -363,22 +363,22 @@ function renderGameView(container) {
     let hexAnimFrame = null;
     
     // [SECURITY] 타겟과 확실히 다른 초기 색상 생성
-    // Hue: 타겟에서 120~240도 반대쪽 (보색 근처)
-    // S/L: 타겟과 최소 25 차이
+    // Hue: 타겟에서 60~300도 오프셋 (보색 ± 랜덤 → 역추적 방지)
+    // S/L: 타겟과 최소 20 차이, 방향 랜덤
     const tH = state.targetColor.h;
     const tS = state.targetColor.s;
     const tL = state.targetColor.l;
     
-    const hueOffset = 120 + Math.floor(Math.random() * 120); // 120~240
+    const hueOffset = 60 + Math.floor(Math.random() * 240); // 60~300
     let currentH = (tH + hueOffset) % 360;
     
-    const sOffset = 25 + Math.floor(Math.random() * 30); // 25~54
-    let currentS = (tS + sOffset > 100) ? tS - sOffset : tS + sOffset;
-    currentS = Math.max(0, Math.min(100, currentS));
+    const sOffset = 20 + Math.floor(Math.random() * 35); // 20~54
+    const sDir = Math.random() > 0.5 ? 1 : -1;
+    let currentS = Math.max(0, Math.min(100, tS + sOffset * sDir));
     
-    const lOffset = 25 + Math.floor(Math.random() * 30);
-    let currentL = (tL + lOffset > 100) ? tL - lOffset : tL + lOffset;
-    currentL = Math.max(0, Math.min(100, currentL));
+    const lOffset = 20 + Math.floor(Math.random() * 35);
+    const lDir = Math.random() > 0.5 ? 1 : -1;
+    let currentL = Math.max(0, Math.min(100, tL + lOffset * lDir));
     
     let isGuessing = true;
 
