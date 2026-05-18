@@ -1,0 +1,114 @@
+/**
+ * ResultView - 중간 결과 화면 (라운드별 점수)
+ * 
+ * 담당: 라운드 점수 표시 + 다음 라운드/최종 결과 분기
+ */
+
+import { getState, setScore, nextRound, getDifficultyMultiplier } from '../core/GameState.js';
+import { toRGBString, rgbToHex } from '../utils/ColorUtils.js';
+import { saveRecord } from '../core/Ranking.js';
+import { isSessionValid, clampScore } from '../utils/AntiCheat.js';
+import { getContrastYIQ, animateValue } from './AnimationUtils.js';
+
+/**
+ * 중간 결과 화면 렌더링
+ * @param {HTMLElement} container - 렌더링 대상
+ * @param {object} nav - 네비게이션 콜백
+ * @param {function} nav.toGameView - 게임 화면으로 전환
+ * @param {function} nav.toScoreboardView - 스코어보드로 전환
+ */
+export function renderInterimResultView(container, nav) {
+  const state = getState();
+  const targetRGB = toRGBString(state.targetColor);
+  const userRGB = toRGBString(state.userColor);
+  const targetHex = rgbToHex(state.targetColor.r, state.targetColor.g, state.targetColor.b);
+  const userHex = rgbToHex(state.userColor.r, state.userColor.g, state.userColor.b);
+  
+  const leftContrast = getContrastYIQ(state.targetColor.r, state.targetColor.g, state.targetColor.b);
+  const rightContrast = getContrastYIQ(state.userColor.r, state.userColor.g, state.userColor.b);
+
+  container.innerHTML = `
+    <div class="split-screen-result" id="interim-panel">
+      <!-- 50:50 분할 배경 -->
+      <div class="split-screen-half" style="background-color: ${targetRGB};"></div>
+      <div class="split-screen-half" style="background-color: ${userRGB};"></div>
+      
+      <!-- 매거진 오버레이 -->
+      <div class="magazine-overlay">
+        
+        <!-- 상단 라운드 표시 -->
+        <div style="display: flex; justify-content: flex-start; width: 100%; flex-shrink: 0; margin-bottom: auto; padding-left: 2vw;">
+          <div style="font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: ${leftContrast}; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px;">
+            ROUND ${state.currentRound} / ${state.maxRounds}
+          </div>
+        </div>
+        
+        <!-- 중앙 영역: 헥스코드 + 스코어 -->
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <div style="display: flex; gap: 4rem; margin-bottom: 1rem;">
+            <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${targetRGB}; background-color: ${leftContrast}; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px;">
+              ${targetHex}
+            </div>
+            <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${userRGB}; background-color: ${rightContrast}; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px;">
+              ${userHex}
+            </div>
+          </div>
+          
+          <div class="magazine-score">
+            <div class="animated-gradient-text" style="line-height: 1;">
+              <span class="animated-score" data-target="${state.score}">0</span>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top: auto; text-align: center; width: 100%; max-width: 400px; z-index: 100; pointer-events: auto;">
+          <button class="magazine-start-btn" id="next-round-btn" style="width: 100%;">${state.currentRound < state.maxRounds ? '다음 라운드' : '최종 결과'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const animatedScore = container.querySelector('.animated-score');
+  if (animatedScore) {
+    const target = parseInt(animatedScore.getAttribute('data-target'));
+    animateValue(animatedScore, 0, target, 1200, true);
+  }
+
+  document.getElementById('next-round-btn').addEventListener('click', () => {
+    const panel = document.getElementById('interim-panel');
+    panel.style.opacity = '0';
+    panel.style.transition = 'opacity 0.4s ease';
+    setTimeout(async () => {
+      if (state.currentRound < state.maxRounds) {
+        nextRound();
+        nav.toGameView();
+      } else {
+        // [Phase 2] 서버가 계산한 최종 점수 사용
+        let finalScore;
+        let multiplier;
+        
+        if (state._serverFinalScore != null) {
+          finalScore = state._serverFinalScore;
+          multiplier = state._serverMultiplier || 1.0;
+        } else {
+          let baseTotalScore = 0;
+          state.roundResults.forEach(r => {
+            baseTotalScore += r.score;
+          });
+          multiplier = getDifficultyMultiplier(state.difficulty);
+          finalScore = Math.floor(baseTotalScore * multiplier);
+          finalScore = clampScore(finalScore, state.difficulty);
+        }
+        
+        if (!isSessionValid()) {
+          finalScore = 0;
+        }
+        
+        setScore(finalScore);
+        
+        await saveRecord(state.playerName, state.originGame, finalScore, state.difficulty);
+        nav.toScoreboardView(multiplier);
+      }
+    }, 400);
+  });
+}
