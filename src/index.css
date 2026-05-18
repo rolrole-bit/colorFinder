@@ -186,26 +186,31 @@ input[type="text"]:focus {
   top: calc(100% + 2px); /* right below the border */
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 0;
-  max-height: 30vh;
+  max-height: 14.5rem; /* 약 4.5개 아이템이 보이도록 설정하여 스크롤 암시 */
   overflow-y: auto;
   z-index: 100;
   margin-top: 0;
   box-shadow: none;
-  mix-blend-mode: difference;
+  -ms-overflow-style: none;  /* IE and Edge 스크롤바 숨김 */
+  scrollbar-width: none;  /* Firefox 스크롤바 숨김 */
+}
+
+.dropdown-list::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera 스크롤바 숨김 */
 }
 
 .dropdown-item {
   padding: 1rem 1.5rem;
   cursor: pointer;
-  color: #fff;
+  color: #000;
   font-family: 'Paperlogy', sans-serif;
   font-weight: 500;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   transition: all 0.2s;
 }
 
@@ -214,8 +219,8 @@ input[type="text"]:focus {
 }
 
 .dropdown-item:hover, .dropdown-item.active {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  background: rgba(0, 0, 0, 0.05);
+  color: #000;
 }
 
 .radio-group {
