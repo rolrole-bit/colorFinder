@@ -719,7 +719,8 @@ input[type="text"].minimal-input:focus {
 .custom-placeholder {
   position: absolute;
   left: 0;
-  top: max(1vh, 0.5rem);
+  top: 0;
+  padding: max(1vh, 0.5rem) 0;
   font-family: 'Paperlogy', 'Inter', sans-serif;
   font-size: clamp(1rem, 3vh, 1.5rem);
   pointer-events: none;
