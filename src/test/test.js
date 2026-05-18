@@ -23,7 +23,7 @@ function assertDeepEqual(actual, expected, testName) {
 }
 
 export function runTests() {
-  console.log("--- ColorFinder 단위 테스트 시작 ---");
+  console.log("--- DyeMaster 단위 테스트 시작 ---");
   
   // 1. calculateScore 테스트
   const color1 = { r: 255, g: 0, b: 0 };
@@ -64,7 +64,7 @@ export function runTests() {
   assertEqual(state.score, 2800, "상태 관리: 점수 설정 (정수)");
 
   // 4. Ranking 테스트
-  localStorage.removeItem('colorFinder_rankings');
+  localStorage.removeItem('DyeMaster_rankings');
   saveRecord("UserA", "WOW", 2800, "Normal");
   saveRecord("UserB", "WOW", 2100, "Easy");
   saveRecord("UserC", "던파", 3600, "Hard");
@@ -79,5 +79,5 @@ export function runTests() {
   assertEqual(playerRanks[0].playerName, "UserC", "플레이어 랭킹 1위 이름");
   assertEqual(playerRanks[0].score, 3600, "플레이어 랭킹 1위 점수");
   
-  console.log("--- ColorFinder 단위 테스트 종료 ---");
+  console.log("--- DyeMaster 단위 테스트 종료 ---");
 }

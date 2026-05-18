@@ -15,8 +15,8 @@ import {
   escapeHTML 
 } from '../utils/AntiCheat.js';
 
-const STORAGE_KEY = "colorFinder_rankings";
-const SIGNATURE_KEY = "colorFinder_sig";
+const STORAGE_KEY = "DyeMaster_rankings";
+const SIGNATURE_KEY = "DyeMaster_sig";
 
 /**
  * [SECURITY] 스토리지에서 기록을 가져오고 서명을 검증합니다.

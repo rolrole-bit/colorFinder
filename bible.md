@@ -1,4 +1,4 @@
-# ColorFinder Bible
+# DYE MASTER Bible
 
 ## 작업 목적
 색상 매칭 게임 "DYE MASTER"의 점수 시스템을 % 기반에서 정수 점수제로 전환하고,
