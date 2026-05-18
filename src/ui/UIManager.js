@@ -362,10 +362,23 @@ function renderGameView(container) {
     let currentDisplayedRGB = hslToRgb(180, 50, 50);
     let hexAnimFrame = null;
     
-    // [SECURITY] 매 라운드 랜덤 초기 색상 — 봇 방어
-    let currentH = Math.floor(Math.random() * 360);
-    let currentS = Math.floor(Math.random() * 100);
-    let currentL = Math.floor(Math.random() * 100);
+    // [SECURITY] 타겟과 확실히 다른 초기 색상 생성
+    // Hue: 타겟에서 120~240도 반대쪽 (보색 근처)
+    // S/L: 타겟과 최소 25 차이
+    const tH = state.targetColor.h;
+    const tS = state.targetColor.s;
+    const tL = state.targetColor.l;
+    
+    const hueOffset = 120 + Math.floor(Math.random() * 120); // 120~240
+    let currentH = (tH + hueOffset) % 360;
+    
+    const sOffset = 25 + Math.floor(Math.random() * 30); // 25~54
+    let currentS = (tS + sOffset > 100) ? tS - sOffset : tS + sOffset;
+    currentS = Math.max(0, Math.min(100, currentS));
+    
+    const lOffset = 25 + Math.floor(Math.random() * 30);
+    let currentL = (tL + lOffset > 100) ? tL - lOffset : tL + lOffset;
+    currentL = Math.max(0, Math.min(100, currentL));
     
     let isGuessing = true;
 
