@@ -306,3 +306,165 @@ export function clearSession() {
   sessionToken = null;
   sessionStartTime = 0;
 }
+
+
+// ═══════════════════════════════════════════
+// 7. [Phase 2] 행동 패턴 분석 (봇 탐지)
+// ═══════════════════════════════════════════
+
+/**
+ * 유저의 행동 패턴을 수집하여 봇 여부를 판별
+ * - 마우스/터치 이벤트 횟수
+ * - 슬라이더 조작 횟수
+ * - 제출까지의 소요 시간
+ * - 이벤트 간격의 분산 (봇은 일정한 간격)
+ */
+const behaviorLog = {
+  pointerMoves: 0,
+  sliderChanges: 0,
+  guessStartTime: 0,
+  intervals: [],
+  lastEventTime: 0
+};
+
+export function resetBehavior() {
+  behaviorLog.pointerMoves = 0;
+  behaviorLog.sliderChanges = 0;
+  behaviorLog.guessStartTime = Date.now();
+  behaviorLog.intervals = [];
+  behaviorLog.lastEventTime = Date.now();
+}
+
+export function logPointerMove() {
+  behaviorLog.pointerMoves++;
+  const now = Date.now();
+  if (behaviorLog.lastEventTime > 0) {
+    behaviorLog.intervals.push(now - behaviorLog.lastEventTime);
+  }
+  behaviorLog.lastEventTime = now;
+}
+
+export function logSliderChange() {
+  behaviorLog.sliderChanges++;
+}
+
+/**
+ * 행동 패턴이 인간적인지 판별
+ * @returns {{ isHuman: boolean, reason: string }}
+ */
+export function analyzeBehavior() {
+  const timeSpent = Date.now() - behaviorLog.guessStartTime;
+  
+  // 1. 최소 조작 시간 (1.5초 미만이면 봇 의심)
+  if (timeSpent < 1500) {
+    return { isHuman: false, reason: 'too_fast' };
+  }
+  
+  // 2. 최소 포인터 이동 (3회 미만이면 봇 의심)
+  if (behaviorLog.pointerMoves < 3) {
+    return { isHuman: false, reason: 'no_mouse_movement' };
+  }
+  
+  // 3. 최소 슬라이더 조작 (2회 미만이면 봇 의심)
+  if (behaviorLog.sliderChanges < 2) {
+    return { isHuman: false, reason: 'no_slider_interaction' };
+  }
+  
+  // 4. 이벤트 간격 분산 체크 (봇은 기계적으로 일정한 간격)
+  if (behaviorLog.intervals.length >= 5) {
+    const mean = behaviorLog.intervals.reduce((a, b) => a + b, 0) / behaviorLog.intervals.length;
+    const variance = behaviorLog.intervals.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / behaviorLog.intervals.length;
+    const cv = Math.sqrt(variance) / mean; // 변동 계수
+    
+    // 변동 계수가 0.05 미만이면 너무 규칙적 → 봇 의심
+    if (cv < 0.05 && mean < 50) {
+      return { isHuman: false, reason: 'robotic_pattern' };
+    }
+  }
+  
+  return { isHuman: true, reason: 'ok' };
+}
+
+
+// ═══════════════════════════════════════════
+// 8. [Phase 2] 타겟 색상 난독화
+// ═══════════════════════════════════════════
+
+/**
+ * 타겟 색상을 XOR 암호화하여 메모리에 저장
+ * DOM이나 getState()로 직접 읽기 어렵게 함
+ */
+const COLOR_XOR_KEY = 0xA7; // 난독화 키
+
+export function encodeColor(color) {
+  return {
+    r: color.r ^ COLOR_XOR_KEY,
+    g: color.g ^ COLOR_XOR_KEY,
+    b: color.b ^ COLOR_XOR_KEY,
+    _encoded: true
+  };
+}
+
+export function decodeColor(encoded) {
+  if (!encoded || !encoded._encoded) return encoded;
+  return {
+    r: encoded.r ^ COLOR_XOR_KEY,
+    g: encoded.g ^ COLOR_XOR_KEY,
+    b: encoded.b ^ COLOR_XOR_KEY
+  };
+}
+
+
+// ═══════════════════════════════════════════
+// 9. [Phase 2] Canvas 기반 색상 렌더링
+// ═══════════════════════════════════════════
+
+/**
+ * Canvas에 색상을 렌더링하여 DOM 스타일 속성에서 직접 읽기를 방지
+ * background-color CSS 대신 canvas 픽셀로 표현
+ * 
+ * @param {HTMLElement} container - canvas를 삽입할 컨테이너
+ * @param {{r: number, g: number, b: number}} color - RGB 색상
+ * @returns {HTMLCanvasElement} 생성된 캔버스
+ */
+export function renderColorOnCanvas(container, color) {
+  let canvas = container.querySelector('canvas.ac-canvas');
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.className = 'ac-canvas';
+    canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;';
+    container.style.position = 'relative';
+    container.insertBefore(canvas, container.firstChild);
+  }
+  
+  // 캔버스 크기를 컨테이너에 맞춤
+  canvas.width = container.clientWidth || window.innerWidth;
+  canvas.height = container.clientHeight || window.innerHeight;
+  
+  const ctx = canvas.getContext('2d');
+  
+  // 기본 색상 채우기
+  ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // [Phase 2] 미세한 노이즈 추가 (화면 캡처 봇의 단순 픽셀 추출 방해)
+  // 인간 눈에는 거의 보이지 않지만 봇의 정확한 색상 추출을 방해
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  
+  // 가장자리 1px에만 ±1 노이즈 (중앙은 순수 색상 유지)
+  for (let y = 0; y < canvas.height; y++) {
+    for (let x = 0; x < canvas.width; x++) {
+      if (x < 2 || x >= canvas.width - 2 || y < 2 || y >= canvas.height - 2) {
+        const i = (y * canvas.width + x) * 4;
+        const noise = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
+        data[i] = Math.max(0, Math.min(255, data[i] + noise));
+        data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise));
+        data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
+      }
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+  
+  return canvas;
+}

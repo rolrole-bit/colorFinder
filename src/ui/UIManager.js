@@ -22,7 +22,12 @@ import {
   isSessionValid,
   clearSession,
   startDevToolsDetection,
-  isDevToolsOpen
+  isDevToolsOpen,
+  resetBehavior,
+  logPointerMove,
+  logSliderChange,
+  analyzeBehavior,
+  renderColorOnCanvas
 } from '../utils/AntiCheat.js';
 
 // Helper to calculate best contrast (Black or White) based on background luminance
@@ -307,6 +312,9 @@ function renderGameView(container) {
     const state = getState();
     const targetHsl = `hsl(${state.targetColor.h}, ${state.targetColor.s}%, ${state.targetColor.l}%)`;
     
+    // [SECURITY Phase 2] 행동 추적 시작
+    resetBehavior();
+    
     container.innerHTML = `
       <div id="round-text" style="position: absolute; top: 1.2vh; left: 5vw; font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: #fff; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px; z-index: 100;">
         ROUND ${state.currentRound} / ${state.maxRounds}
@@ -441,18 +449,21 @@ function renderGameView(container) {
     // Initialize custom sliders
     const hueSlider = new CustomVerticalSlider(hueWrapper, {
       min: 0, max: 360, value: 180,
-      onChange: (val) => { currentH = val; updateColor(); }
+      onChange: (val) => { currentH = val; updateColor(); logSliderChange(); }
     });
     
     const satSlider = new CustomVerticalSlider(satWrapper, {
       min: 0, max: 100, value: 50,
-      onChange: (val) => { currentS = val; updateColor(); }
+      onChange: (val) => { currentS = val; updateColor(); logSliderChange(); }
     });
     
     const lightSlider = new CustomVerticalSlider(lightWrapper, {
       min: 0, max: 100, value: 50,
-      onChange: (val) => { currentL = val; updateColor(); }
+      onChange: (val) => { currentL = val; updateColor(); logSliderChange(); }
     });
+
+    // [SECURITY Phase 2] 포인터 이동 추적
+    document.addEventListener('pointermove', logPointerMove);
 
     // trigger initial color sync
     updateColor();
@@ -461,11 +472,21 @@ function renderGameView(container) {
       playSubmitSound();
       isGuessing = false;
       
+      // [SECURITY Phase 2] 포인터 추적 정리
+      document.removeEventListener('pointermove', logPointerMove);
+      
+      // [SECURITY Phase 2] 행동 분석
+      const behavior = analyzeBehavior();
+      
       const state = getState();
       const baseScore = calculateScore(state.targetColor, state.userColor);
       // [SECURITY] 라운드 점수 유효성 검증 & 클램핑
       let roundScore = Math.floor(baseScore);
       if (!isValidRoundScore(roundScore)) {
+        roundScore = 0;
+      }
+      // [SECURITY Phase 2] 봇 탐지 시 점수 무효화
+      if (!behavior.isHuman) {
         roundScore = 0;
       }
       
