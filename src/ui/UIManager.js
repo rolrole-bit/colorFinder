@@ -150,9 +150,9 @@ function renderEntryView(container) {
 
   playerNameInput.addEventListener('input', validate);
   
-  const renderDropdownList = (filterVal = '') => {
+  const renderDropdownList = async (filterVal = '') => {
     gameDropdown.innerHTML = '';
-    const ranks = getGameRankings();
+    const ranks = await getGameRankings();
     const rankMap = {};
     ranks.forEach(r => { 
       rankMap[r.game] = { rank: r.rank, trend: r.trend, isNew: r.isNew }; 
