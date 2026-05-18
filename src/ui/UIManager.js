@@ -325,6 +325,24 @@ function renderGameView(container) {
     // [SECURITY Phase 2] 행동 추적 시작
     resetBehavior();
     
+    // [SECURITY] 타겟과 확실히 다른 초기 색상 생성 (HTML 렌더링 전에 계산)
+    const tH = state.targetColor.h;
+    const tS = state.targetColor.s;
+    const tL = state.targetColor.l;
+    
+    const hueOffset = 60 + Math.floor(Math.random() * 240);
+    let currentH = (tH + hueOffset) % 360;
+    
+    const sOffset = 20 + Math.floor(Math.random() * 35);
+    const sDir = Math.random() > 0.5 ? 1 : -1;
+    let currentS = Math.max(0, Math.min(100, tS + sOffset * sDir));
+    
+    const lOffset = 20 + Math.floor(Math.random() * 35);
+    const lDir = Math.random() > 0.5 ? 1 : -1;
+    let currentL = Math.max(0, Math.min(100, tL + lOffset * lDir));
+    
+    const initHsl = `hsl(${currentH}, ${currentS}%, ${currentL}%)`;
+    
     container.innerHTML = `
       <div id="round-text" style="position: absolute; top: 1.2vh; left: 5vw; font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: #fff; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px; z-index: 100;">
         ROUND ${state.currentRound} / ${state.maxRounds}
@@ -332,7 +350,7 @@ function renderGameView(container) {
       <div class="animated-gradient-bg"></div>
       <div id="game-box" class="game-box-container">
         <div id="target-bg" class="split-bg" style="background-color: ${targetHsl};"></div>
-        <div id="guess-bg" class="split-bg" style="background-color: hsl(180, 50%, 50%);"></div>
+        <div id="guess-bg" class="split-bg" style="background-color: ${initHsl};"></div>
         
         <div style="position: absolute; top: 2rem; right: 2rem; display: flex; gap: 1rem; z-index: 10;">
           <div id="hex-display" style="font-family: 'Paperlogy', sans-serif; font-size: 2rem; font-weight: 300; letter-spacing: 3px; padding: 0.5rem 1rem; border-radius: 8px;">
@@ -369,26 +387,8 @@ function renderGameView(container) {
     const lightWrapper = document.getElementById('l-wrapper');
     const hexDisplay = document.getElementById('hex-display');
     
-    let currentDisplayedRGB = hslToRgb(180, 50, 50);
+    let currentDisplayedRGB = hslToRgb(currentH, currentS, currentL);
     let hexAnimFrame = null;
-    
-    // [SECURITY] 타겟과 확실히 다른 초기 색상 생성
-    // Hue: 타겟에서 60~300도 오프셋 (보색 ± 랜덤 → 역추적 방지)
-    // S/L: 타겟과 최소 20 차이, 방향 랜덤
-    const tH = state.targetColor.h;
-    const tS = state.targetColor.s;
-    const tL = state.targetColor.l;
-    
-    const hueOffset = 60 + Math.floor(Math.random() * 240); // 60~300
-    let currentH = (tH + hueOffset) % 360;
-    
-    const sOffset = 20 + Math.floor(Math.random() * 35); // 20~54
-    const sDir = Math.random() > 0.5 ? 1 : -1;
-    let currentS = Math.max(0, Math.min(100, tS + sOffset * sDir));
-    
-    const lOffset = 20 + Math.floor(Math.random() * 35);
-    const lDir = Math.random() > 0.5 ? 1 : -1;
-    let currentL = Math.max(0, Math.min(100, tL + lOffset * lDir));
     
     let isGuessing = true;
 
