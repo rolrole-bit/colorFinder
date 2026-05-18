@@ -1,15 +1,17 @@
 /**
- * DYE MASTER 서버 진입점
- * Express + SQLite 기반 서버사이드 랭킹 시스템
- * 
- * 기존 http-server(8080)를 대체하여 정적 파일 서빙 + API를 통합
- * 포트 8080에서 실행
+ * DYE MASTER 서버 진입점 v2.1 (Security Hardened)
+ * Express + JSON DB 기반 서버사이드 랭킹 시스템
  */
 
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { cleanupSessions } from './db.js';
+import {
+  rateLimit,
+  securityHeaders,
+  blockServerDirectory
+} from './utils/security.js';
 
 import sessionRoutes from './routes/session.js';
 import roundRoutes from './routes/round.js';
@@ -22,24 +24,51 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 // ═══════════════════════════════════════════
-// 미들웨어
+// [SECURITY] 보안 미들웨어 (순서 중요)
 // ═══════════════════════════════════════════
 
-app.use(express.json());
+// 1. 보안 헤더 (모든 응답에 적용)
+app.use(securityHeaders);
 
-// CORS (개발 환경)
+// 2. JSON 바디 크기 제한 (100KB) — DoS 방어
+app.use(express.json({ limit: '100kb' }));
+
+// 3. 잘못된 JSON 파싱 에러 핸들링
+app.use((err, req, res, next) => {
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'Payload too large' });
+  }
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'Invalid JSON' });
+  }
+  next(err);
+});
+
+// 4. server/, data/, node_modules/ 접근 차단
+app.use(blockServerDirectory);
+
+// 5. CORS (같은 호스트만 허용)
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  // 로컬 개발 환경만 허용
+  const allowedOrigins = [
+    `http://localhost:${PORT}`,
+    `http://127.0.0.1:${PORT}`
+  ];
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.sendStatus(200);
   next();
 });
 
-// 요청 로깅
+// 6. 요청 로깅 (IP 포함)
 app.use((req, res, next) => {
   if (req.url.startsWith('/api/')) {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    const ip = req.ip || req.connection.remoteAddress;
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} [${ip}]`);
   }
   next();
 });
@@ -49,19 +78,46 @@ app.use((req, res, next) => {
 // ═══════════════════════════════════════════
 
 const projectRoot = join(__dirname, '..');
-app.use(express.static(projectRoot));
+app.use(express.static(projectRoot, {
+  // dotfiles 접근 차단 (.env, .git 등)
+  dotfiles: 'deny',
+  // 디렉토리 목록 비활성화
+  index: 'index.html'
+}));
 
 // ═══════════════════════════════════════════
-// API 라우트
+// [SECURITY] Rate Limited API 라우트
 // ═══════════════════════════════════════════
 
-app.use('/api/session', sessionRoutes);
-app.use('/api/round', roundRoutes);
-app.use('/api/rankings', rankingRoutes);
+// 세션 시작: 분당 5회 (봇 세션 폭탄 방어)
+app.use('/api/session', rateLimit(5, 60 * 1000, 'session'), sessionRoutes);
+
+// 라운드 제출: 분당 20회
+app.use('/api/round', rateLimit(20, 60 * 1000, 'round'), roundRoutes);
+
+// 랭킹 조회: 분당 30회
+app.use('/api/rankings', rateLimit(30, 60 * 1000, 'ranking'), rankingRoutes);
 
 // 헬스 체크
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// ═══════════════════════════════════════════
+// 404 핸들러 (API 전용)
+// ═══════════════════════════════════════════
+
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
+// ═══════════════════════════════════════════
+// 글로벌 에러 핸들러
+// ═══════════════════════════════════════════
+
+app.use((err, req, res, next) => {
+  console.error('[ERROR]', err.message);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 // ═══════════════════════════════════════════
@@ -83,9 +139,9 @@ setInterval(() => {
 app.listen(PORT, () => {
   console.log(`
   ╔══════════════════════════════════════════╗
-  ║   🎨 DYE MASTER Server v2.0             ║
+  ║   🎨 DYE MASTER Server v2.1 (Secured)   ║
   ║   http://localhost:${PORT}                 ║
-  ║   Server-side ranking enabled            ║
+  ║   Security: Rate-Limit + Headers + Guard ║
   ╚══════════════════════════════════════════╝
   `);
 });

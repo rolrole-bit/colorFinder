@@ -1,10 +1,10 @@
 /**
- * JSON 파일 기반 데이터베이스 모듈
- * better-sqlite3 네이티브 빌드 이슈 회피를 위한 경량 대안
+ * JSON 파일 기반 데이터베이스 모듈 v2.1 (Security Hardened)
  * 
- * 데이터 구조:
- * - sessions: Map<sessionId, SessionObject>  (메모리)
- * - rankings: Array<RankingRecord>  (파일 영속)
+ * 보안 강화:
+ * - 세션 개수 상한 (MAX_SESSIONS)
+ * - 랭킹 레코드 상한 (MAX_RANKINGS)
+ * - 파일 쓰기 에러 핸들링
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
@@ -18,7 +18,10 @@ const __dirname = dirname(__filename);
 const DATA_DIR = join(__dirname, '..', 'data');
 const RANKINGS_FILE = join(DATA_DIR, 'rankings.json');
 
-// data 디렉토리 자동 생성
+// [SECURITY] 리소스 상한
+const MAX_SESSIONS = 1000;    // 동시 세션 상한
+const MAX_RANKINGS = 1000;    // 랭킹 레코드 상한
+
 mkdirSync(DATA_DIR, { recursive: true });
 
 // ═══════════════════════════════════════════
@@ -28,34 +31,51 @@ mkdirSync(DATA_DIR, { recursive: true });
 function loadRankings() {
   try {
     if (existsSync(RANKINGS_FILE)) {
-      return JSON.parse(readFileSync(RANKINGS_FILE, 'utf-8'));
+      const data = readFileSync(RANKINGS_FILE, 'utf-8');
+      // [SECURITY] 파일 크기 검증 (10MB 상한)
+      if (data.length > 10 * 1024 * 1024) {
+        console.error('[DB] rankings.json이 너무 큽니다. 초기화합니다.');
+        return [];
+      }
+      const parsed = JSON.parse(data);
+      if (!Array.isArray(parsed)) return [];
+      return parsed;
     }
   } catch (e) {
-    console.error('[DB] rankings.json 파싱 실패, 초기화합니다.', e.message);
+    console.error('[DB] rankings.json 파싱 실패:', e.message);
   }
   return [];
 }
 
 function persistRankings(rankings) {
-  writeFileSync(RANKINGS_FILE, JSON.stringify(rankings, null, 2), 'utf-8');
+  try {
+    writeFileSync(RANKINGS_FILE, JSON.stringify(rankings, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('[DB] rankings.json 저장 실패:', e.message);
+  }
 }
 
 // ═══════════════════════════════════════════
-// 세션 관리 (메모리 — 서버 재시작 시 초기화)
+// 세션 관리 (메모리)
 // ═══════════════════════════════════════════
 
 const sessions = new Map();
 
 /**
  * 새 게임 세션 생성
- * @param {string} playerName
- * @param {string} originGame
- * @param {string} difficulty
- * @param {Array} targetColors - 3라운드 분의 타겟 색상
- * @param {number} multiplier
- * @returns {string} sessionId
+ * @returns {string|null} sessionId (상한 초과 시 null)
  */
 export function createSession(playerName, originGame, difficulty, targetColors, multiplier) {
+  // [SECURITY] 세션 개수 상한 검사
+  if (sessions.size >= MAX_SESSIONS) {
+    // 오래된 미완료 세션 정리 시도
+    cleanupSessions();
+    if (sessions.size >= MAX_SESSIONS) {
+      console.warn('[DB] 세션 상한 도달:', sessions.size);
+      return null;
+    }
+  }
+
   const sessionId = crypto.randomUUID();
   
   sessions.set(sessionId, {
@@ -70,7 +90,8 @@ export function createSession(playerName, originGame, difficulty, targetColors, 
     multiplier,
     created_at: new Date().toISOString(),
     completed_at: null,
-    final_score: null
+    final_score: null,
+    _lastSubmitTime: null
   });
   
   return sessionId;
@@ -80,6 +101,8 @@ export function createSession(playerName, originGame, difficulty, targetColors, 
  * 세션 조회
  */
 export function getSession(sessionId) {
+  // [SECURITY] UUID 형식 검증
+  if (typeof sessionId !== 'string' || sessionId.length > 50) return null;
   return sessions.get(sessionId) || null;
 }
 
@@ -90,14 +113,22 @@ export function addRoundScore(sessionId, score) {
   const session = sessions.get(sessionId);
   if (!session) throw new Error('Session not found');
   
-  session.round_scores.push(score);
+  // [SECURITY] 점수 타입/범위 재검증
+  const safeScore = Math.max(0, Math.min(1500, Math.floor(Number(score) || 0)));
+  
+  session.round_scores.push(safeScore);
   session.current_round += 1;
   
   const isLast = session.current_round > session.max_rounds;
   
   if (isLast) {
     const totalBase = session.round_scores.reduce((a, b) => a + b, 0);
-    session.final_score = Math.floor(totalBase * session.multiplier);
+    let finalScore = Math.floor(totalBase * session.multiplier);
+    
+    // [SECURITY] 최종 점수 상한 (이론상 최대: 1500 * 3 * 1.4 = 6300)
+    finalScore = Math.max(0, Math.min(6300, finalScore));
+    
+    session.final_score = finalScore;
     session.completed_at = new Date().toISOString();
   }
   
@@ -112,15 +143,27 @@ export function addRoundScore(sessionId, score) {
  * 랭킹 기록 저장
  */
 export function saveRanking(playerName, originGame, score, difficulty, sessionId) {
+  // [SECURITY] 점수 재검증
+  const safeScore = Math.max(0, Math.min(6300, Math.floor(Number(score) || 0)));
+  
   const rankings = loadRankings();
+  
+  // [SECURITY] 랭킹 레코드 상한 — 오래된 것부터 제거
+  if (rankings.length >= MAX_RANKINGS) {
+    // 점수 낮은 순으로 정렬 후 하위 제거
+    rankings.sort((a, b) => b.score - a.score);
+    rankings.length = MAX_RANKINGS - 1;
+  }
+  
   rankings.push({
     player_name: playerName,
     origin_game: originGame,
-    score,
+    score: safeScore,
     difficulty,
     session_id: sessionId,
     created_at: new Date().toISOString()
   });
+  
   persistRankings(rankings);
 }
 
@@ -130,7 +173,6 @@ export function saveRanking(playerName, originGame, score, difficulty, sessionId
 export function getGameRankings() {
   const rankings = loadRankings();
   
-  // 게임별 최고점 집계
   const gameMap = {};
   rankings.forEach(r => {
     const game = r.origin_game;
@@ -140,7 +182,6 @@ export function getGameRankings() {
     gameMap[game].playCount++;
     if (r.score > gameMap[game].topScore) gameMap[game].topScore = r.score;
     
-    // 오늘 기록
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (new Date(r.created_at) >= today && r.score > gameMap[game].todayTop) {
@@ -168,7 +209,6 @@ export function getGameRankings() {
 export function getPlayerRankings() {
   const rankings = loadRankings();
   
-  // 플레이어별 최고점
   const playerMap = {};
   rankings.forEach(r => {
     const key = `${r.player_name}|${r.origin_game}`;
@@ -188,14 +228,28 @@ export function getPlayerRankings() {
 }
 
 // ═══════════════════════════════════════════
-// 세션 정리 (1시간 이상 된 미완료 세션)
+// 세션 정리 (30분 이상 된 미완료 세션 + 완료된 세션)
 // ═══════════════════════════════════════════
 
 export function cleanupSessions() {
-  const oneHourAgo = Date.now() - 60 * 60 * 1000;
+  const thirtyMinAgo = Date.now() - 30 * 60 * 1000;
+  const fiveMinAgo = Date.now() - 5 * 60 * 1000;
+  let cleaned = 0;
+  
   for (const [id, session] of sessions) {
-    if (!session.completed_at && new Date(session.created_at).getTime() < oneHourAgo) {
+    // 미완료 + 30분 경과 → 삭제
+    if (!session.completed_at && new Date(session.created_at).getTime() < thirtyMinAgo) {
       sessions.delete(id);
+      cleaned++;
     }
+    // 완료 + 5분 경과 → 삭제 (불필요한 메모리 해제)
+    if (session.completed_at && new Date(session.completed_at).getTime() < fiveMinAgo) {
+      sessions.delete(id);
+      cleaned++;
+    }
+  }
+  
+  if (cleaned > 0) {
+    console.log(`[DB] ${cleaned}개 세션 정리 완료. 현재: ${sessions.size}개`);
   }
 }
