@@ -682,7 +682,7 @@ async function renderScoreBoardView(container, appliedMultiplier = 1.0) {
     <li class="rank-item" style="border-color: currentColor;">
       <span class="rank-num">${i + 1}</span>
       <span class="rank-name">${escapeHTML(r.game)}</span>
-      <span class="rank-score">${r.score.toLocaleString()}</span>
+      <span class="rank-score">${(r.score || r.topScore || 0).toLocaleString()}</span>
     </li>
   `).join('');
 

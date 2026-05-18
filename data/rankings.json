@@ -6,5 +6,37 @@
     "difficulty": "Normal",
     "session_id": "4ef47e20-1a44-47db-acc7-33fb0250411c",
     "created_at": "2026-05-18T09:19:33.862Z"
+  },
+  {
+    "player_name": "카리나",
+    "origin_game": "마비노기 모바일",
+    "score": 2075,
+    "difficulty": "Normal",
+    "session_id": "e37bf5d6-29db-4504-a686-5c4968c1c0c7",
+    "created_at": "2026-05-18T11:30:48.425Z"
+  },
+  {
+    "player_name": "TestPlayer",
+    "origin_game": "WOW",
+    "score": 532,
+    "difficulty": "Normal",
+    "session_id": "7018a923-5198-4cfd-a4ad-bdb9661ca126",
+    "created_at": "2026-05-18T11:34:01.539Z"
+  },
+  {
+    "player_name": "TestPlayer",
+    "origin_game": "WOW",
+    "score": 817,
+    "difficulty": "Normal",
+    "session_id": "4b06d6c0-1477-40d5-aa0f-f65a7b7a466f",
+    "created_at": "2026-05-18T11:36:47.076Z"
+  },
+  {
+    "player_name": "TestPlayer",
+    "origin_game": "WOW",
+    "score": 1294,
+    "difficulty": "Easy",
+    "session_id": "559bb825-725a-47d6-b1b8-952b8147e54f",
+    "created_at": "2026-05-18T11:41:14.350Z"
   }
 ]
