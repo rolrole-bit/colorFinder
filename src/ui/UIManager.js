@@ -122,7 +122,7 @@ function renderEntryView(container) {
           <div style="position: relative;">
             <input type="text" id="player-name" class="minimal-input" placeholder=" " autocomplete="off" />
             <div class="custom-placeholder">
-              닉네임을 입력하세요<span class="blink-cursor">I</span>
+              닉네임을 입력하세요
             </div>
           </div>
         </div>

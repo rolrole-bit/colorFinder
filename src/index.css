@@ -771,7 +771,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 
 .radio-group.clean {
   display: flex;
-  gap: 2rem;
+  gap: 1rem;
   flex-wrap: wrap; /* Allows wrapping on smaller screens */
 }
 
