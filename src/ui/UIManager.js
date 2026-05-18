@@ -1,5 +1,5 @@
 import { MMO_GAMES } from '../utils/Constants.js';
-import { getRandomColor, calculateScore, toRGBString, hslToRgb, rgbToHex, getContrastColor } from '../utils/ColorUtils.js';
+import { getRandomColor, calculateScore, toRGBString, hslToRgb, rgbToHsl, rgbToHex, getContrastColor } from '../utils/ColorUtils.js';
 import { getState, setPlayerInfo, setTargetColor, setUserColor, setScore, resetGame, setDifficulty, setPhase, getDifficultyTime, getDifficultyMultiplier, getDifficultyName, addRoundResult, nextRound } from '../core/GameState.js';
 import { saveRecord, getGameRankings, getPlayerRankings } from '../core/Ranking.js';
 import { CustomVerticalSlider } from './CustomSlider.js';
@@ -320,15 +320,17 @@ function renderGameView(container) {
   function transitionToGuess() {
     setPhase("GUESS");
     const state = getState();
-    const targetHsl = `hsl(${state.targetColor.h}, ${state.targetColor.s}%, ${state.targetColor.l}%)`;
     
     // [SECURITY Phase 2] 행동 추적 시작
     resetBehavior();
     
     // [SECURITY] 타겟과 확실히 다른 초기 색상 생성 (HTML 렌더링 전에 계산)
-    const tH = state.targetColor.h;
-    const tS = state.targetColor.s;
-    const tL = state.targetColor.l;
+    // state.targetColor는 RGB → HSL로 변환 필요
+    const targetHslObj = rgbToHsl(state.targetColor.r, state.targetColor.g, state.targetColor.b);
+    const targetHsl = `hsl(${targetHslObj.h}, ${targetHslObj.s}%, ${targetHslObj.l}%)`;
+    const tH = targetHslObj.h;
+    const tS = targetHslObj.s;
+    const tL = targetHslObj.l;
     
     const hueOffset = 60 + Math.floor(Math.random() * 240);
     let currentH = (tH + hueOffset) % 360;
