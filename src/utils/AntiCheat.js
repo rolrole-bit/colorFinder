@@ -355,29 +355,24 @@ export function logSliderChange() {
 export function analyzeBehavior() {
   const timeSpent = Date.now() - behaviorLog.guessStartTime;
   
-  // 1. 최소 조작 시간 (1.5초 미만이면 봇 의심)
-  if (timeSpent < 1500) {
+  // 1. 최소 조작 시간 (0.8초 미만이면 봇 의심 — 인간은 최소 이 정도 걸림)
+  if (timeSpent < 800) {
     return { isHuman: false, reason: 'too_fast' };
   }
   
-  // 2. 최소 포인터 이동 (3회 미만이면 봇 의심)
-  if (behaviorLog.pointerMoves < 3) {
-    return { isHuman: false, reason: 'no_mouse_movement' };
-  }
-  
-  // 3. 최소 슬라이더 조작 (2회 미만이면 봇 의심)
-  if (behaviorLog.sliderChanges < 2) {
+  // 2. 최소 슬라이더 조작 (1회 미만이면 봇 의심 — 색상을 한 번도 안 바꿈)
+  if (behaviorLog.sliderChanges < 1) {
     return { isHuman: false, reason: 'no_slider_interaction' };
   }
   
-  // 4. 이벤트 간격 분산 체크 (봇은 기계적으로 일정한 간격)
-  if (behaviorLog.intervals.length >= 5) {
+  // 3. 이벤트 간격 분산 체크 (봇은 기계적으로 일정한 간격)
+  if (behaviorLog.intervals.length >= 10) {
     const mean = behaviorLog.intervals.reduce((a, b) => a + b, 0) / behaviorLog.intervals.length;
     const variance = behaviorLog.intervals.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / behaviorLog.intervals.length;
     const cv = Math.sqrt(variance) / mean; // 변동 계수
     
-    // 변동 계수가 0.05 미만이면 너무 규칙적 → 봇 의심
-    if (cv < 0.05 && mean < 50) {
+    // 변동 계수가 0.02 미만 + 평균 간격 30ms 미만이면 너무 규칙적 → 봇 의심
+    if (cv < 0.02 && mean < 30) {
       return { isHuman: false, reason: 'robotic_pattern' };
     }
   }
