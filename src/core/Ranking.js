@@ -21,9 +21,9 @@ const SIGNATURE_KEY = "DyeMaster_sig";
 /**
  * [SECURITY] 스토리지에서 기록을 가져오고 서명을 검증합니다.
  * 서명이 불일치하면 데이터를 신뢰하지 않고 빈 배열을 반환합니다.
- * @returns {Array} 검증된 기록 배열
+ * @returns {Promise<Array>} 검증된 기록 배열
  */
-function getRecords() {
+async function getRecords() {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     if (!data) return [];
@@ -31,9 +31,9 @@ function getRecords() {
     const records = JSON.parse(data);
     if (!Array.isArray(records)) return [];
     
-    // 서명 검증
+    // 서명 검증 (async)
     const storedSig = localStorage.getItem(SIGNATURE_KEY);
-    if (storedSig && !verifySignature(records, storedSig)) {
+    if (storedSig && !(await verifySignature(records, storedSig))) {
       // 서명 불일치 → 데이터 변조 감지
       console.warn('[AntiCheat] 랭킹 데이터 무결성 검증 실패. 데이터를 초기화합니다.');
       localStorage.removeItem(STORAGE_KEY);
@@ -55,11 +55,11 @@ function getRecords() {
 }
 
 /**
- * [SECURITY] 레코드를 서명과 함께 저장
+ * [SECURITY] 레코드를 서명과 함께 저장 (비동기)
  * @param {Array} records - 저장할 레코드 배열
  */
-function saveRecords(records) {
-  const signature = generateSignature(records);
+async function saveRecords(records) {
+  const signature = await generateSignature(records);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
   localStorage.setItem(SIGNATURE_KEY, signature);
 }
@@ -72,7 +72,7 @@ function saveRecords(records) {
  * @param {number} score - 최종 점수 (정수)
  * @param {string} difficulty - 난이도
  */
-export function saveRecord(playerName, originGame, score, difficulty) {
+export async function saveRecord(playerName, originGame, score, difficulty) {
   // [SECURITY] 점수 유효성 검증
   if (!isValidFinalScore(score, difficulty)) {
     console.warn('[AntiCheat] 비정상 점수 감지. 기록을 저장하지 않습니다.');
@@ -85,7 +85,7 @@ export function saveRecord(playerName, originGame, score, difficulty) {
   
   if (!cleanName || !cleanGame) return;
   
-  const records = getRecords();
+  const records = await getRecords();
   records.push({
     playerName: cleanName,
     originGame: cleanGame,
@@ -94,12 +94,12 @@ export function saveRecord(playerName, originGame, score, difficulty) {
     date: new Date().toISOString()
   });
   
-  // [SECURITY] 서명 포함 저장
-  saveRecords(records);
+  // [SECURITY] 서명 포함 저장 (비동기)
+  await saveRecords(records);
 }
 
-export function getGameRankings() {
-  const records = getRecords();
+export async function getGameRankings() {
+  const records = await getRecords();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -147,8 +147,8 @@ export function getGameRankings() {
  * 전체 플레이어 순위를 반환합니다. (상위 5개)
  * @returns {Array} [{ playerName: '유저1', originGame: 'WOW', score: 3200, difficulty: 'Normal' }, ...]
  */
-export function getPlayerRankings() {
-  const records = getRecords();
+export async function getPlayerRankings() {
+  const records = await getRecords();
   
   // 플레이어 이름 + 출신 게임의 조합으로 중복된 경우 최고점만 반영 (선택 사항)
   const playerMap = {};

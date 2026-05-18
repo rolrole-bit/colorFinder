@@ -591,7 +591,7 @@ function renderInterimResultView(container) {
     const panel = document.getElementById('interim-panel');
     panel.style.opacity = '0';
     panel.style.transition = 'opacity 0.4s ease';
-    setTimeout(() => {
+    setTimeout(async () => {
       if (state.currentRound < state.maxRounds) {
         nextRound();
         renderGameView(container);
@@ -612,17 +612,17 @@ function renderInterimResultView(container) {
         
         setScore(finalScore);
         
-        saveRecord(state.playerName, state.originGame, finalScore, state.difficulty);
-        renderScoreBoardView(container, multiplier);
+        await saveRecord(state.playerName, state.originGame, finalScore, state.difficulty);
+        await renderScoreBoardView(container, multiplier);
       }
     }, 400);
   });
 }
 
-function renderScoreBoardView(container, appliedMultiplier = 1.0) {
+async function renderScoreBoardView(container, appliedMultiplier = 1.0) {
   const state = getState();
-  const gameRanks = getGameRankings();
-  const playerRanks = getPlayerRankings();
+  const gameRanks = await getGameRankings();
+  const playerRanks = await getPlayerRankings();
 
   // [SECURITY] XSS 방어: 사용자 입력값을 escapeHTML로 정제
   let gameRanksHTML = gameRanks.map((r, i) => `

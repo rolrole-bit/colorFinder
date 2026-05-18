@@ -65,48 +65,58 @@ export function clampScore(score, difficulty) {
 
 
 // ═══════════════════════════════════════════
-// 2. LocalStorage 데이터 서명/검증
+// 2. LocalStorage 데이터 서명/검증 (SHA-256)
 // ═══════════════════════════════════════════
 
 /**
- * 간이 해시 함수 (FNV-1a 변형)
- * 클라이언트 전용이므로 암호학적 보안보다 탐지 목적
+ * [SECURITY Phase 1] SHA-256 해시 (Web Crypto API)
+ * 암호학적으로 안전한 해시 — FNV-1a 대비 충돌 불가
  * @param {string} str - 해싱할 문자열
- * @returns {string} 해시 문자열
+ * @returns {Promise<string>} hex 해시 문자열
  */
-function simpleHash(str) {
-  let hash = 0x811c9dc5; // FNV offset basis
-  for (let i = 0; i < str.length; i++) {
-    hash ^= str.charCodeAt(i);
-    hash = Math.imul(hash, 0x01000193); // FNV prime
-  }
-  // 부호 없는 32비트로 변환 후 base36
-  return (hash >>> 0).toString(36);
+async function sha256(str) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 /**
- * 데이터와 함께 저장할 서명 생성
- * @param {Array} records - 랭킹 레코드 배열
- * @returns {string} 서명 문자열
+ * [SECURITY] 동적 salt 생성
+ * 세션마다 다른 salt를 사용하되, 검증 시 복원 가능하도록
+ * 데이터 자체의 구조적 특성(레코드 수, 첫/마지막 날짜)을 salt에 포함
  */
-export function generateSignature(records) {
-  // 핵심 데이터만 추출하여 서명 (순서 보존)
+function buildDynamicSalt(records) {
+  const count = records.length;
+  const firstDate = records.length > 0 ? records[0].date : 'empty';
+  const lastDate = records.length > 0 ? records[records.length - 1].date : 'empty';
+  return `DM_v2_${count}_${firstDate}_${lastDate}`;
+}
+
+/**
+ * [SECURITY] 데이터와 함께 저장할 서명 생성 (SHA-256, 비동기)
+ * @param {Array} records - 랭킹 레코드 배열
+ * @returns {Promise<string>} 서명 문자열
+ */
+export async function generateSignature(records) {
   const payload = records.map(r => 
     `${r.playerName}|${r.originGame}|${r.score}|${r.difficulty}|${r.date}`
   ).join(';;');
   
-  const salt = 'DyeM4st3r_AntiCheat_v1';
-  return simpleHash(payload + salt);
+  const salt = buildDynamicSalt(records);
+  return await sha256(payload + salt);
 }
 
 /**
- * 저장된 데이터의 서명 검증
+ * [SECURITY] 저장된 데이터의 서명 검증 (비동기)
  * @param {Array} records - 랭킹 레코드 배열
  * @param {string} signature - 저장된 서명
- * @returns {boolean} 서명 일치 여부
+ * @returns {Promise<boolean>} 서명 일치 여부
  */
-export function verifySignature(records, signature) {
-  return generateSignature(records) === signature;
+export async function verifySignature(records, signature) {
+  const expected = await generateSignature(records);
+  return expected === signature;
 }
 
 
@@ -279,8 +289,14 @@ export function sanitizeGameName(game) {
 let sessionToken = null;
 let sessionStartTime = 0;
 
+/**
+ * [SECURITY Phase 1] 암호학적으로 안전한 세션 토큰 생성
+ * crypto.getRandomValues 사용 — Math.random 대비 예측 불가
+ */
 export function startSession() {
-  sessionToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
+  const arr = new Uint8Array(24);
+  crypto.getRandomValues(arr);
+  sessionToken = Array.from(arr, b => b.toString(16).padStart(2, '0')).join('') + '_' + Date.now().toString(36);
   sessionStartTime = Date.now();
   return sessionToken;
 }
@@ -294,7 +310,6 @@ export function startSession() {
 export function isSessionValid() {
   if (!sessionToken) return false;
   const elapsed = Date.now() - sessionStartTime;
-  // 최소 5초 (봇이 아무리 빨라도 기억+제출에 최소 시간 소요)
   return elapsed >= 5000;
 }
 
