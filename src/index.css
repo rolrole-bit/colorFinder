@@ -707,12 +707,52 @@ input[type="text"].minimal-input {
 }
 
 input[type="text"].minimal-input::placeholder {
-  color: rgba(255,255,255,0.7);
+  color: transparent; /* custom-placeholder를 대신 사용 */
 }
 
 input[type="text"].minimal-input:focus {
   border-bottom-color: #fff !important;
   box-shadow: none !important;
+}
+
+/* Animated Custom Placeholder */
+.custom-placeholder {
+  position: absolute;
+  left: 0;
+  top: max(1vh, 0.5rem);
+  font-family: 'Paperlogy', 'Inter', sans-serif;
+  font-size: clamp(1rem, 3vh, 1.5rem);
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(255,255,255,0.4), rgba(255,255,255,0.9), rgba(255,255,255,0.4));
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientPlaceholder 3s ease infinite;
+  transition: opacity 0.3s ease;
+}
+
+@keyframes gradientPlaceholder {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.blink-cursor {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  margin-left: 4px;
+  -webkit-text-fill-color: rgba(255,255,255,0.8);
+  animation: blinkCursor 1s step-end infinite;
+}
+
+@keyframes blinkCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+input.minimal-input:focus + .custom-placeholder,
+input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
+  opacity: 0;
 }
 
 .difficulty-group {

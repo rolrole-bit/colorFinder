@@ -108,16 +108,26 @@ function renderEntryView(container) {
       
       <div class="entry-form">
         <div class="form-group dropdown-container" style="position: relative;">
-          <span class="diff-label">어느게임 출신이세요?</span>
-          <input type="text" id="origin-game" class="minimal-input" placeholder="게임을 검색하거나 선택하세요" autocomplete="off" />
+          <span class="diff-label">1. 어느게임 출신이세요?</span>
+          <div style="position: relative;">
+            <input type="text" id="origin-game" class="minimal-input" placeholder=" " autocomplete="off" />
+            <div class="custom-placeholder">
+              게임을 검색하거나 선택하세요<span class="blink-cursor">I</span>
+            </div>
+          </div>
           <div class="dropdown-list hidden" id="game-dropdown" style="width: 100%;"></div>
         </div>
         <div class="form-group">
-          <span class="diff-label">당신의 이름은?</span>
-          <input type="text" id="player-name" class="minimal-input" placeholder="닉네임을 입력하세요" autocomplete="off" />
+          <span class="diff-label">2. 당신의 이름은?</span>
+          <div style="position: relative;">
+            <input type="text" id="player-name" class="minimal-input" placeholder=" " autocomplete="off" />
+            <div class="custom-placeholder">
+              닉네임을 입력하세요<span class="blink-cursor">I</span>
+            </div>
+          </div>
         </div>
         <div class="form-group difficulty-group">
-          <span class="diff-label">난이도 (기억 시간 / 점수 배율)</span>
+          <span class="diff-label">3. 난이도 (기억 시간 / 점수 배율)</span>
           <div class="radio-group clean">
             <label><input type="radio" name="difficulty" value="Easy"> ${getDifficultyName("Easy")} (${getDifficultyTime("Easy") / 1000}초) &times;${getDifficultyMultiplier("Easy").toFixed(1)}</label>
             <label><input type="radio" name="difficulty" value="Normal" checked> ${getDifficultyName("Normal")} (${getDifficultyTime("Normal") / 1000}초) &times;${getDifficultyMultiplier("Normal").toFixed(1)}</label>
