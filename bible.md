@@ -1,94 +1,85 @@
 # DYE MASTER Bible
 
 ## 작업 목적
-색상 매칭 게임 "DYE MASTER"의 점수 시스템을 % 기반에서 정수 점수제로 전환하고,
-난이도별 배율을 적용하여 고난도 플레이에 보상을 제공하는 구조로 리팩토링.
+색상 매칭 게임 "DYE MASTER" — Node.js/Express 서버사이드 랭킹 + 보안 강화 아키텍처.
 
 ## 프로젝트 구조
 ```
 /src
   /core
     GameState.js    — 게임 상태 관리 (난이도, 점수, 라운드) [방어적 deep copy, 범위 검증]
-    Ranking.js      — LocalStorage 기반 랭킹 시스템 [서명 검증, 점수 상한]
+    Ranking.js      — 서버 API 기반 랭킹 시스템 (캐싱 포함)
+    ServerAPI.js    — 서버 통신 모듈 (세션, 라운드, 랭킹)
   /ui
-    UIManager.js    — 전체 UI 렌더링 (엔트리 → 게임 → 결과 → 스코어보드) [XSS 방어]
+    UIManager.js    — 뷰 라우터 (오케스트레이터, ~50줄)
+    EntryView.js    — 엔트리 화면 (플레이어 입력, 게임 선택, 난이도)
+    GameView.js     — 게임 플레이 화면 (기억 → 추측 → 제출)
+    ResultView.js   — 중간 결과 화면 (라운드별 점수)
+    ScoreboardView.js — 최종 스코어보드 (랭킹 표시)
+    AnimationUtils.js — 공통 애니메이션 (scramble, animateValue, getContrastYIQ)
     CustomSlider.js — 포인터 이벤트 기반 수직 슬라이더
   /utils
     ColorUtils.js   — 색상 생성, 점수 계산, 색상 변환 유틸리티
     Constants.js    — MMO 게임 목록
     SoundUtils.js   — Web Audio API 기반 효과음
-    AntiCheat.js    — 안티치트 유틸리티 (점수 검증, 서명, DevTools 감지, XSS 방어)
-  /test
-    test.js         — 단위 테스트
+    AntiCheat.js    — 안티치트 (점수 검증, DevTools 감지, 봇 탐지, XSS 방어)
+
+/server
+  index.js          — Express 서버 진입점 v2.1 (Secured)
+  db.js             — JSON 파일 기반 DB (세션 메모리 + 랭킹 파일)
+  /routes
+    session.js      — POST /api/session/start
+    round.js        — POST /api/round/submit
+    ranking.js      — GET /api/rankings
+  /utils
+    scoreCalc.js    — 서버 점수 계산 모듈
+    security.js     — Rate Limiter, 보안 헤더, 입력 새니타이징
+  /data
+    rankings.json   — 랭킹 영속 저장소
+```
+
+## 실행 방법
+```bash
+# 서버 시작 (포트 8080)
+node server/index.js
+# 또는 start.bat 더블클릭
+
+# PowerShell 정책 문제 시
+cmd /c "node server/index.js"
 ```
 
 ## 주요 설계 결정
 
 ### 점수 공식: `accuracy² × 1000 × 난이도배율`
-- **제곱 적용 이유**: 90%+ 고정밀 매칭에 기하급수적 보상 → 차별화
+- **제곱 적용**: 90%+ 고정밀 매칭에 기하급수적 보상
 - **1000점 기반**: 소수점 없이 깔끔한 정수 표현
-- **합산 방식**: 3라운드 평균이 아닌 합산 → 일관된 실력 요구
+- **합산 방식**: 3라운드 합산 → 일관된 실력 요구
 
 ### 난이도 배율
-| 난이도 | 기억 시간 | 배율 | 라운드 만점 | 3R 만점 |
-|--------|----------|------|-----------|---------|
-| Easy   | 5초      | ×1.0 | 1,000     | 3,000   |
-| Normal | 2초      | ×1.2 | 1,200     | 3,600   |
-| Hard   | 0.5초    | ×1.5 | 1,500     | 4,500   |
+| 난이도 | 기억 시간 | 배율 | 3R 만점 |
+|--------|----------|------|---------|
+| Easy   | 5초      | ×1.0 | 3,000   |
+| Normal | 2초      | ×1.1 | 3,300   |
+| Hard   | 0.5초    | ×1.2 | 3,600   |
+| Hell   | 0.3초    | ×1.3 | 3,900   |
 
-### 시간 관련 제거
-- 추측 단계의 타이머 표시 완전 제거
-- 시간 패널티 로직 제거
-- 순수 색감 정확도만으로 점수 산정
+### 서버 보안 (v2.1)
+- **Rate Limiter**: 세션 5/분, 제출 20/분, 랭킹 30/분
+- **보안 헤더**: CSP, X-Frame-Options, X-XSS-Protection 등 6종
+- **디렉토리 차단**: /server/, /data/, /node_modules/ 접근 403
+- **CORS 제한**: 로컬호스트만 허용
+- **JSON 바디 100KB 제한**: DoS 방어
+- **타이밍 검증**: 라운드 제출 최소 1초 간격
+- **세션/랭킹 상한**: 각 1000개/1000건
 
-### 버튼 텍스트 한글화
-- 플레이어에게 친숙하고 직관적인 UX를 제공하기 위해 제출 버튼의 명칭을 영문 `SEND`에서 국문 `결정`으로 변경.
+### UI 아키텍처 (v2.1 리팩토링)
+- **nav 패턴**: 순환 의존성 방지 — UIManager가 nav 객체를 생성하여 각 뷰에 주입
+- **화면별 모듈**: 엔트리/게임/결과/스코어보드를 독립 파일로 분리
+- **서버 폴백**: 서버 통신 실패 시 클라이언트 로컬 계산으로 자동 전환
 
-### ROUND UI 컴포넌트 최적화
-- **레이아웃 침범 제거**: 게임 화면의 디자인 요소를 방해하지 않도록 기존 카드의 모서리 영역 대신, 상단 여백(`top: 1.2vh; left: 5vw;`)으로 격리 배치함.
-- **가독성 향상**: 텍스트 크기를 `0.85rem`으로 줄이고, 서체를 `Paperlogy ExtraBold (800)`로 설정하여 작지만 눈에 잘 띄는 가독성을 유지함.
-
-### 플레이어 랭킹 표시 형식 변경
-- 플레이어 랭킹 리스트 아이템 노출 시 기존 `[게임 이름] 사용자 이름`에서, 직관적인 주체 구분을 위해 **`사용자 이름 [게임 이름]`** 순서로 교체 배치함.
-
-## 사용 방법
-```bash
-# 로컬 서버 실행
-python3 -m http.server 8000
-# http://localhost:8000 접속
-```
-
-## 테스트 방법
-브라우저 콘솔에서:
-```js
-import { runTests } from './src/test/test.js';
-runTests();
-```
-또는 `test_contrast.html`에서 테스트 모듈 로드.
-
-## 보안 (AntiCheat) 설계 결정
-
-### AntiCheat.js 모듈 (Phase 1 방어)
-- **점수 범위 검증**: 난이도별 이론적 최대 점수를 초과하는 값 거부
-- **LocalStorage 서명**: FNV-1a 해시 기반 데이터 무결성 검증. 직접 수정 시 서명 불일치로 데이터 폐기
-- **DevTools 감지**: 창 크기 차이 + console 객체 감시 이중 방식
-- **타이머 가드**: `performance.now()`와 `Date.now()` 교차 검증으로 시간 조작 탐지
-- **XSS 방어**: 닉네임/게임명의 HTML 특수문자 이스케이프 (`escapeHTML()`)
-- **세션 관리**: 게임 시작 시 토큰 발행, 최소 플레이 시간 검증
-
-### GameState.js 방어
-- `getState()` → JSON deep copy 반환 (외부 참조 변형 차단)
-- 모든 setter에 화이트리스트/범위 검증 적용
-- 난이도/페이즈: 유효 값 목록 화이트리스트
-- RGB 값: 0-255 클램핑
-- 라운드 결과: maxRounds 초과 삽입 방지
-
-### Ranking.js 방어
-- 저장 시 자동 서명 생성, 로드 시 자동 서명 검증
-- 개별 레코드 점수 유효성 필터링
-- 입력 새니타이징 (HTML 태그 제거, 길이 제한)
-
-### 남은 한계 (Phase 2 필요)
-- DOM에서 타겟 색상 추출 (100% 방어 불가 → 서버 사이드 필요)
-- 화면 캡처 봇 (클라이언트 단독 방어 불가)
-- 자동 반복 플레이 (레이트 리미팅 → 서버 필요)
+### 안티치트 (클라이언트)
+- **점수 범위 검증**: 난이도별 이론적 최대 점수 초과 거부
+- **DevTools 감지**: 창 크기 + console 객체 이중 감시
+- **봇 탐지**: 포인터 이벤트 간격 분산 분석
+- **XSS 방어**: escapeHTML()으로 사용자 입력 정제
+- **세션 관리**: crypto.getRandomValues 기반 토큰, 최소 플레이 시간 검증

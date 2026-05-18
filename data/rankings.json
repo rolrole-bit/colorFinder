@@ -54,5 +54,13 @@
     "difficulty": "Normal",
     "session_id": "cb88b032-bec3-46f2-83fb-d8f565da0564",
     "created_at": "2026-05-18T12:52:43.566Z"
+  },
+  {
+    "player_name": "카모플",
+    "origin_game": "마비노기 모바일",
+    "score": 1389,
+    "difficulty": "Normal",
+    "session_id": "db6eab32-3557-480f-af5c-e65e0ce26d5d",
+    "created_at": "2026-05-18T12:55:26.804Z"
   }
 ]
