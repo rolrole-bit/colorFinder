@@ -1,164 +1,77 @@
 /**
  * Ranking
- * LocalStorage를 활용하여 점수 데이터를 기록하고 순위 리스트를 반환하는 모듈
- * 점수는 정수 기반 (0~4500점 범위)
+ * 서버 API를 통해 랭킹 데이터를 관리하는 모듈
  * 
- * [SECURITY] 데이터 서명/검증, 점수 상한 검증 적용
+ * Phase 2: LocalStorage → Server DB 전환
+ * 서버가 점수 계산과 랭킹 저장을 전담하므로
+ * 클라이언트는 조회(GET)만 수행
  */
 
-import { 
-  isValidFinalScore, 
-  generateSignature, 
-  verifySignature,
-  sanitizePlayerName,
-  sanitizeGameName,
-  escapeHTML 
-} from '../utils/AntiCheat.js';
+import { fetchRankings } from './ServerAPI.js';
 
-const STORAGE_KEY = "DyeMaster_rankings";
-const SIGNATURE_KEY = "DyeMaster_sig";
+// 랭킹 캐시 (불필요한 반복 요청 방지)
+let cachedRankings = null;
+let cacheTimestamp = 0;
+const CACHE_TTL = 5000; // 5초
 
 /**
- * [SECURITY] 스토리지에서 기록을 가져오고 서명을 검증합니다.
- * 서명이 불일치하면 데이터를 신뢰하지 않고 빈 배열을 반환합니다.
- * @returns {Promise<Array>} 검증된 기록 배열
+ * 서버에서 랭킹 데이터를 가져옴 (캐시 적용)
+ * @returns {Promise<{gameRankings: Array, playerRankings: Array}>}
  */
-async function getRecords() {
+async function getRankingsFromServer() {
+  const now = Date.now();
+  if (cachedRankings && (now - cacheTimestamp) < CACHE_TTL) {
+    return cachedRankings;
+  }
+  
   try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) return [];
-    
-    const records = JSON.parse(data);
-    if (!Array.isArray(records)) return [];
-    
-    // 서명 검증 (async)
-    const storedSig = localStorage.getItem(SIGNATURE_KEY);
-    if (storedSig && !(await verifySignature(records, storedSig))) {
-      // 서명 불일치 → 데이터 변조 감지
-      console.warn('[AntiCheat] 랭킹 데이터 무결성 검증 실패. 데이터를 초기화합니다.');
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(SIGNATURE_KEY);
-      return [];
-    }
-    
-    // 각 레코드의 점수 유효성 개별 검증
-    return records.filter(r => {
-      if (!r || typeof r.score !== 'number') return false;
-      return isValidFinalScore(r.score, r.difficulty || 'Easy');
-    });
-  } catch (e) {
-    // JSON 파싱 오류 등
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(SIGNATURE_KEY);
-    return [];
+    cachedRankings = await fetchRankings();
+    cacheTimestamp = now;
+    return cachedRankings;
+  } catch (err) {
+    console.error('[Ranking] 서버 랭킹 조회 실패:', err);
+    // 서버 실패 시 빈 결과 반환
+    return { gameRankings: [], playerRankings: [] };
   }
 }
 
 /**
- * [SECURITY] 레코드를 서명과 함께 저장 (비동기)
- * @param {Array} records - 저장할 레코드 배열
+ * 캐시를 무효화합니다 (점수 저장 후 호출)
  */
-async function saveRecords(records) {
-  const signature = await generateSignature(records);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-  localStorage.setItem(SIGNATURE_KEY, signature);
+export function invalidateRankingCache() {
+  cachedRankings = null;
+  cacheTimestamp = 0;
 }
 
 /**
- * 새로운 게임 결과를 스토리지에 저장합니다.
- * [SECURITY] 점수 상한 검증, 입력 새니타이징 적용
+ * 새로운 게임 결과를 서버에 저장합니다.
+ * Phase 2에서는 round/submit API가 마지막 라운드에서 자동 저장하므로
+ * 이 함수는 캐시 무효화 역할만 수행
+ * 
  * @param {string} playerName - 플레이어 이름
  * @param {string} originGame - 출신 게임
  * @param {number} score - 최종 점수 (정수)
  * @param {string} difficulty - 난이도
  */
 export async function saveRecord(playerName, originGame, score, difficulty) {
-  // [SECURITY] 점수 유효성 검증
-  if (!isValidFinalScore(score, difficulty)) {
-    console.warn('[AntiCheat] 비정상 점수 감지. 기록을 저장하지 않습니다.');
-    return;
-  }
-  
-  // [SECURITY] 입력 새니타이징
-  const cleanName = sanitizePlayerName(playerName);
-  const cleanGame = sanitizeGameName(originGame);
-  
-  if (!cleanName || !cleanGame) return;
-  
-  const records = await getRecords();
-  records.push({
-    playerName: cleanName,
-    originGame: cleanGame,
-    score: Math.floor(score),
-    difficulty: difficulty || 'Normal',
-    date: new Date().toISOString()
-  });
-  
-  // [SECURITY] 서명 포함 저장 (비동기)
-  await saveRecords(records);
-}
-
-export async function getGameRankings() {
-  const records = await getRecords();
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const prevGameMap = {};
-  const currGameMap = {};
-
-  records.forEach(r => {
-    const recordDate = new Date(r.date);
-    
-    if (!currGameMap[r.originGame] || currGameMap[r.originGame] < r.score) {
-      currGameMap[r.originGame] = r.score;
-    }
-    
-    if (recordDate < today) {
-      if (!prevGameMap[r.originGame] || prevGameMap[r.originGame] < r.score) {
-        prevGameMap[r.originGame] = r.score;
-      }
-    }
-  });
-
-  const getSortedRanks = (map) => {
-    return Object.keys(map)
-      .map(game => ({ game, score: map[game] }))
-      .sort((a, b) => b.score - a.score)
-      .map((item, index) => ({ ...item, rank: index + 1 }));
-  };
-
-  const prevRanks = getSortedRanks(prevGameMap);
-  const currRanks = getSortedRanks(currGameMap);
-
-  return currRanks.slice(0, 10).map(curr => {
-    const prevItem = prevRanks.find(p => p.game === curr.game);
-    let trend = 0;
-    let isNew = false;
-    if (prevItem) {
-      trend = prevItem.rank - curr.rank; // Positive means rank went up
-    } else {
-      isNew = true;
-    }
-    return { ...curr, trend, isNew };
-  });
+  // 서버 round/submit에서 이미 저장됨 — 캐시만 무효화
+  invalidateRankingCache();
 }
 
 /**
- * 전체 플레이어 순위를 반환합니다. (상위 5개)
- * @returns {Array} [{ playerName: '유저1', originGame: 'WOW', score: 3200, difficulty: 'Normal' }, ...]
+ * 게임별 랭킹 조회
+ * @returns {Promise<Array>} [{ game, topScore, rank, trend, isNew }, ...]
+ */
+export async function getGameRankings() {
+  const { gameRankings } = await getRankingsFromServer();
+  return gameRankings;
+}
+
+/**
+ * 플레이어별 랭킹 조회 (상위 5명)
+ * @returns {Promise<Array>} [{ playerName, originGame, score, difficulty }, ...]
  */
 export async function getPlayerRankings() {
-  const records = await getRecords();
-  
-  // 플레이어 이름 + 출신 게임의 조합으로 중복된 경우 최고점만 반영 (선택 사항)
-  const playerMap = {};
-  records.forEach(r => {
-    const key = `${r.originGame}_${r.playerName}`;
-    if (!playerMap[key] || playerMap[key].score < r.score) {
-      playerMap[key] = r;
-    }
-  });
-
-  const sortedPlayers = Object.values(playerMap).sort((a, b) => b.score - a.score);
-  return sortedPlayers.slice(0, 5);
+  const { playerRankings } = await getRankingsFromServer();
+  return playerRankings;
 }

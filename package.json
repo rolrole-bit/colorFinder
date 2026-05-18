@@ -1,5 +1,12 @@
 {
   "name": "dyemaster",
-  "version": "1.0.0",
-  "type": "module"
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
 }

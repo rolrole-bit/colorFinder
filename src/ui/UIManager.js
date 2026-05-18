@@ -2,6 +2,7 @@ import { MMO_GAMES } from '../utils/Constants.js';
 import { getRandomColor, calculateScore, toRGBString, hslToRgb, rgbToHsl, rgbToHex, getContrastColor } from '../utils/ColorUtils.js';
 import { getState, setPlayerInfo, setTargetColor, setUserColor, setScore, resetGame, setDifficulty, setPhase, getDifficultyTime, getDifficultyMultiplier, getDifficultyName, addRoundResult, nextRound } from '../core/GameState.js';
 import { saveRecord, getGameRankings, getPlayerRankings } from '../core/Ranking.js';
+import { startSession as startServerSession, submitRound } from '../core/ServerAPI.js';
 import { CustomVerticalSlider } from './CustomSlider.js';
 import { 
   initAudio, 
@@ -29,6 +30,10 @@ import {
   analyzeBehavior,
   renderColorOnCanvas
 } from '../utils/AntiCheat.js';
+
+// ═══ 서버 세션 상태 ═══
+let serverSessionId = null;
+let serverNextTargetColor = null;
 
 // Helper to calculate best contrast (Black or White) based on background luminance
 const getContrastYIQ = (r, g, b) => {
@@ -234,7 +239,7 @@ function renderEntryView(container) {
     }
   });
 
-  startBtn.addEventListener('click', () => {
+  startBtn.addEventListener('click', async () => {
     const selectedDifficulty = document.querySelector('input[name="difficulty"]:checked').value;
     setPlayerInfo(playerNameInput.value.trim(), originGameInput.value.trim());
     setDifficulty(selectedDifficulty);
@@ -242,6 +247,22 @@ function renderEntryView(container) {
     // [SECURITY] 세션 시작 & DevTools 감지
     startSession();
     startDevToolsDetection();
+    
+    // [Phase 2] 서버 세션 시작 - 타겟 색상을 서버에서 받아옴
+    try {
+      const serverSession = await startServerSession(
+        playerNameInput.value.trim(),
+        originGameInput.value.trim(),
+        selectedDifficulty
+      );
+      serverSessionId = serverSession.sessionId;
+      serverNextTargetColor = serverSession.targetColor;
+    } catch (err) {
+      console.error('[Server] 세션 시작 실패:', err);
+      // 서버 실패 시 클라이언트 폴백
+      serverSessionId = null;
+      serverNextTargetColor = null;
+    }
     
     const panel = document.getElementById('entry-panel');
     panel.classList.add('fade-out');
@@ -274,7 +295,9 @@ function renderEntryView(container) {
 }
 
 function renderGameView(container) {
-  const targetColor = getRandomColor();
+  // [Phase 2] 서버에서 받은 타겟 색상 사용, 폴백: 클라이언트 생성
+  const targetColor = serverNextTargetColor || getRandomColor();
+  serverNextTargetColor = null;
   setTargetColor(targetColor);
   
   setPhase("MEMORIZE");
@@ -493,7 +516,7 @@ function renderGameView(container) {
     // trigger initial color sync
     updateColor();
 
-    submitBtn.addEventListener('click', () => {
+    submitBtn.addEventListener('click', async () => {
       playSubmitSound();
       isGuessing = false;
       
@@ -504,16 +527,37 @@ function renderGameView(container) {
       const behavior = analyzeBehavior();
       
       const state = getState();
-      const baseScore = calculateScore(state.targetColor, state.userColor);
-      // [SECURITY] 라운드 점수 유효성 검증 & 클램핑
-      let roundScore = Math.floor(baseScore);
-      if (!isValidRoundScore(roundScore)) {
-        roundScore = 0;
+      let roundScore = 0;
+      
+      // [Phase 2] 서버에서 점수 계산
+      if (serverSessionId) {
+        try {
+          const result = await submitRound(serverSessionId, state.userColor);
+          roundScore = result.score;
+          
+          // 다음 라운드 타겟 색상 저장
+          if (result.nextTargetColor) {
+            serverNextTargetColor = result.nextTargetColor;
+          }
+          
+          // 마지막 라운드면 최종 점수 미리 저장
+          if (result.isLastRound) {
+            state._serverFinalScore = result.finalScore;
+            state._serverMultiplier = result.multiplier;
+          }
+        } catch (err) {
+          console.error('[Server] 라운드 제출 실패:', err);
+          // 폴백: 클라이언트 계산
+          roundScore = Math.floor(calculateScore(state.targetColor, state.userColor));
+        }
+      } else {
+        // 서버 없을 때 폴백
+        roundScore = Math.floor(calculateScore(state.targetColor, state.userColor));
       }
-      // [SECURITY Phase 2] 봇 탐지 시 점수 무효화
-      if (!behavior.isHuman) {
-        roundScore = 0;
-      }
+      
+      // [SECURITY] 라운드 점수 유효성 검증
+      if (!isValidRoundScore(roundScore)) roundScore = 0;
+      if (!behavior.isHuman) roundScore = 0;
       
       addRoundResult(roundScore, state.targetColor, state.userColor);
       setScore(roundScore);
@@ -596,18 +640,27 @@ function renderInterimResultView(container) {
         nextRound();
         renderGameView(container);
       } else {
-        let baseTotalScore = 0;
-        state.roundResults.forEach(r => {
-          baseTotalScore += r.score;
-        });
+        // [Phase 2] 서버가 계산한 최종 점수 사용
+        let finalScore;
+        let multiplier;
         
-        const multiplier = getDifficultyMultiplier(state.difficulty);
-        let finalScore = Math.floor(baseTotalScore * multiplier);
+        if (state._serverFinalScore != null) {
+          finalScore = state._serverFinalScore;
+          multiplier = state._serverMultiplier || 1.0;
+        } else {
+          // 폴백: 클라이언트 계산
+          let baseTotalScore = 0;
+          state.roundResults.forEach(r => {
+            baseTotalScore += r.score;
+          });
+          multiplier = getDifficultyMultiplier(state.difficulty);
+          finalScore = Math.floor(baseTotalScore * multiplier);
+          finalScore = clampScore(finalScore, state.difficulty);
+        }
         
-        // [SECURITY] 최종 점수 유효성 검증 & 세션 체크
-        finalScore = clampScore(finalScore, state.difficulty);
+        // [SECURITY] 세션 체크
         if (!isSessionValid()) {
-          finalScore = 0; // 비정상 세션
+          finalScore = 0;
         }
         
         setScore(finalScore);
