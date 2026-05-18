@@ -12,6 +12,18 @@ import {
   playGoSound,
   playSubmitSound
 } from '../utils/SoundUtils.js';
+import {
+  escapeHTML,
+  isValidRoundScore,
+  isValidFinalScore,
+  clampScore,
+  createTimerGuard,
+  startSession,
+  isSessionValid,
+  clearSession,
+  startDevToolsDetection,
+  isDevToolsOpen
+} from '../utils/AntiCheat.js';
 
 // Helper to calculate best contrast (Black or White) based on background luminance
 const getContrastYIQ = (r, g, b) => {
@@ -211,7 +223,10 @@ function renderEntryView(container) {
     const selectedDifficulty = document.querySelector('input[name="difficulty"]:checked').value;
     setPlayerInfo(playerNameInput.value.trim(), originGameInput.value.trim());
     setDifficulty(selectedDifficulty);
-    initAudio(); 
+    initAudio();
+    // [SECURITY] 세션 시작 & DevTools 감지
+    startSession();
+    startDevToolsDetection();
     
     const panel = document.getElementById('entry-panel');
     panel.classList.add('fade-out');
@@ -448,7 +463,11 @@ function renderGameView(container) {
       
       const state = getState();
       const baseScore = calculateScore(state.targetColor, state.userColor);
-      const roundScore = Math.floor(baseScore);
+      // [SECURITY] 라운드 점수 유효성 검증 & 클램핑
+      let roundScore = Math.floor(baseScore);
+      if (!isValidRoundScore(roundScore)) {
+        roundScore = 0;
+      }
       
       addRoundResult(roundScore, state.targetColor, state.userColor);
       setScore(roundScore);
@@ -537,7 +556,13 @@ function renderInterimResultView(container) {
         });
         
         const multiplier = getDifficultyMultiplier(state.difficulty);
-        const finalScore = Math.floor(baseTotalScore * multiplier);
+        let finalScore = Math.floor(baseTotalScore * multiplier);
+        
+        // [SECURITY] 최종 점수 유효성 검증 & 세션 체크
+        finalScore = clampScore(finalScore, state.difficulty);
+        if (!isSessionValid()) {
+          finalScore = 0; // 비정상 세션
+        }
         
         setScore(finalScore);
         
@@ -553,10 +578,11 @@ function renderScoreBoardView(container, appliedMultiplier = 1.0) {
   const gameRanks = getGameRankings();
   const playerRanks = getPlayerRankings();
 
+  // [SECURITY] XSS 방어: 사용자 입력값을 escapeHTML로 정제
   let gameRanksHTML = gameRanks.map((r, i) => `
     <li class="rank-item" style="border-color: currentColor;">
       <span class="rank-num">${i + 1}</span>
-      <span class="rank-name">${r.game}</span>
+      <span class="rank-name">${escapeHTML(r.game)}</span>
       <span class="rank-score">${r.score.toLocaleString()}</span>
     </li>
   `).join('');
@@ -566,7 +592,7 @@ function renderScoreBoardView(container, appliedMultiplier = 1.0) {
   let playerRanksHTML = playerRanks.map((r, i) => `
     <li class="rank-item" style="border-color: currentColor;">
       <span class="rank-num">${i + 1}</span>
-      <span class="rank-name">${r.playerName} [${r.originGame}]</span>
+      <span class="rank-name">${escapeHTML(r.playerName)} [${escapeHTML(r.originGame)}]</span>
       <span class="rank-score">${r.score.toLocaleString()}</span>
     </li>
   `).join('');
@@ -682,6 +708,7 @@ function renderScoreBoardView(container, appliedMultiplier = 1.0) {
 
   document.getElementById('retry-btn').addEventListener('click', () => {
     resetGame();
+    clearSession(); // [SECURITY] 세션 초기화
     const panel = document.getElementById('score-panel');
     panel.style.opacity = '0';
     panel.style.transition = 'opacity 0.4s ease';
