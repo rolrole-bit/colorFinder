@@ -350,8 +350,7 @@ function renderGameView(container) {
         ROUND ${state.currentRound} / ${state.maxRounds}
       </div>
       <div class="animated-gradient-bg"></div>
-      <div id="game-box" class="game-box-container">
-        <div id="target-bg" class="split-bg" style="background-color: ${targetHsl};"></div>
+      <div id="game-box" class="game-box-container" style="grid-template-columns: 1fr;">
         <div id="guess-bg" class="split-bg" style="background-color: ${initHsl};"></div>
         
         <div style="position: absolute; top: 2rem; right: 2rem; display: flex; gap: 1rem; z-index: 10;">
