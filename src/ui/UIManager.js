@@ -362,9 +362,10 @@ function renderGameView(container) {
     let currentDisplayedRGB = hslToRgb(180, 50, 50);
     let hexAnimFrame = null;
     
-    let currentH = 180;
-    let currentS = 50;
-    let currentL = 50;
+    // [SECURITY] 매 라운드 랜덤 초기 색상 — 봇 방어
+    let currentH = Math.floor(Math.random() * 360);
+    let currentS = Math.floor(Math.random() * 100);
+    let currentL = Math.floor(Math.random() * 100);
     
     let isGuessing = true;
 
@@ -446,19 +447,19 @@ function renderGameView(container) {
       lightWrapper.style.background = `linear-gradient(to top, #000 0%, hsl(${currentH}, ${currentS}%, 50%) 50%, #fff 100%)`;
     };
 
-    // Initialize custom sliders
+    // [SECURITY] 슬라이더 초기값 = currentH/S/L (이미 랜덤)
     const hueSlider = new CustomVerticalSlider(hueWrapper, {
-      min: 0, max: 360, value: 180,
+      min: 0, max: 360, value: currentH,
       onChange: (val) => { currentH = val; updateColor(); logSliderChange(); }
     });
     
     const satSlider = new CustomVerticalSlider(satWrapper, {
-      min: 0, max: 100, value: 50,
+      min: 0, max: 100, value: currentS,
       onChange: (val) => { currentS = val; updateColor(); logSliderChange(); }
     });
     
     const lightSlider = new CustomVerticalSlider(lightWrapper, {
-      min: 0, max: 100, value: 50,
+      min: 0, max: 100, value: currentL,
       onChange: (val) => { currentL = val; updateColor(); logSliderChange(); }
     });
 

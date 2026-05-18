@@ -355,23 +355,19 @@ export function logSliderChange() {
 export function analyzeBehavior() {
   const timeSpent = Date.now() - behaviorLog.guessStartTime;
   
-  // 1. 최소 조작 시간 (0.8초 미만이면 봇 의심 — 인간은 최소 이 정도 걸림)
+  // 1. 최소 조작 시간 (0.8초 미만이면 봇 의심 — 인간은 화면을 보는 데만 이 정도 걸림)
   if (timeSpent < 800) {
     return { isHuman: false, reason: 'too_fast' };
   }
   
-  // 2. 최소 슬라이더 조작 (1회 미만이면 봇 의심 — 색상을 한 번도 안 바꿈)
-  if (behaviorLog.sliderChanges < 1) {
-    return { isHuman: false, reason: 'no_slider_interaction' };
-  }
-  
-  // 3. 이벤트 간격 분산 체크 (봇은 기계적으로 일정한 간격)
+  // 2. 이벤트 간격 분산 체크 (봇은 기계적으로 일정한 간격으로 이벤트 발생)
+  //    슬라이더 조작 여부는 체크하지 않음 — 초기값이 랜덤이므로
+  //    조작 없이 제출하면 자연스럽게 낮은 점수가 됨
   if (behaviorLog.intervals.length >= 10) {
     const mean = behaviorLog.intervals.reduce((a, b) => a + b, 0) / behaviorLog.intervals.length;
     const variance = behaviorLog.intervals.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / behaviorLog.intervals.length;
-    const cv = Math.sqrt(variance) / mean; // 변동 계수
+    const cv = Math.sqrt(variance) / mean;
     
-    // 변동 계수가 0.02 미만 + 평균 간격 30ms 미만이면 너무 규칙적 → 봇 의심
     if (cv < 0.02 && mean < 30) {
       return { isHuman: false, reason: 'robotic_pattern' };
     }
