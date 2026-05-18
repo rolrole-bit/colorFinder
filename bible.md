@@ -8,14 +8,16 @@
 ```
 /src
   /core
-    GameState.js    — 게임 상태 관리 (난이도, 점수, 라운드)
-    Ranking.js      — LocalStorage 기반 랭킹 시스템
+    GameState.js    — 게임 상태 관리 (난이도, 점수, 라운드) [방어적 deep copy, 범위 검증]
+    Ranking.js      — LocalStorage 기반 랭킹 시스템 [서명 검증, 점수 상한]
   /ui
-    UIManager.js    — 전체 UI 렌더링 (엔트리 → 게임 → 결과 → 스코어보드)
+    UIManager.js    — 전체 UI 렌더링 (엔트리 → 게임 → 결과 → 스코어보드) [XSS 방어]
     CustomSlider.js — 포인터 이벤트 기반 수직 슬라이더
   /utils
     ColorUtils.js   — 색상 생성, 점수 계산, 색상 변환 유틸리티
     Constants.js    — MMO 게임 목록
+    SoundUtils.js   — Web Audio API 기반 효과음
+    AntiCheat.js    — 안티치트 유틸리티 (점수 검증, 서명, DevTools 감지, XSS 방어)
   /test
     test.js         — 단위 테스트
 ```
@@ -63,3 +65,30 @@ import { runTests } from './src/test/test.js';
 runTests();
 ```
 또는 `test_contrast.html`에서 테스트 모듈 로드.
+
+## 보안 (AntiCheat) 설계 결정
+
+### AntiCheat.js 모듈 (Phase 1 방어)
+- **점수 범위 검증**: 난이도별 이론적 최대 점수를 초과하는 값 거부
+- **LocalStorage 서명**: FNV-1a 해시 기반 데이터 무결성 검증. 직접 수정 시 서명 불일치로 데이터 폐기
+- **DevTools 감지**: 창 크기 차이 + console 객체 감시 이중 방식
+- **타이머 가드**: `performance.now()`와 `Date.now()` 교차 검증으로 시간 조작 탐지
+- **XSS 방어**: 닉네임/게임명의 HTML 특수문자 이스케이프 (`escapeHTML()`)
+- **세션 관리**: 게임 시작 시 토큰 발행, 최소 플레이 시간 검증
+
+### GameState.js 방어
+- `getState()` → JSON deep copy 반환 (외부 참조 변형 차단)
+- 모든 setter에 화이트리스트/범위 검증 적용
+- 난이도/페이즈: 유효 값 목록 화이트리스트
+- RGB 값: 0-255 클램핑
+- 라운드 결과: maxRounds 초과 삽입 방지
+
+### Ranking.js 방어
+- 저장 시 자동 서명 생성, 로드 시 자동 서명 검증
+- 개별 레코드 점수 유효성 필터링
+- 입력 새니타이징 (HTML 태그 제거, 길이 제한)
+
+### 남은 한계 (Phase 2 필요)
+- DOM에서 타겟 색상 추출 (100% 방어 불가 → 서버 사이드 필요)
+- 화면 캡처 봇 (클라이언트 단독 방어 불가)
+- 자동 반복 플레이 (레이트 리미팅 → 서버 필요)
