@@ -497,6 +497,28 @@ pm2 restart dyemaster</div>
 <div class="card-title">⚠️ 이전 버전과의 차이</div>
 <p>v2.0 이하(정적 파일)에서는 Web Station만으로 충분했으나, v3.0은 Node.js 서버가 필수입니다. Web Station의 정적 호스팅은 사용하지 않고, PM2 + 리버스 프록시 조합으로 운영합니다.</p>
 </div>
+
+<div class="card" style="border-color:#ff6b6b">
+<div class="card-title">🗑️ 배포 후 보안 정리 (필수)</div>
+<p>프로덕션 배포 완료 후, 아래 파일/디렉토리를 <strong>반드시 삭제</strong>하세요. 공격 표면을 최소화합니다.</p>
+<table>
+<thead><tr><th>대상</th><th>이유</th><th>삭제 명령</th></tr></thead>
+<tbody>
+<tr><td><code>tools/</code></td><td>설치 스크립트 (시스템 명령 포함). 설치 후 불필요.</td><td><code>rm -rf tools/</code></td></tr>
+<tr><td><code>plan1.md</code>, <code>plan2.md</code></td><td>개발 계획 문서. 내부 아키텍처 정보 노출.</td><td><code>rm plan1.md plan2.md</code></td></tr>
+<tr><td><code>bible.md</code></td><td>프로젝트 가이드. 서버 구조/지뢰 정보 포함.</td><td><code>rm bible.md</code></td></tr>
+<tr><td><code>.env.example</code></td><td>환경변수 샘플. 설정 키 이름 노출.</td><td><code>rm .env.example</code></td></tr>
+<tr><td><code>.git/</code></td><td>Git 히스토리. 코드 변경 이력/민감 커밋 노출 가능.</td><td><code>rm -rf .git/</code></td></tr>
+<tr><td><code>security_report.html</code></td><td>본 보안 보고서. 보안 조치 상세 내역 노출.</td><td><code>rm security_report.html</code> (선택)</td></tr>
+</tbody>
+</table>
+<div class="code"># 한 번에 정리 (Linux/NAS)
+rm -rf tools/ .git/ .env.example plan1.md plan2.md bible.md
+
+# Windows
+rmdir /s /q tools .git & del .env.example plan1.md plan2.md bible.md</div>
+<p style="color:#ff8787;font-size:.9rem;margin-top:1rem">⚠️ <code>.env</code> 파일은 삭제하면 안 됩니다! 서버 구동에 필수입니다.</p>
+</div>
 </section>
 
 </div><!-- end tab-install -->
