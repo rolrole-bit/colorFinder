@@ -99,9 +99,11 @@ export function renderGameView(container, nav) {
       <div class="animated-gradient-bg"></div>
       <div id="game-box" class="game-box-container" style="grid-template-columns: 1fr;">
         <div id="guess-bg" class="split-bg" style="background-color: ${initHsl};"></div>
+        <!-- 블러 오버레이 추가 -->
+        <div style="position: absolute; inset: 0; backdrop-filter: blur(80px); background: rgba(255,255,255,0.05); z-index: 5;"></div>
         
         <div style="position: absolute; top: 2rem; right: 2rem; display: flex; gap: 1rem; z-index: 10;">
-          <div id="hex-display" style="font-family: 'Paperlogy', sans-serif; font-size: 2rem; font-weight: 300; letter-spacing: 3px; padding: 0.5rem 1rem; border-radius: 8px;">
+          <div id="hex-display" style="font-family: 'Paperlogy', sans-serif; font-size: 2rem; font-weight: 300; letter-spacing: 3px; padding: 0.5rem 1rem; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
             #000000
           </div>
         </div>
@@ -133,24 +135,27 @@ export function renderGameView(container, nav) {
             </defs>
             <g id="tracks-group">
               <!-- Colored tracks (딱 붙게) -->
-              <path id="track-h" fill="none" stroke="url(#grad-h)" stroke-width="40" stroke-linecap="round" />
-              <path id="track-s" fill="none" stroke="url(#grad-s)" stroke-width="40" stroke-linecap="round" />
-              <path id="track-l" fill="none" stroke="url(#grad-l)" stroke-width="40" stroke-linecap="round" />
+              <path id="track-h" fill="none" stroke="url(#grad-h)" stroke-width="60" stroke-linecap="round" />
+              <path id="track-s" fill="none" stroke="url(#grad-s)" stroke-width="60" stroke-linecap="round" />
+              <path id="track-l" fill="none" stroke="url(#grad-l)" stroke-width="60" stroke-linecap="round" />
               
               <!-- Invisible touch areas (fatter for easier grabbing) -->
-              <path id="touch-h" fill="none" stroke="transparent" stroke-width="50" stroke-linecap="round" style="cursor: pointer;" />
-              <path id="touch-s" fill="none" stroke="transparent" stroke-width="50" stroke-linecap="round" style="cursor: pointer;" />
-              <path id="touch-l" fill="none" stroke="transparent" stroke-width="50" stroke-linecap="round" style="cursor: pointer;" />
+              <path id="touch-h" fill="none" stroke="transparent" stroke-width="70" stroke-linecap="round" style="cursor: pointer;" />
+              <path id="touch-s" fill="none" stroke="transparent" stroke-width="70" stroke-linecap="round" style="cursor: pointer;" />
+              <path id="touch-l" fill="none" stroke="transparent" stroke-width="70" stroke-linecap="round" style="cursor: pointer;" />
             </g>
             <g id="thumbs-group">
               <g id="thumb-h-group" style="pointer-events: none;" filter="url(#brutal-shadow)">
-                <circle cx="0" cy="0" r="22" fill="#fff" stroke="#000" stroke-width="4" />
+                <path d="M -22 0 L 22 0 M 0 -22 L 0 22" stroke="#000" stroke-width="12" stroke-linecap="round" />
+                <path d="M -22 0 L 22 0 M 0 -22 L 0 22" stroke="#fff" stroke-width="6" stroke-linecap="round" />
               </g>
               <g id="thumb-s-group" style="pointer-events: none;" filter="url(#brutal-shadow)">
-                <circle cx="0" cy="0" r="22" fill="#fff" stroke="#000" stroke-width="4" />
+                <path d="M -22 0 L 22 0 M 0 -22 L 0 22" stroke="#000" stroke-width="12" stroke-linecap="round" />
+                <path d="M -22 0 L 22 0 M 0 -22 L 0 22" stroke="#fff" stroke-width="6" stroke-linecap="round" />
               </g>
               <g id="thumb-l-group" style="pointer-events: none;" filter="url(#brutal-shadow)">
-                <circle cx="0" cy="0" r="22" fill="#fff" stroke="#000" stroke-width="4" />
+                <path d="M -22 0 L 22 0 M 0 -22 L 0 22" stroke="#000" stroke-width="12" stroke-linecap="round" />
+                <path d="M -22 0 L 22 0 M 0 -22 L 0 22" stroke="#fff" stroke-width="6" stroke-linecap="round" />
               </g>
             </g>
           </svg>
@@ -175,9 +180,9 @@ export function renderGameView(container, nav) {
     const midY = (bottomY + topY) / 2;
     
     // Sliders curve to the right, from bottom to top
-    const trackSpacing = 40; // 굵기(40)에 딱 맞춰 간격을 주어 붙어있게 함
-    const startX = 40; // Distance from left border
-    const endX = startX + 220; // Curve distance (더 많이 휘게 변경)
+    const trackSpacing = 60; // 굵기(60)에 맞춰 간격 조정
+    const startX = 60; // Distance from left border
+    const endX = startX + 240; // Curve distance
     
     const paths = {
       h: `M ${startX} ${bottomY} C ${startX} ${midY}, ${endX} ${midY}, ${endX} ${topY}`,
