@@ -5,7 +5,7 @@
  */
 
 import { getState, setScore, nextRound, getDifficultyMultiplier } from '../core/GameState.js';
-import { toRGBString, rgbToHex } from '../utils/ColorUtils.js';
+import { toRGBString, rgbToHex, rgbToHsl } from '../utils/ColorUtils.js';
 import { saveRecord } from '../core/Ranking.js';
 import { isSessionValid, clampScore } from '../utils/AntiCheat.js';
 import { getContrastYIQ, animateValue } from './AnimationUtils.js';
@@ -26,6 +26,34 @@ export function renderInterimResultView(container, nav) {
   
   const leftContrast = getContrastYIQ(state.targetColor.r, state.targetColor.g, state.targetColor.b);
   const rightContrast = getContrastYIQ(state.userColor.r, state.userColor.g, state.userColor.b);
+
+  const targetHsl = rgbToHsl(state.targetColor.r, state.targetColor.g, state.targetColor.b);
+  const userHsl = rgbToHsl(state.userColor.r, state.userColor.g, state.userColor.b);
+  
+  let hDiff = userHsl.h - targetHsl.h;
+  if (hDiff > 180) hDiff -= 360;
+  if (hDiff < -180) hDiff += 360;
+  const sDiff = userHsl.s - targetHsl.s;
+  const lDiff = userHsl.l - targetHsl.l;
+
+  const feedbacks = [];
+  if (Math.abs(hDiff) <= 4) feedbacks.push("색조(H)는 거의 완벽합니다.");
+  else if (hDiff > 0) feedbacks.push("색조(H)를 조금 낮춰보세요.");
+  else feedbacks.push("색조(H)를 조금 높여보세요.");
+
+  if (Math.abs(sDiff) <= 4) feedbacks.push("채도(S)는 거의 완벽합니다.");
+  else if (sDiff > 0) feedbacks.push("채도(S)가 다소 높습니다.");
+  else feedbacks.push("채도(S)가 다소 부족합니다.");
+
+  if (Math.abs(lDiff) <= 4) feedbacks.push("명도(L)는 거의 완벽합니다.");
+  else if (lDiff > 0) feedbacks.push("명도(L)가 다소 밝습니다.");
+  else feedbacks.push("명도(L)가 다소 어둡습니다.");
+
+  const feedbackHTML = `
+    <div style="margin-top: 1.5rem; font-family: 'Paperlogy', sans-serif; font-size: 0.95rem; color: #fff; letter-spacing: 1px; line-height: 1.6; text-align: center; word-break: keep-all; font-weight: 300; background: rgba(0,0,0,0.2); padding: 0.8rem 1.2rem; border-radius: 12px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">
+      ${feedbacks.join('<br/>')}
+    </div>
+  `;
 
   container.innerHTML = `
     <div class="split-screen-result" id="interim-panel">
@@ -59,6 +87,7 @@ export function renderInterimResultView(container, nav) {
               <span class="animated-score" data-target="${state.score}">0</span>
             </div>
           </div>
+          ${feedbackHTML}
         </div>
         
         <div style="margin-top: auto; text-align: center; width: 100%; max-width: 400px; z-index: 100; pointer-events: auto;">
