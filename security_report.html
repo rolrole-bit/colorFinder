@@ -62,6 +62,13 @@ tr:hover td{background:#12121a}
 .verdict p{color:#a7c4b5;font-size:.95rem}
 @media(max-width:700px){.grid2{grid-template-columns:1fr}.metric{min-width:80px}}
 footer{text-align:center;padding:3rem;color:#444;font-size:.75rem;border-top:1px solid #1a1a24;margin-top:3rem}
+.tab-nav{display:flex;gap:.5rem;margin:2rem 0 0;justify-content:center}
+.tab-btn{padding:.8rem 2rem;border:1px solid #333;border-radius:10px 10px 0 0;background:#111118;color:#888;font-size:1rem;font-weight:600;cursor:pointer;transition:all .3s;font-family:'Inter',sans-serif;border-bottom:none}
+.tab-btn:hover{color:#fff;background:#1a1a2e}
+.tab-btn.active{background:#0a0a0f;color:#fff;border-color:#7c8aff;border-bottom:2px solid #0a0a0f;position:relative;top:1px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.tab-bar{border-bottom:1px solid #333;margin-bottom:2rem}
 </style>
 </head>
 <body>
@@ -74,19 +81,14 @@ footer{text-align:center;padding:3rem;color:#444;font-size:.75rem;border-top:1px
 
 <div class="container">
 
-<div class="toc">
-  <h2>목차</h2>
-  <a href="#summary">1. 요약</a>
-  <a href="#timeline">2. 보안 강화 타임라인</a>
-  <a href="#threats">3. 위협 모델 &amp; 해결 현황</a>
-  <a href="#server">4. 서버사이드 보안 아키텍처</a>
-  <a href="#client">5. 클라이언트 보안 계층</a>
-  <a href="#refactor">6. 리팩토링 &amp; 데드코드 제거</a>
-  <a href="#owasp">7. OWASP Top 10 컴플라이언스</a>
-  <a href="#verdict">8. 공개 배포 적합성 판정</a>
-  <a href="#windows">9. Windows 배포 가이드 (원클릭)</a>
-  <a href="#deploy">10. 시놀로지 NAS 배포 가이드</a>
+<div class="tab-bar">
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('security')">🛡️ 보안 리포트</button>
+    <button class="tab-btn" onclick="switchTab('install')">📦 설치 방법</button>
+  </div>
 </div>
+
+<div id="tab-security" class="tab-content active">
 
 <!-- 1. 요약 -->
 <section id="summary">
@@ -319,7 +321,9 @@ server {
 }
 </div>
 </section>
+</div><!-- end tab-security -->
 
+<div id="tab-install" class="tab-content">
 <!-- 9. Windows 배포 -->
 <section id="windows">
 <h2><span class="num">09</span>Windows 배포 가이드 (원클릭)</h2>
@@ -495,6 +499,8 @@ pm2 restart dyemaster</div>
 </div>
 </section>
 
+</div><!-- end tab-install -->
+
 </div>
 
 <footer>
@@ -502,5 +508,15 @@ pm2 restart dyemaster</div>
   Stack: Node.js + Express + Helmet.js + dotenv | OWASP Top 10 2021 Compliant
 </footer>
 
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+if (location.hash === '#install') switchTab('install');
+</script>
 </body>
 </html>
