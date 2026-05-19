@@ -91,8 +91,8 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
   let breakdownHTML = '';
   if (state.roundResults && state.roundResults.length > 0) {
     breakdownHTML = `
-      <div style="display: flex; flex-direction: row; gap: 1rem; flex-wrap: wrap; justify-content: center; font-size: 1.1rem; font-weight: 400; letter-spacing: 1px; margin-top: 1rem; color: #fff; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));">
-        ${state.roundResults.map((r, i) => `<div>${i + 1}라운드 <span class="animated-gradient-text" style="font-weight:800; font-size: 1.2em; display: inline-block;">${r.score.toLocaleString()}</span></div>`).join('')}
+      <div style="display: flex; flex-direction: row; gap: 1rem; flex-wrap: wrap; justify-content: center; font-size: 1.1rem; font-weight: 400; letter-spacing: 1px; margin-top: 1rem; color: #fff;">
+        ${state.roundResults.map((r, i) => `<div>ROUND ${i + 1} <span class="animated-gradient-text" style="font-weight:800; font-size: 1.2em; display: inline-block;">${r.score.toLocaleString()}</span></div>`).join('')}
       </div>
     `;
   }
@@ -131,7 +131,7 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
             ${breakdownHTML}
             
             <!-- 한줄평 -->
-            <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.85rem, 2.5vw, 1.1rem); font-weight: 400; color: #fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); letter-spacing: 1px; text-align: center; max-width: 500px; line-height: 1.6; opacity: 0; transition: opacity 1s ease 0.5s; font-style: italic;">
+            <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.85rem, 2.5vw, 1.1rem); font-weight: 400; color: #fff; letter-spacing: 1px; text-align: center; max-width: 500px; line-height: 1.6; opacity: 0; transition: opacity 1s ease 0.5s; font-style: italic;">
               ${comment}
             </div>
           </div>
