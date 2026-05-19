@@ -270,5 +270,13 @@
     "difficulty": "Normal",
     "session_id": "e28b2bf0-24ab-4cd8-807d-aa5ca0055c65",
     "created_at": "2026-05-19T07:54:00.370Z"
+  },
+  {
+    "player_name": "김류진",
+    "origin_game": "마비노기 모바일",
+    "score": 1100,
+    "difficulty": "Hard",
+    "session_id": "d9a3697f-d089-48df-a39b-bbdf3697a19e",
+    "created_at": "2026-05-19T07:57:31.903Z"
   }
 ]

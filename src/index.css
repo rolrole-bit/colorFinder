@@ -570,28 +570,35 @@ input[type="range"]::-webkit-slider-thumb:active {
   height: 100vh;
   display: flex;
   z-index: 2000;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .split-screen-half {
-  flex: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50%;
   height: 100%;
 }
 
+.split-screen-half:nth-child(2) {
+  left: 50%;
+}
+
 .magazine-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  pointer-events: none;
+  pointer-events: auto;
   padding: clamp(1.5rem, 4vh, 3rem);
+  padding-bottom: 6rem;
   box-sizing: border-box;
-  overflow-y: auto;
-  overflow-x: hidden;
+  z-index: 1;
 }
 
 .magazine-score {
