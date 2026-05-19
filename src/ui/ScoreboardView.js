@@ -128,12 +128,12 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
             </div>
             ${breakdownHTML}
             
-            <div id="bonus-text" style="font-size: 1.1rem; font-weight: 300; opacity: 0; letter-spacing: 2px; white-space: nowrap; display: block; margin-top: 1rem; color: #fff; transition: opacity 0.8s ease;">
+            <div id="bonus-text" style="font-size: 1.4rem; font-weight: 700; opacity: 0; letter-spacing: 2px; white-space: nowrap; display: block; margin-top: 1rem; color: #fff; transition: opacity 0.8s ease;">
               ${getDifficultyName(state.difficulty)} BONUS X ${Number(appliedMultiplier.toFixed(2))}
             </div>
             
             <!-- 한줄평 -->
-            <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.85rem, 2.5vw, 1.1rem); font-weight: 400; color: #fff; letter-spacing: 1px; text-align: center; max-width: 500px; line-height: 1.6; opacity: 0; transition: opacity 1s ease 0.5s; font-style: italic;">
+            <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.85rem, 2.5vw, 1.1rem); font-weight: 400; color: #fff; letter-spacing: 1px; text-align: center; max-width: 500px; line-height: 1.6; word-break: keep-all; opacity: 0; transition: opacity 1s ease 0.5s; font-style: italic;">
               ${comment}
             </div>
           </div>
