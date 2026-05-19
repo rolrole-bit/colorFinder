@@ -56,8 +56,8 @@ app.use(helmet({
       frameAncestors: ["'none'"],
       baseUri: ["'self'"],
       formAction: ["'self'"],
-      // HTTPS 리버스 프록시 뒤에서만 활성화 (HTTP 직접 접속 시 비활성화)
-      upgradeInsecureRequests: process.env.TRUST_PROXY === 'true' ? [] : null
+      // HTTPS 전환은 리버스 프록시(Nginx/Synology)가 담당
+      upgradeInsecureRequests: null
     }
   },
   crossOriginEmbedderPolicy: false,
