@@ -17,7 +17,7 @@ import express from 'express';
 import helmet from 'helmet';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { cleanupSessions, getPlayerRankings } from './db.js';
+import { cleanupSessions, getPlayerRankings, getAllPlayerRankings } from './db.js';
 import { rateLimit, blockServerDirectory } from './utils/security.js';
 
 import sessionRoutes from './routes/session.js';
@@ -127,16 +127,37 @@ app.get('/share', (req, res) => {
   const comment = (req.query.comment || '').substring(0, 100).replace(/[<>"'&]/g, '');
   const gameUrl = `${req.protocol}://${req.get('host')}/`;
 
-  // 본인 등수 계산
-  const playerRanks = getPlayerRankings();
-  const totalPlayers = playerRanks.length;
-  let myRank = totalPlayers + 1;
-  for (let i = 0; i < playerRanks.length; i++) {
-    if (score >= playerRanks[i].score) { myRank = i + 1; break; }
+  // 전체 랭킹에서 본인 등수 + 앞뒤 2명 계산
+  const allRanks = getAllPlayerRankings();
+  const totalPlayers = allRanks.length;
+  
+  // 본인 위치 찾기 (이름+점수 매칭, 없으면 점수 기반 삽입 위치)
+  let myIdx = allRanks.findIndex(r => r.playerName === name && r.score === score);
+  if (myIdx === -1) {
+    // 점수 기반으로 삽입될 위치
+    myIdx = allRanks.findIndex(r => score >= r.score);
+    if (myIdx === -1) myIdx = allRanks.length;
   }
-  const rankText = `전체 ${totalPlayers}명 중 ${myRank}위`;
+  const myRank = myIdx + 1;
+  
+  // 앞 2명 + 나 + 뒤 2명 슬라이스
+  const startIdx = Math.max(0, myIdx - 2);
+  const endIdx = Math.min(allRanks.length, myIdx + 3);
+  const esc = (s) => (s || '').substring(0, 12).replace(/[<>"'&]/g, '');
+  
+  let boardHTML = '';
+  for (let i = startIdx; i < endIdx; i++) {
+    const r = allRanks[i];
+    if (!r) continue;
+    const isMe = (i === myIdx);
+    boardHTML += `<div class="rb ${isMe ? 'rb-me' : ''}"><span class="rb-n">${i + 1}</span><span class="rb-nm">${esc(r.playerName)}</span><span class="rb-s">${r.score.toLocaleString()}</span></div>`;
+  }
+  // 본인이 랭킹 밖인 경우 직접 추가
+  if (myIdx >= allRanks.length) {
+    boardHTML += `<div class="rb rb-me"><span class="rb-n">${myRank}</span><span class="rb-nm">${esc(name)}</span><span class="rb-s">${score.toLocaleString()}</span></div>`;
+  }
 
-  // 다중 라운드 색상 파싱 (tc=r,g,b|r,g,b|r,g,b  uc=r,g,b|r,g,b|r,g,b)
+  // 다중 라운드 색상 파싱
   const parseColors = (str) => {
     if (!str) return [];
     return str.split('|').map(s => {
@@ -146,14 +167,8 @@ app.get('/share', (req, res) => {
   };
   const tcArr = parseColors(req.query.tc);
   const ucArr = parseColors(req.query.uc);
-  
-  // 좌측(타겟) 그라데이션, 우측(유저) 그라데이션
-  const leftBg = tcArr.length > 1
-    ? `linear-gradient(to bottom, ${tcArr.join(', ')})`
-    : (tcArr[0] || 'rgb(102,126,234)');
-  const rightBg = ucArr.length > 1
-    ? `linear-gradient(to bottom, ${ucArr.join(', ')})`
-    : (ucArr[0] || 'rgb(118,75,162)');
+  const leftBg = tcArr.length > 1 ? `linear-gradient(to bottom, ${tcArr.join(', ')})` : (tcArr[0] || 'rgb(102,126,234)');
+  const rightBg = ucArr.length > 1 ? `linear-gradient(to bottom, ${ucArr.join(', ')})` : (ucArr[0] || 'rgb(118,75,162)');
 
   const title = `🎨 ${name}님의 DYE MASTER 점수: ${score.toLocaleString()}점`;
   const desc = comment || `색감 테스트에서 ${score.toLocaleString()}점을 획득했습니다! 나의 색감을 증명해 보세요.`;
@@ -189,10 +204,17 @@ body{min-height:100vh;display:flex;align-items:center;justify-content:center;fon
 .label{font-size:.8rem;color:rgba(255,255,255,0.5);letter-spacing:3px;margin-bottom:.4rem;text-transform:uppercase}
 .name{font-size:1.15rem;font-weight:600;margin-bottom:.2rem;color:rgba(255,255,255,0.85)}
 .score{font-size:4.5rem;font-weight:900;line-height:1;color:#fff;text-shadow:0 4px 20px rgba(0,0,0,0.3);margin:.3rem 0 .8rem}
-.comment{font-size:.85rem;color:rgba(255,255,255,0.65);font-style:italic;margin-bottom:2rem;line-height:1.6}
+.comment{font-size:.85rem;color:rgba(255,255,255,0.65);font-style:italic;margin-bottom:1.8rem;line-height:1.6}
 .btn{display:inline-block;padding:.9rem 2.5rem;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);color:#fff;text-decoration:none;border-radius:50px;font-size:1rem;font-weight:700;letter-spacing:1px;transition:all .2s;backdrop-filter:blur(10px)}
 .btn:hover{background:rgba(255,255,255,0.25);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,0.3)}
-.my-rank{margin-top:1.5rem;font-size:.85rem;color:rgba(255,255,255,0.5);letter-spacing:1px}
+.board{margin-top:1.5rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.1);text-align:left}
+.board-title{font-size:.7rem;color:rgba(255,255,255,0.4);letter-spacing:2px;text-align:center;margin-bottom:.5rem;text-transform:uppercase}
+.rb{display:flex;align-items:center;padding:.4rem .6rem;border-radius:8px;font-size:.8rem;color:rgba(255,255,255,0.55);margin-bottom:2px}
+.rb-me{background:rgba(255,255,255,0.12);color:#fff;font-size:.95rem;font-weight:700;padding:.5rem .6rem;border:1px solid rgba(255,255,255,0.15)}
+.rb-n{width:1.8rem;font-weight:800;font-size:.9rem;color:rgba(255,255,255,0.5)}
+.rb-me .rb-n{color:#fff}
+.rb-nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rb-s{font-weight:700;min-width:3rem;text-align:right}
 </style>
 </head>
 <body>
@@ -204,7 +226,10 @@ body{min-height:100vh;display:flex;align-items:center;justify-content:center;fon
   <div class="score">${score.toLocaleString()}</div>
   <div class="comment">${desc}</div>
   <a href="${gameUrl}" class="btn">나도 도전하기</a>
-  <div class="my-rank">🏆 ${rankText}</div>
+  <div class="board">
+    <div class="board-title">🏆 전체 ${totalPlayers}명 중 ${myRank}위</div>
+    ${boardHTML}
+  </div>
 </div>
 </body>
 </html>`);

@@ -207,6 +207,13 @@ export function getGameRankings() {
  * 플레이어별 랭킹 조회 (상위 5명)
  */
 export function getPlayerRankings() {
+  return getAllPlayerRankings().slice(0, 5);
+}
+
+/**
+ * 전체 플레이어 랭킹 (중복 제거, 점수 내림차순)
+ */
+export function getAllPlayerRankings() {
   const rankings = loadRankings();
   
   const playerMap = {};
@@ -223,8 +230,7 @@ export function getPlayerRankings() {
   });
   
   return Object.values(playerMap)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 5);
+    .sort((a, b) => b.score - a.score);
 }
 
 // ═══════════════════════════════════════════

@@ -230,5 +230,13 @@
     "difficulty": "Hard",
     "session_id": "fd82e2d8-b9df-4266-be35-92320a4ad6b7",
     "created_at": "2026-05-19T06:23:48.186Z"
+  },
+  {
+    "player_name": "신류진",
+    "origin_game": "마비노기 모바일",
+    "score": 1104,
+    "difficulty": "Hard",
+    "session_id": "824cee75-b8b4-4fe5-9992-5725c8a9d070",
+    "created_at": "2026-05-19T06:29:27.248Z"
   }
 ]
