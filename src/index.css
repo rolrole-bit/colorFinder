@@ -631,7 +631,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   border: none;
   border-radius: 0;
   width: 100%;
-  max-width: 1000px;
   pointer-events: auto;
   flex-shrink: 0;
 }
@@ -647,6 +646,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   color: #fff;
   background: none;
   -webkit-text-fill-color: #fff;
+  text-align: left;
 }
 
 /* === NEW: Magazine Entry Screen === */
