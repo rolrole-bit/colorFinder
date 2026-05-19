@@ -118,6 +118,54 @@ app.use((req, res, next) => {
 });
 
 // ═══════════════════════════════════════════
+// OG 공유 페이지 (SNS 미리보기 카드)
+// ═══════════════════════════════════════════
+
+app.get('/share', (req, res) => {
+  const score = parseInt(req.query.score) || 0;
+  const name = (req.query.name || '플레이어').substring(0, 20).replace(/[<>"'&]/g, '');
+  const comment = (req.query.comment || '').substring(0, 100).replace(/[<>"'&]/g, '');
+  const gameUrl = `${req.protocol}://${req.get('host')}/`;
+
+  // SNS 크롤러 감지 (User-Agent)
+  const ua = (req.headers['user-agent'] || '').toLowerCase();
+  const isBot = /facebookexternalhit|twitterbot|slackbot|linkedinbot|kakaotalk|discordbot|telegrambot|line|whatsapp/i.test(ua);
+
+  if (!isBot) {
+    // 실제 유저 → 게임 페이지로 리다이렉트
+    return res.redirect(302, gameUrl);
+  }
+
+  // SNS 크롤러 → OG 메타태그 HTML 반환
+  const title = `🎨 ${name}님의 DYE MASTER 점수: ${score.toLocaleString()}점`;
+  const desc = comment || `색감 테스트에서 ${score.toLocaleString()}점을 획득했습니다! 나의 색감을 증명해 보세요.`;
+
+  res.send(`<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>${title}</title>
+<meta name="description" content="${desc}">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="${title}">
+<meta property="og:description" content="${desc}">
+<meta property="og:url" content="${gameUrl}">
+<meta property="og:site_name" content="DYE MASTER">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="${title}">
+<meta name="twitter:description" content="${desc}">
+
+<meta http-equiv="refresh" content="0;url=${gameUrl}">
+</head>
+<body><p><a href="${gameUrl}">DYE MASTER 플레이하기</a></p></body>
+</html>`);
+});
+
+// ═══════════════════════════════════════════
 // 정적 파일
 // ═══════════════════════════════════════════
 

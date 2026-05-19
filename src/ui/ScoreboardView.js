@@ -155,7 +155,14 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
     <div id="share-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); justify-content:center; align-items:center;">
       <div style="background:#1a1a2e; border-radius:16px; padding:2rem; max-width:360px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
         <div style="font-size:1.3rem; font-weight:700; color:#fff; margin-bottom:0.5rem;">📤 공유하기</div>
-        <div id="share-toast" style="font-size:0.9rem; color:#aaa; margin-bottom:1.5rem;">점수 이미지가 클립보드에 복사되었습니다!</div>
+        <div id="share-toast" style="font-size:0.85rem; color:#7fda89; margin-bottom:1rem;">✅ 점수 이미지가 클립보드에 복사되었습니다!</div>
+        
+        <!-- 공유 URL -->
+        <div style="display:flex; gap:0.5rem; margin-bottom:1.2rem;">
+          <input id="share-url-input" type="text" readonly style="flex:1; padding:0.6rem 0.8rem; border-radius:8px; border:1px solid #333; background:#111; color:#ccc; font-size:0.8rem; outline:none;">
+          <button id="copy-url-btn" style="padding:0.6rem 1rem; border:none; border-radius:8px; background:#667eea; color:#fff; font-size:0.8rem; cursor:pointer; white-space:nowrap;">URL 복사</button>
+        </div>
+        
         <div style="display:flex; justify-content:center; gap:1.5rem; margin-bottom:1.5rem;">
           <a id="share-twitter" href="#" target="_blank" rel="noopener" style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;text-decoration:none;color:#1DA1F2;">
             <div style="width:52px;height:52px;border-radius:14px;background:#1DA1F2;display:flex;align-items:center;justify-content:center;">
@@ -223,11 +230,15 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
     }, 400);
   });
 
-  // 공유하기 → 클립보드 복사 + 모달
+  // 공유하기 → 클립보드 이미지 복사 + OG URL 공유 모달
   document.getElementById('share-btn').addEventListener('click', async () => {
     const shareBtn = document.getElementById('share-btn');
     shareBtn.disabled = true;
     shareBtn.textContent = '캡처 중...';
+    
+    // OG 공유 URL 생성
+    const comment = getScoreComment(state.score);
+    const sharePageUrl = `${window.location.origin}/share?score=${state.score}&name=${encodeURIComponent(state.playerName)}&comment=${encodeURIComponent(comment)}`;
     
     try {
       // html2canvas 동적 로드
@@ -241,9 +252,8 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
         });
       }
       
-      // 하단 버튼 & 모달 숨기고 캡처
+      // 하단 버튼 숨기고 캡처
       const btnBar = shareBtn.parentElement;
-      const modal = document.getElementById('share-modal');
       btnBar.style.display = 'none';
       
       const canvas = await window.html2canvas(document.getElementById('score-panel'), {
@@ -254,30 +264,38 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
       
       btnBar.style.display = 'flex';
       
-      // 클립보드로 복사
+      // 클립보드로 이미지 복사
       const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+      const toast = document.getElementById('share-toast');
       try {
         await navigator.clipboard.write([
           new ClipboardItem({ 'image/png': blob })
         ]);
+        toast.textContent = '✅ 점수 이미지가 클립보드에 복사되었습니다!';
+        toast.style.color = '#7fda89';
       } catch (e) {
-        console.warn('[Share] 클립보드 복사 실패:', e);
+        toast.textContent = '⚠️ 이미지 복사 실패. URL을 직접 복사해 주세요.';
+        toast.style.color = '#ffa94d';
       }
       
-      // SNS 공유 링크 설정
-      const shareText = encodeURIComponent(`DYE MASTER에서 ${state.score.toLocaleString()}점을 획득했어요! 🎨 나의 색감을 증명하세요!`);
-      const shareUrl = encodeURIComponent(window.location.href);
+      // 공유 URL 세팅
+      document.getElementById('share-url-input').value = sharePageUrl;
       
-      document.getElementById('share-twitter').href = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
-      document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}&quote=${shareText}`;
-      document.getElementById('share-instagram').href = '#'; // Instagram은 직접 공유 API 없음
+      // SNS 공유 링크 (OG URL 포함)
+      const shareText = encodeURIComponent(`DYE MASTER에서 ${state.score.toLocaleString()}점! 🎨 나의 색감을 증명하세요!`);
+      const encodedUrl = encodeURIComponent(sharePageUrl);
+      
+      document.getElementById('share-twitter').href = `https://twitter.com/intent/tweet?text=${shareText}&url=${encodedUrl}`;
+      document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
       document.getElementById('share-instagram').addEventListener('click', (e) => {
         e.preventDefault();
-        alert('Instagram은 앱에서 직접 공유해주세요.\n클립보드에 복사된 이미지를 붙여넣기 하세요!');
+        navigator.clipboard.writeText(sharePageUrl).then(() => {
+          alert('URL이 복사되었습니다!\nInstagram 스토리나 게시물에 붙여넣기 하세요.');
+        });
       }, { once: true });
       
       // 모달 표시
-      modal.style.display = 'flex';
+      document.getElementById('share-modal').style.display = 'flex';
       
     } catch (err) {
       console.error('[Share]', err);
@@ -285,6 +303,16 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
       shareBtn.textContent = '📤 공유하기';
       shareBtn.disabled = false;
     }
+  });
+  
+  // URL 복사 버튼
+  document.getElementById('copy-url-btn').addEventListener('click', () => {
+    const urlInput = document.getElementById('share-url-input');
+    navigator.clipboard.writeText(urlInput.value).then(() => {
+      const btn = document.getElementById('copy-url-btn');
+      btn.textContent = '✅ 복사됨';
+      setTimeout(() => { btn.textContent = 'URL 복사'; }, 1500);
+    });
   });
   
   // 모달 닫기
