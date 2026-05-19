@@ -127,16 +127,6 @@ app.get('/share', (req, res) => {
   const comment = (req.query.comment || '').substring(0, 100).replace(/[<>"'&]/g, '');
   const gameUrl = `${req.protocol}://${req.get('host')}/`;
 
-  // SNS 크롤러 감지 (User-Agent)
-  const ua = (req.headers['user-agent'] || '').toLowerCase();
-  const isBot = /facebookexternalhit|twitterbot|slackbot|linkedinbot|kakaotalk|discordbot|telegrambot|line|whatsapp/i.test(ua);
-
-  if (!isBot) {
-    // 실제 유저 → 게임 페이지로 리다이렉트
-    return res.redirect(302, gameUrl);
-  }
-
-  // SNS 크롤러 → OG 메타태그 HTML 반환
   const title = `🎨 ${name}님의 DYE MASTER 점수: ${score.toLocaleString()}점`;
   const desc = comment || `색감 테스트에서 ${score.toLocaleString()}점을 획득했습니다! 나의 색감을 증명해 보세요.`;
 
@@ -144,24 +134,41 @@ app.get('/share', (req, res) => {
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${title}</title>
 <meta name="description" content="${desc}">
-
-<!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${desc}">
 <meta property="og:url" content="${gameUrl}">
 <meta property="og:site_name" content="DYE MASTER">
-
-<!-- Twitter Card -->
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="${title}">
 <meta name="twitter:description" content="${desc}">
-
-<meta http-equiv="refresh" content="0;url=${gameUrl}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0a;font-family:'Inter',sans-serif;color:#fff}
+.card{text-align:center;padding:3rem 2rem;max-width:400px;width:90%;background:linear-gradient(135deg,rgba(102,126,234,0.15),rgba(118,75,162,0.15));border:1px solid rgba(255,255,255,0.1);border-radius:24px;backdrop-filter:blur(10px)}
+.label{font-size:.9rem;color:#aaa;letter-spacing:2px;margin-bottom:.5rem}
+.name{font-size:1.3rem;font-weight:700;margin-bottom:.3rem}
+.score{font-size:5rem;font-weight:900;line-height:1;background:linear-gradient(135deg,#667eea,#764ba2,#f093fb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:.5rem 0}
+.comment{font-size:.95rem;color:#bbb;font-style:italic;margin:1rem 0 2rem;line-height:1.5}
+.btn{display:inline-block;padding:1rem 3rem;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;text-decoration:none;border-radius:50px;font-size:1.1rem;font-weight:700;letter-spacing:1px;transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(102,126,234,0.4)}
+.sub{font-size:.75rem;color:#555;margin-top:1.5rem}
+</style>
 </head>
-<body><p><a href="${gameUrl}">DYE MASTER 플레이하기</a></p></body>
+<body>
+<div class="card">
+  <div class="label">DYE MASTER</div>
+  <div class="name">${name}님의 점수</div>
+  <div class="score">${score.toLocaleString()}</div>
+  <div class="comment">${desc}</div>
+  <a href="${gameUrl}" class="btn">🎨 나도 도전하기</a>
+  <div class="sub">색감 테스트 게임</div>
+</div>
+</body>
 </html>`);
 });
 
