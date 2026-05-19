@@ -36,22 +36,27 @@ export function renderInterimResultView(container, nav) {
   const sDiff = userHsl.s - targetHsl.s;
   const lDiff = userHsl.l - targetHsl.l;
 
-  const feedbacks = [];
-  if (Math.abs(hDiff) <= 4) feedbacks.push("색조(H)는 거의 완벽합니다.");
-  else if (hDiff > 0) feedbacks.push("색조(H)를 조금 낮춰보세요.");
-  else feedbacks.push("색조(H)를 조금 높여보세요.");
+  const perfects = [];
+  const flaws = [];
+  
+  if (Math.abs(hDiff) <= 4) perfects.push("색조"); else flaws.push("색조");
+  if (Math.abs(sDiff) <= 4) perfects.push("채도"); else flaws.push("채도");
+  if (Math.abs(lDiff) <= 4) perfects.push("명도"); else flaws.push("명도");
 
-  if (Math.abs(sDiff) <= 4) feedbacks.push("채도(S)는 거의 완벽합니다.");
-  else if (sDiff > 0) feedbacks.push("채도(S)가 다소 높습니다.");
-  else feedbacks.push("채도(S)가 다소 부족합니다.");
-
-  if (Math.abs(lDiff) <= 4) feedbacks.push("명도(L)는 거의 완벽합니다.");
-  else if (lDiff > 0) feedbacks.push("명도(L)가 다소 밝습니다.");
-  else feedbacks.push("명도(L)가 다소 어둡습니다.");
+  let feedbackText = "";
+  if (perfects.length === 3) {
+    feedbackText = "완벽하게 색상을 맞추셨습니다!";
+  } else if (perfects.length === 0) {
+    feedbackText = "색조, 채도, 명도 모두 조금씩 조절이 필요합니다.";
+  } else {
+    const pStr = perfects.join("와 ");
+    const fStr = flaws.join("와 ");
+    feedbackText = `${pStr}는 완벽하나, ${fStr}가 다소 아쉽습니다.`;
+  }
 
   const feedbackHTML = `
     <div style="margin-top: 1.5rem; font-family: 'Paperlogy', sans-serif; font-size: 0.95rem; color: #fff; letter-spacing: 1px; line-height: 1.6; text-align: center; word-break: keep-all; font-weight: 300; background: rgba(0,0,0,0.2); padding: 0.8rem 1.2rem; border-radius: 12px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">
-      ${feedbacks.join('<br/>')}
+      ${feedbackText}
     </div>
   `;
 
