@@ -111,8 +111,8 @@ export function renderGameView(container, nav) {
         <div id="svg-sliders-container" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none;">
           <svg id="sliders-svg" width="100%" height="100%" style="pointer-events: auto; touch-action: none;">
             <defs>
-              <filter id="brutal-shadow" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow dx="4" dy="4" stdDeviation="0" flood-color="#000" flood-opacity="1" />
+              <filter id="track-blur" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="25" />
               </filter>
               <linearGradient id="grad-h" x1="0" y1="1" x2="0" y2="0">
                 <stop offset="0%" stop-color="#ff0000" />
@@ -133,7 +133,7 @@ export function renderGameView(container, nav) {
                 <stop offset="100%" stop-color="#fff" />
               </linearGradient>
             </defs>
-            <g id="tracks-group">
+            <g id="tracks-group" filter="url(#track-blur)">
               <!-- Colored tracks (딱 붙게) -->
               <path id="track-h" fill="none" stroke="url(#grad-h)" stroke-width="60" stroke-linecap="round" />
               <path id="track-s" fill="none" stroke="url(#grad-s)" stroke-width="60" stroke-linecap="round" />
@@ -145,17 +145,17 @@ export function renderGameView(container, nav) {
               <path id="touch-l" fill="none" stroke="transparent" stroke-width="70" stroke-linecap="round" style="cursor: pointer;" />
             </g>
             <g id="thumbs-group">
-              <g id="thumb-h-group" style="pointer-events: none;" filter="url(#brutal-shadow)">
-                <path d="M -22 0 L 22 0 M 0 -22 L 0 22" stroke="#000" stroke-width="12" stroke-linecap="round" />
-                <path d="M -22 0 L 22 0 M 0 -22 L 0 22" stroke="#fff" stroke-width="6" stroke-linecap="round" />
+              <g id="thumb-h-group" style="pointer-events: none;">
+                <path d="M -20 0 L 20 0 M 0 -20 L 0 20" stroke="#000" stroke-width="9" stroke-linecap="round" />
+                <path d="M -20 0 L 20 0 M 0 -20 L 0 20" stroke="#fff" stroke-width="5" stroke-linecap="round" />
               </g>
-              <g id="thumb-s-group" style="pointer-events: none;" filter="url(#brutal-shadow)">
-                <path d="M -22 0 L 22 0 M 0 -22 L 0 22" stroke="#000" stroke-width="12" stroke-linecap="round" />
-                <path d="M -22 0 L 22 0 M 0 -22 L 0 22" stroke="#fff" stroke-width="6" stroke-linecap="round" />
+              <g id="thumb-s-group" style="pointer-events: none;">
+                <path d="M -20 0 L 20 0 M 0 -20 L 0 20" stroke="#000" stroke-width="9" stroke-linecap="round" />
+                <path d="M -20 0 L 20 0 M 0 -20 L 0 20" stroke="#fff" stroke-width="5" stroke-linecap="round" />
               </g>
-              <g id="thumb-l-group" style="pointer-events: none;" filter="url(#brutal-shadow)">
-                <path d="M -22 0 L 22 0 M 0 -22 L 0 22" stroke="#000" stroke-width="12" stroke-linecap="round" />
-                <path d="M -22 0 L 22 0 M 0 -22 L 0 22" stroke="#fff" stroke-width="6" stroke-linecap="round" />
+              <g id="thumb-l-group" style="pointer-events: none;">
+                <path d="M -20 0 L 20 0 M 0 -20 L 0 20" stroke="#000" stroke-width="9" stroke-linecap="round" />
+                <path d="M -20 0 L 20 0 M 0 -20 L 0 20" stroke="#fff" stroke-width="5" stroke-linecap="round" />
               </g>
             </g>
           </svg>
@@ -181,8 +181,13 @@ export function renderGameView(container, nav) {
     
     // Sliders curve to the right, from bottom to top
     const trackSpacing = 60; // 굵기(60)에 맞춰 간격 조정
-    const startX = 60; // Distance from left border
-    const endX = startX + 240; // Curve distance
+    
+    // 화면 폭을 기준으로 트랙 전체를 중앙에 정렬
+    const curveWidth = 240; 
+    const totalTrackWidth = trackSpacing * 2;
+    const totalVisualWidth = curveWidth + totalTrackWidth;
+    const startX = (svgWidth - totalVisualWidth) / 2;
+    const endX = startX + curveWidth;
     
     const paths = {
       h: `M ${startX} ${bottomY} C ${startX} ${midY}, ${endX} ${midY}, ${endX} ${topY}`,
