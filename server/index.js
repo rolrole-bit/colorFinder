@@ -55,7 +55,9 @@ app.use(helmet({
       objectSrc: ["'none'"],
       frameAncestors: ["'none'"],
       baseUri: ["'self'"],
-      formAction: ["'self'"]
+      formAction: ["'self'"],
+      // HTTPS 리버스 프록시 뒤에서만 활성화 (HTTP 직접 접속 시 비활성화)
+      upgradeInsecureRequests: process.env.TRUST_PROXY === 'true' ? [] : null
     }
   },
   crossOriginEmbedderPolicy: false,

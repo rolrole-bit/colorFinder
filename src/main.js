@@ -7,6 +7,10 @@ import { initUI } from './ui/UIManager.js';
 try {
   initUI();
 } catch (e) {
-  document.body.innerHTML = `<div style="color: red; padding: 20px;">Error: ${e.message}<br><pre>${e.stack}</pre></div>`;
-  console.error(e);
+  document.getElementById('app').innerHTML = `<div style="color: red; padding: 20px; background:#000; font-family:monospace;">
+    <h2>initUI Error</h2>
+    <pre>${e.message}</pre>
+    <pre>${e.stack}</pre>
+  </div>`;
+  console.error('[DYE MASTER]', e);
 }
