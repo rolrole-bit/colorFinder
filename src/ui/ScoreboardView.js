@@ -1,7 +1,7 @@
 /**
  * ScoreboardView - 최종 스코어보드 (랭킹 표시)
  * 
- * 담당: 최종 점수 애니메이션 + 게임/플레이어 랭킹 표시 + 재시작/지옥 도전
+ * 담당: 최종 점수 애니메이션 + 게임/플레이어 랭킹 표시 + 공유 + 한줄평
  */
 
 import { getState, resetGame, setDifficulty, getDifficultyName, getDifficultyMultiplier } from '../core/GameState.js';
@@ -10,6 +10,24 @@ import { toRGBString, rgbToHex } from '../utils/ColorUtils.js';
 import { escapeHTML, clearSession } from '../utils/AntiCheat.js';
 import { playBonusBounceSound, playScoreImpactSound } from '../utils/SoundUtils.js';
 import { getContrastYIQ, animateValue } from './AnimationUtils.js';
+
+/**
+ * 점수 기반 한줄평 (10단계, 일본 애니메이션 선생님 교훈 톤)
+ * @param {number} score - 최종 점수
+ * @returns {string}
+ */
+function getScoreComment(score) {
+  if (score >= 2700) return "「전설이 되었구나... 너야말로 진정한 色の達人(이로노 타츠진)이다.」";
+  if (score >= 2400) return "「경이로운 실력... 네 눈에는 색의 심연이 보이는 것이냐.」";
+  if (score >= 2100) return "「놀랍다! 네 색감은 이미 장인의 경지에 들어섰구나.」";
+  if (score >= 1800) return "「대단하군... 색의 본질을 꿰뚫어 보고 있어.」";
+  if (score >= 1500) return "「훌륭해. 너의 눈은 이미 범인을 넘어섰다.」";
+  if (score >= 1200) return "「제법이군! 색의 흐름을 읽기 시작했구나.」";
+  if (score >= 900) return "「좋아, 네 안의 색감이 깨어나고 있어. 계속 정진하거라.」";
+  if (score >= 600) return "「나쁘지 않군. 색의 조각이 보이기 시작한 거야.」";
+  if (score >= 300) return "「아직 갈 길이 멀다. 하지만 포기하지 않는 자만이 색을 읽을 수 있지.」";
+  return "「흠... 색을 보는 눈이 아직 열리지 않았구나. 수련이 필요해.」";
+}
 
 /**
  * 최종 스코어보드 화면 렌더링
@@ -46,8 +64,6 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
 
   const targetRGB = toRGBString(state.targetColor);
   const userRGB = toRGBString(state.userColor);
-  const targetHex = rgbToHex(state.targetColor.r, state.targetColor.g, state.targetColor.b);
-  const userHex = rgbToHex(state.userColor.r, state.userColor.g, state.userColor.b);
   
   const leftContrast = getContrastYIQ(state.targetColor.r, state.targetColor.g, state.targetColor.b);
   const rightContrast = getContrastYIQ(state.userColor.r, state.userColor.g, state.userColor.b);
@@ -70,6 +86,9 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
     `;
   }
 
+  const comment = getScoreComment(state.score);
+  const playerNameSafe = escapeHTML(state.playerName);
+
   container.innerHTML = `
     <div class="split-screen-result" id="score-panel">
       <!-- 50:50 분할 배경 -->
@@ -79,10 +98,15 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
       <!-- 매거진 오버레이 -->
       <div class="magazine-overlay">
 
-        <!-- 중앙 영역: 라운드 결과 + 최종 스코어 -->
+        <!-- 중앙 영역: 플레이어 이름 + 최종 스코어 + 한줄평 -->
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 4rem; margin-top: 2rem;">
 
           <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <!-- 플레이어 이름 -->
+            <div style="font-size: clamp(1rem, 3vw, 1.4rem); font-weight: 300; color: #fff; letter-spacing: 2px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); margin-bottom: 0.5rem;">
+              <span style="font-weight: 700;">${playerNameSafe}</span>님의 점수는
+            </div>
+            
             <div style="display: flex; flex-direction: column; text-align: center;">
               <div class="magazine-score" style="margin-top: 0; font-size: clamp(5rem, 18vw, 10rem);">
                 <div class="animated-gradient-text" style="line-height: 1;">
@@ -94,6 +118,11 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
               </div>
             </div>
             ${breakdownHTML}
+            
+            <!-- 한줄평 -->
+            <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.85rem, 2.5vw, 1.1rem); font-weight: 400; color: #fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); letter-spacing: 1px; text-align: center; max-width: 500px; line-height: 1.6; opacity: 0; transition: opacity 1s ease 0.5s; font-style: italic;">
+              ${comment}
+            </div>
           </div>
         </div>
         
@@ -121,7 +150,42 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
         <button class="magazine-start-btn" id="share-btn" style="flex: 1; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; box-shadow: 0 10px 30px rgba(118,75,162,0.5);">📤 공유하기</button>
       </div>
     </div>
+    
+    <!-- 공유 모달 -->
+    <div id="share-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); justify-content:center; align-items:center;">
+      <div style="background:#1a1a2e; border-radius:16px; padding:2rem; max-width:360px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+        <div style="font-size:1.3rem; font-weight:700; color:#fff; margin-bottom:0.5rem;">📤 공유하기</div>
+        <div id="share-toast" style="font-size:0.9rem; color:#aaa; margin-bottom:1.5rem;">점수 이미지가 클립보드에 복사되었습니다!</div>
+        <div style="display:flex; justify-content:center; gap:1.5rem; margin-bottom:1.5rem;">
+          <a id="share-twitter" href="#" target="_blank" rel="noopener" style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;text-decoration:none;color:#1DA1F2;">
+            <div style="width:52px;height:52px;border-radius:14px;background:#1DA1F2;display:flex;align-items:center;justify-content:center;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </div>
+            <span style="font-size:0.75rem;">Twitter</span>
+          </a>
+          <a id="share-facebook" href="#" target="_blank" rel="noopener" style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;text-decoration:none;color:#1877F2;">
+            <div style="width:52px;height:52px;border-radius:14px;background:#1877F2;display:flex;align-items:center;justify-content:center;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </div>
+            <span style="font-size:0.75rem;">Facebook</span>
+          </a>
+          <a id="share-instagram" href="#" target="_blank" rel="noopener" style="display:flex;flex-direction:column;align-items:center;gap:0.4rem;text-decoration:none;color:#E4405F;">
+            <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            </div>
+            <span style="font-size:0.75rem;">Instagram</span>
+          </a>
+        </div>
+        <button id="share-close-btn" style="width:100%;padding:0.8rem;border:none;border-radius:10px;background:#333;color:#fff;font-size:1rem;cursor:pointer;transition:background 0.2s;">닫기</button>
+      </div>
+    </div>
   `;
+
+  // 한줄평 페이드 인
+  requestAnimationFrame(() => {
+    const commentEl = document.getElementById('score-comment');
+    if (commentEl) commentEl.style.opacity = '1';
+  });
 
   // 점수 애니메이션
   const animatedScoreFinal = container.querySelector('.animated-score');
@@ -159,12 +223,11 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
     }, 400);
   });
 
-  // 공유하기
+  // 공유하기 → 클립보드 복사 + 모달
   document.getElementById('share-btn').addEventListener('click', async () => {
     const shareBtn = document.getElementById('share-btn');
-    const originalText = shareBtn.textContent;
-    shareBtn.textContent = '캡처 중...';
     shareBtn.disabled = true;
+    shareBtn.textContent = '캡처 중...';
     
     try {
       // html2canvas 동적 로드
@@ -178,8 +241,9 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
         });
       }
       
-      // 하단 버튼 숨기고 캡처
+      // 하단 버튼 & 모달 숨기고 캡처
       const btnBar = shareBtn.parentElement;
+      const modal = document.getElementById('share-modal');
       btnBar.style.display = 'none';
       
       const canvas = await window.html2canvas(document.getElementById('score-panel'), {
@@ -190,31 +254,46 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
       
       btnBar.style.display = 'flex';
       
-      // Canvas → Blob
+      // 클립보드로 복사
       const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-      const file = new File([blob], 'dye-master-score.png', { type: 'image/png' });
-      
-      // Web Share API 시도
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          title: 'DYE MASTER - 내 색감 점수',
-          text: `DYE MASTER에서 ${state.score.toLocaleString()}점을 획득했어요! 🎨`,
-          files: [file]
-        });
-      } else {
-        // 폴백: 이미지 다운로드
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'dye-master-score.png';
-        a.click();
-        URL.revokeObjectURL(url);
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+      } catch (e) {
+        console.warn('[Share] 클립보드 복사 실패:', e);
       }
+      
+      // SNS 공유 링크 설정
+      const shareText = encodeURIComponent(`DYE MASTER에서 ${state.score.toLocaleString()}점을 획득했어요! 🎨 나의 색감을 증명하세요!`);
+      const shareUrl = encodeURIComponent(window.location.href);
+      
+      document.getElementById('share-twitter').href = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+      document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}&quote=${shareText}`;
+      document.getElementById('share-instagram').href = '#'; // Instagram은 직접 공유 API 없음
+      document.getElementById('share-instagram').addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('Instagram은 앱에서 직접 공유해주세요.\n클립보드에 복사된 이미지를 붙여넣기 하세요!');
+      }, { once: true });
+      
+      // 모달 표시
+      modal.style.display = 'flex';
+      
     } catch (err) {
       console.error('[Share]', err);
     } finally {
-      shareBtn.textContent = originalText;
+      shareBtn.textContent = '📤 공유하기';
       shareBtn.disabled = false;
+    }
+  });
+  
+  // 모달 닫기
+  document.getElementById('share-close-btn').addEventListener('click', () => {
+    document.getElementById('share-modal').style.display = 'none';
+  });
+  document.getElementById('share-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'share-modal') {
+      document.getElementById('share-modal').style.display = 'none';
     }
   });
 }
