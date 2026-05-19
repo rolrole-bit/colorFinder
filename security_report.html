@@ -84,6 +84,7 @@ footer{text-align:center;padding:3rem;color:#444;font-size:.75rem;border-top:1px
   <a href="#refactor">6. 리팩토링 &amp; 데드코드 제거</a>
   <a href="#owasp">7. OWASP Top 10 컴플라이언스</a>
   <a href="#verdict">8. 공개 배포 적합성 판정</a>
+  <a href="#deploy">9. 시놀로지 NAS 배포 가이드</a>
 </div>
 
 <!-- 1. 요약 -->
@@ -315,6 +316,133 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
+</div>
+</section>
+
+<!-- 9. 시놀로지 배포 -->
+<section id="deploy">
+<h2><span class="num">09</span>시놀로지 NAS 배포 가이드</h2>
+<p>이전 버전(정적 파일)과 달리 v3.0은 Node.js 서버가 필수입니다. 아래 순서대로 진행하세요.</p>
+
+<h3>STEP 1. Node.js 설치</h3>
+<div class="card">
+<div class="card-title">패키지 센터 → Node.js v20 설치</div>
+<p>DSM 패키지 센터에서 "Node.js v20" 검색 후 설치. 없으면 커뮤니티 소스 추가 필요.</p>
+</div>
+<div class="code"># SSH 접속 후 확인
+ssh admin@시놀로지IP -p 포트
+node -v   # v20.x.x 확인
+npm -v    # 10.x.x 확인</div>
+
+<h3>STEP 2. 프로젝트 업로드</h3>
+<div class="code"># 방법 A: Git Clone (권장)
+cd /volume1/web
+git clone https://github.com/rolrole-bit/colorFinder.git dyemaster
+cd dyemaster
+
+# 방법 B: File Station으로 ZIP 업로드
+# /volume1/web/dyemaster/ 에 압축 해제</div>
+
+<h3>STEP 3. 의존성 설치 &amp; 환경설정</h3>
+<div class="code"># 의존성 설치
+cd /volume1/web/dyemaster
+npm install --production
+
+# 환경변수 설정
+cp .env.example .env
+vi .env</div>
+<div class="card">
+<div class="card-title">.env 설정 (시놀로지용)</div>
+<p>아래 값을 시놀로지 환경에 맞게 수정:</p>
+</div>
+<div class="code">PORT=8080
+NODE_ENV=production
+CORS_ORIGINS=http://시놀로지IP:8080,https://도메인.synology.me
+TRUST_PROXY=true
+RATE_LIMIT_SESSION=5
+RATE_LIMIT_ROUND=20
+RATE_LIMIT_RANKING=30
+MAX_SESSIONS=1000
+MAX_RANKINGS=1000</div>
+
+<h3>STEP 4. PM2로 영구 실행</h3>
+<div class="card">
+<div class="card-title">왜 PM2인가?</div>
+<p>node server/index.js는 SSH 종료 시 함께 종료됩니다. PM2는 프로세스 매니저로 자동 재시작, 로그 관리, 부팅 시 자동 실행을 지원합니다.</p>
+</div>
+<div class="code"># PM2 전역 설치
+npm install -g pm2
+
+# 서버 시작
+cd /volume1/web/dyemaster
+pm2 start server/index.js --name dyemaster
+
+# 상태 확인
+pm2 status
+pm2 logs dyemaster
+
+# 부팅 시 자동 시작 등록
+pm2 startup
+pm2 save
+
+# 업데이트 후 재시작
+git pull
+npm install --production
+pm2 restart dyemaster</div>
+
+<h3>STEP 5. DSM 리버스 프록시 설정 (HTTPS)</h3>
+<div class="card">
+<div class="card-title">DSM 제어판 → 로그인 포털 → 고급 → 역방향 프록시</div>
+<p>시놀로지 내장 리버스 프록시로 HTTPS를 무료로 적용합니다. Let's Encrypt 인증서는 DSM이 자동 관리합니다.</p>
+</div>
+<table>
+<thead><tr><th>항목</th><th>설정값</th></tr></thead>
+<tbody>
+<tr><td>설명</td><td>DYE MASTER</td></tr>
+<tr><td>소스 프로토콜</td><td>HTTPS</td></tr>
+<tr><td>소스 호스트명</td><td>*.synology.me 또는 커스텀 도메인</td></tr>
+<tr><td>소스 포트</td><td>443 (또는 원하는 외부 포트)</td></tr>
+<tr><td>대상 프로토콜</td><td>HTTP</td></tr>
+<tr><td>대상 호스트명</td><td>localhost</td></tr>
+<tr><td>대상 포트</td><td>8080</td></tr>
+</tbody>
+</table>
+
+<h3>STEP 6. Let's Encrypt 인증서</h3>
+<div class="code"># DSM 제어판 → 보안 → 인증서 → 추가
+# "Let's Encrypt에서 인증서 가져오기" 선택
+# 도메인: your-name.synology.me
+# 이메일 입력 → 적용
+
+# 인증서를 리버스 프록시에 할당:
+# 제어판 → 보안 → 인증서 → 구성
+# DYE MASTER 역방향 프록시에 인증서 지정</div>
+
+<h3>STEP 7. 방화벽 설정</h3>
+<div class="code"># DSM 제어판 → 보안 → 방화벽 → 규칙 편집
+# 포트 8080 허용 (내부 직접 접속 시)
+# 포트 443 허용 (HTTPS 리버스 프록시 시)
+
+# ⚠️ 외부 공개 시 포트 8080은 차단하고
+#    443만 열어 리버스 프록시 경유만 허용</div>
+
+<h3>STEP 8. 최종 확인 체크리스트</h3>
+<table>
+<thead><tr><th>#</th><th>항목</th><th>확인 방법</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>서버 실행</td><td><code>pm2 status</code> → online 확인</td></tr>
+<tr><td>2</td><td>내부 접속</td><td>http://시놀로지IP:8080 → 게임 로드</td></tr>
+<tr><td>3</td><td>HTTPS 접속</td><td>https://도메인.synology.me → 자물쇠 아이콘</td></tr>
+<tr><td>4</td><td>API 동작</td><td>/api/health → {"status":"ok"}</td></tr>
+<tr><td>5</td><td>게임 플레이</td><td>3라운드 완료 → 스코어보드 정상 표시</td></tr>
+<tr><td>6</td><td>서버 보호</td><td>/server/index.js 접속 → 403 Forbidden</td></tr>
+<tr><td>7</td><td>부팅 복구</td><td>NAS 재부팅 후 pm2 자동 시작 확인</td></tr>
+</tbody>
+</table>
+
+<div class="card" style="border-color:#ffa94d">
+<div class="card-title">⚠️ 이전 버전과의 차이</div>
+<p>v2.0 이하(정적 파일)에서는 Web Station만으로 충분했으나, v3.0은 Node.js 서버가 필수입니다. Web Station의 정적 호스팅은 사용하지 않고, PM2 + 리버스 프록시 조합으로 운영합니다.</p>
 </div>
 </section>
 
