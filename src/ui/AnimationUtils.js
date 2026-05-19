@@ -78,7 +78,7 @@ export const animateValue = (element, start, end, duration, isInteger = false, p
       element.innerHTML = isInteger ? Math.floor(current).toLocaleString() : current.toFixed(1);
       
       if (playSound && timestamp - lastTick > 40) {
-        playScoreTickSound();
+        playScoreTickSound(progress);
         lastTick = timestamp;
       }
       

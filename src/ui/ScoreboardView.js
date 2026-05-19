@@ -118,9 +118,7 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
       
       <div style="position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); width: calc(100% - 4rem); max-width: 1000px; z-index: 3000; text-align: center; display: flex; gap: 1rem;">
         <button class="magazine-start-btn" id="retry-btn" style="flex: 1; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">다시 하기</button>
-        ${state.difficulty === "Hard" && state.score >= 3000 ? `
-          <button class="magazine-start-btn" id="hell-btn" style="flex: 1; background: #800000; color: #ffcccc; box-shadow: 0 10px 30px rgba(255,0,0,0.5);">지옥 난이도 도전</button>
-        ` : ''}
+        <button class="magazine-start-btn" id="share-btn" style="flex: 1; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; box-shadow: 0 10px 30px rgba(118,75,162,0.5);">📤 공유하기</button>
       </div>
     </div>
   `;
@@ -161,18 +159,62 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
     }, 400);
   });
 
-  // 지옥 난이도 도전
-  const hellBtn = document.getElementById('hell-btn');
-  if (hellBtn) {
-    hellBtn.addEventListener('click', () => {
-      resetGame();
-      setDifficulty("Hell");
-      const panel = document.getElementById('score-panel');
-      panel.style.opacity = '0';
-      panel.style.transition = 'opacity 0.4s ease';
-      setTimeout(() => {
-        nav.toGameView();
-      }, 400);
-    });
-  }
+  // 공유하기
+  document.getElementById('share-btn').addEventListener('click', async () => {
+    const shareBtn = document.getElementById('share-btn');
+    const originalText = shareBtn.textContent;
+    shareBtn.textContent = '캡처 중...';
+    shareBtn.disabled = true;
+    
+    try {
+      // html2canvas 동적 로드
+      if (!window.html2canvas) {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+      
+      // 하단 버튼 숨기고 캡처
+      const btnBar = shareBtn.parentElement;
+      btnBar.style.display = 'none';
+      
+      const canvas = await window.html2canvas(document.getElementById('score-panel'), {
+        backgroundColor: '#000',
+        scale: 2,
+        useCORS: true
+      });
+      
+      btnBar.style.display = 'flex';
+      
+      // Canvas → Blob
+      const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+      const file = new File([blob], 'dye-master-score.png', { type: 'image/png' });
+      
+      // Web Share API 시도
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: 'DYE MASTER - 내 색감 점수',
+          text: `DYE MASTER에서 ${state.score.toLocaleString()}점을 획득했어요! 🎨`,
+          files: [file]
+        });
+      } else {
+        // 폴백: 이미지 다운로드
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'dye-master-score.png';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error('[Share]', err);
+    } finally {
+      shareBtn.textContent = originalText;
+      shareBtn.disabled = false;
+    }
+  });
 }

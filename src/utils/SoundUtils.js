@@ -51,28 +51,30 @@ export function playBonusBounceSound() {
   osc.stop(audioCtx.currentTime + 0.4);
 }
 
-export function playScoreTickSound() {
+export function playScoreTickSound(progress = 0) {
   if (!audioCtx) return;
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   
-  osc.type = 'square';
-  osc.frequency.setValueAtTime(800 + Math.random() * 200, audioCtx.currentTime);
+  // 진행률에 따라 피치가 올라가는 "또로로록" 효과
+  const baseFreq = 400 + progress * 800; // 400Hz → 1200Hz
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.2, audioCtx.currentTime + 0.04);
   
-  gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+  gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
   
-  // Add a slight filter to make it less harsh
   const filter = audioCtx.createBiquadFilter();
   filter.type = 'lowpass';
-  filter.frequency.value = 2000;
+  filter.frequency.value = 3000;
   
   osc.connect(filter);
   filter.connect(gain);
   gain.connect(audioCtx.destination);
   
   osc.start();
-  osc.stop(audioCtx.currentTime + 0.03);
+  osc.stop(audioCtx.currentTime + 0.06);
 }
 
 export function playScoreImpactSound() {
