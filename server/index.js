@@ -189,7 +189,7 @@ body{min-height:100vh;display:flex;align-items:center;justify-content:center;fon
 .ranking{margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid rgba(255,255,255,0.1);text-align:left}
 .ranking h4{font-size:.75rem;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:.6rem}
 .rank-row{display:flex;align-items:center;padding:.35rem 0;font-size:.8rem;color:rgba(255,255,255,0.7)}
-.rank-n{width:1.5rem;font-weight:800;color:rgba(255,255,255,0.4);font-size:.75rem}
+.rank-n{width:1.5rem;font-weight:900;color:rgba(255,255,255,0.7);font-size:.85rem}
 .rank-nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rank-nm small{color:rgba(255,255,255,0.35);font-size:.7rem}
 .rank-s{font-weight:800;font-size:.85rem;color:#fff}
