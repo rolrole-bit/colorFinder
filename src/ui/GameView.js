@@ -112,9 +112,10 @@ export function renderGameView(container, nav) {
           <svg id="sliders-svg" width="100%" height="100%" style="pointer-events: auto; touch-action: none;">
             <defs>
               <filter id="track-blur" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="25" />
+                <feGaussianBlur stdDeviation="40" />
               </filter>
-              <linearGradient id="grad-h" x1="0" y1="1" x2="0" y2="0">
+              <!-- Top to Bottom Gradients -->
+              <linearGradient id="grad-h" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#ff0000" />
                 <stop offset="17%" stop-color="#ff00ff" />
                 <stop offset="33%" stop-color="#0000ff" />
@@ -123,41 +124,43 @@ export function renderGameView(container, nav) {
                 <stop offset="83%" stop-color="#ffff00" />
                 <stop offset="100%" stop-color="#ff0000" />
               </linearGradient>
-              <linearGradient id="grad-s" x1="0" y1="1" x2="0" y2="0">
-                <stop offset="0%" stop-color="#808080" id="sat-stop-0" />
-                <stop offset="100%" stop-color="#ff0000" id="sat-stop-1" />
+              <linearGradient id="grad-s" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ff0000" id="sat-stop-1" />
+                <stop offset="100%" stop-color="#808080" id="sat-stop-0" />
               </linearGradient>
-              <linearGradient id="grad-l" x1="0" y1="1" x2="0" y2="0">
-                <stop offset="0%" stop-color="#000" />
+              <linearGradient id="grad-l" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ffffff" />
                 <stop offset="50%" stop-color="#ff0000" id="light-stop-mid" />
-                <stop offset="100%" stop-color="#fff" />
+                <stop offset="100%" stop-color="#000000" />
               </linearGradient>
             </defs>
-            <g id="tracks-group" filter="url(#track-blur)">
-              <!-- Colored tracks (딱 붙게) -->
-              <path id="track-h" fill="none" stroke="url(#grad-h)" stroke-width="60" stroke-linecap="round" />
-              <path id="track-s" fill="none" stroke="url(#grad-s)" stroke-width="60" stroke-linecap="round" />
-              <path id="track-l" fill="none" stroke="url(#grad-l)" stroke-width="60" stroke-linecap="round" />
-              
-              <!-- Invisible touch areas (fatter for easier grabbing) -->
-              <path id="touch-h" fill="none" stroke="transparent" stroke-width="70" stroke-linecap="round" style="cursor: pointer;" />
-              <path id="touch-s" fill="none" stroke="transparent" stroke-width="70" stroke-linecap="round" style="cursor: pointer;" />
-              <path id="touch-l" fill="none" stroke="transparent" stroke-width="70" stroke-linecap="round" style="cursor: pointer;" />
-            </g>
-            <g id="thumbs-group">
-              <g id="thumb-h-group" style="pointer-events: none;">
-                <path d="M -20 0 L 20 0 M 0 -20 L 0 20" stroke="#000" stroke-width="9" stroke-linecap="round" />
-                <path d="M -20 0 L 20 0 M 0 -20 L 0 20" stroke="#fff" stroke-width="5" stroke-linecap="round" />
+
+            <!-- Scrollable Tapes -->
+            <g id="tapes-group" filter="url(#track-blur)" opacity="0.9">
+              <g id="tape-h">
+                <rect x="0%" y="-1500" width="33.34%" height="1500" fill="url(#grad-h)" />
+                <rect x="0%" y="0" width="33.34%" height="1500" fill="url(#grad-h)" />
+                <rect x="0%" y="1500" width="33.34%" height="1500" fill="url(#grad-h)" />
               </g>
-              <g id="thumb-s-group" style="pointer-events: none;">
-                <path d="M -20 0 L 20 0 M 0 -20 L 0 20" stroke="#000" stroke-width="9" stroke-linecap="round" />
-                <path d="M -20 0 L 20 0 M 0 -20 L 0 20" stroke="#fff" stroke-width="5" stroke-linecap="round" />
+              <g id="tape-s">
+                <rect x="33.33%" y="-3000" width="33.34%" height="3000" id="sat-fill-top" />
+                <rect x="33.33%" y="0" width="33.34%" height="1500" fill="url(#grad-s)" />
+                <rect x="33.33%" y="1500" width="33.34%" height="3000" fill="#808080" />
               </g>
-              <g id="thumb-l-group" style="pointer-events: none;">
-                <path d="M -20 0 L 20 0 M 0 -20 L 0 20" stroke="#000" stroke-width="9" stroke-linecap="round" />
-                <path d="M -20 0 L 20 0 M 0 -20 L 0 20" stroke="#fff" stroke-width="5" stroke-linecap="round" />
+              <g id="tape-l">
+                <rect x="66.66%" y="-3000" width="33.34%" height="3000" fill="#ffffff" />
+                <rect x="66.66%" y="0" width="33.34%" height="1500" fill="url(#grad-l)" />
+                <rect x="66.66%" y="1500" width="33.34%" height="3000" fill="#000000" />
               </g>
             </g>
+
+            <!-- Center Picking Line -->
+            <line x1="0" y1="50%" x2="100%" y2="50%" stroke="#fff" stroke-width="4" style="mix-blend-mode: difference; pointer-events: none;" />
+
+            <!-- Invisible Touch Areas -->
+            <rect id="touch-h" x="0%" y="0" width="33.33%" height="100%" fill="transparent" style="cursor: grab;" />
+            <rect id="touch-s" x="33.33%" y="0" width="33.34%" height="100%" fill="transparent" style="cursor: grab;" />
+            <rect id="touch-l" x="66.66%" y="0" width="33.34%" height="100%" fill="transparent" style="cursor: grab;" />
           </svg>
         </div>
         
@@ -171,38 +174,63 @@ export function renderGameView(container, nav) {
     
     // SVG Paths Initialization
     const svgContainer = document.getElementById('svg-sliders-container');
-    const svgWidth = svgContainer.clientWidth;
-    const svgHeight = svgContainer.clientHeight;
-    
-    const padY = svgHeight * 0.15;
-    const bottomY = svgHeight - padY;
-    const topY = padY;
-    const midY = (bottomY + topY) / 2;
-    
-    // Sliders curve to the right, from bottom to top
-    const trackSpacing = 60; // 굵기(60)에 맞춰 간격 조정
-    
-    // 화면 폭을 기준으로 트랙 전체를 중앙에 정렬
-    const curveWidth = 240; 
-    const totalTrackWidth = trackSpacing * 2;
-    const totalVisualWidth = curveWidth + totalTrackWidth;
-    const startX = (svgWidth - totalVisualWidth) / 2;
-    const endX = startX + curveWidth;
-    
-    const paths = {
-      h: `M ${startX} ${bottomY} C ${startX} ${midY}, ${endX} ${midY}, ${endX} ${topY}`,
-      s: `M ${startX + trackSpacing} ${bottomY} C ${startX + trackSpacing} ${midY}, ${endX + trackSpacing} ${midY}, ${endX + trackSpacing} ${topY}`,
-      l: `M ${startX + trackSpacing*2} ${bottomY} C ${startX + trackSpacing*2} ${midY}, ${endX + trackSpacing*2} ${midY}, ${endX + trackSpacing*2} ${topY}`
-    };
-    
-    ['h', 's', 'l'].forEach(id => {
-      document.getElementById(`track-${id}`).setAttribute('d', paths[id]);
-      document.getElementById(`touch-${id}`).setAttribute('d', paths[id]);
-    });
     
     let currentDisplayedRGB = hslToRgb(currentH, currentS, currentL);
     let hexAnimFrame = null;
     let isGuessing = true;
+
+    class TapeSlider {
+      constructor({ min, max, value, tapeGroup, touchArea, onChange }) {
+        this.min = min;
+        this.max = max;
+        this.value = value;
+        this.tapeGroup = tapeGroup;
+        this.touchArea = touchArea;
+        this.onChange = onChange;
+        this.trackLen = 1500;
+        this.svgContainer = document.getElementById('svg-sliders-container');
+        this.isDragging = false;
+        this.lastY = 0;
+        this.updateTransform();
+        this.touchArea.addEventListener('pointerdown', this.onDown.bind(this));
+        window.addEventListener('pointermove', this.onMove.bind(this), {passive: false});
+        window.addEventListener('pointerup', this.onUp.bind(this));
+      }
+      updateTransform() {
+        let v = (this.value - this.min) / (this.max - this.min);
+        const cy = this.svgContainer.clientHeight / 2;
+        const ty = cy - (1 - v) * this.trackLen;
+        this.tapeGroup.setAttribute('transform', `translate(0, ${ty})`);
+      }
+      onDown(e) {
+        this.isDragging = true;
+        this.lastY = e.clientY;
+        this.touchArea.setPointerCapture(e.pointerId);
+      }
+      onMove(e) {
+        if (!this.isDragging) return;
+        e.preventDefault();
+        const dy = e.clientY - this.lastY;
+        this.lastY = e.clientY;
+        let dv = dy / this.trackLen;
+        let v = (this.value - this.min) / (this.max - this.min);
+        v += dv;
+        if (this.max === 360) {
+          v = v - Math.floor(v);
+        } else {
+          v = Math.max(0, Math.min(1, v));
+        }
+        this.value = this.min + v * (this.max - this.min);
+        this.updateTransform();
+        if (this.onChange) this.onChange(this.value);
+      }
+      onUp(e) {
+        if (this.isDragging) {
+          this.isDragging = false;
+          this.touchArea.releasePointerCapture(e.pointerId);
+        }
+      }
+    }
 
     const updateColor = () => {
       const targetRGB = hslToRgb(currentH, currentS, currentL);
@@ -265,6 +293,8 @@ export function renderGameView(container, nav) {
         }
       }
       
+      const satFillTop = document.getElementById('sat-fill-top');
+      if (satFillTop) satFillTop.setAttribute('fill', `hsl(${currentH}, 100%, 50%)`);
       const satStop0 = document.getElementById('sat-stop-0');
       const satStop1 = document.getElementById('sat-stop-1');
       if (satStop0) satStop0.setAttribute('stop-color', `hsl(${currentH}, 0%, 50%)`);
@@ -274,26 +304,23 @@ export function renderGameView(container, nav) {
       if (lightStopMid) lightStopMid.setAttribute('stop-color', `hsl(${currentH}, ${currentS}%, 50%)`);
     };
 
-    const hueSlider = new CustomVerticalSlider({
+    const hueSlider = new TapeSlider({
       min: 0, max: 360, value: currentH,
-      pathElement: document.getElementById('track-h'),
-      thumbGroup: document.getElementById('thumb-h-group'),
+      tapeGroup: document.getElementById('tape-h'),
       touchArea: document.getElementById('touch-h'),
       onChange: (val) => { currentH = val; updateColor(); logSliderChange(); }
     });
     
-    const satSlider = new CustomVerticalSlider({
+    const satSlider = new TapeSlider({
       min: 0, max: 100, value: currentS,
-      pathElement: document.getElementById('track-s'),
-      thumbGroup: document.getElementById('thumb-s-group'),
+      tapeGroup: document.getElementById('tape-s'),
       touchArea: document.getElementById('touch-s'),
       onChange: (val) => { currentS = val; updateColor(); logSliderChange(); }
     });
     
-    const lightSlider = new CustomVerticalSlider({
+    const lightSlider = new TapeSlider({
       min: 0, max: 100, value: currentL,
-      pathElement: document.getElementById('track-l'),
-      thumbGroup: document.getElementById('thumb-l-group'),
+      tapeGroup: document.getElementById('tape-l'),
       touchArea: document.getElementById('touch-l'),
       onChange: (val) => { currentL = val; updateColor(); logSliderChange(); }
     });
