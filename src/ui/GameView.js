@@ -155,7 +155,7 @@ export function renderGameView(container, nav) {
             </g>
 
             <!-- Center Picking Line -->
-            <line x1="0" y1="50%" x2="100%" y2="50%" stroke="#fff" stroke-width="4" style="mix-blend-mode: difference; pointer-events: none;" />
+            <line id="center-line" x1="0" y1="50%" x2="100%" y2="50%" stroke="#fff" stroke-width="8" style="pointer-events: none; filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.6));" />
 
             <!-- Invisible Touch Areas -->
             <rect id="touch-h" x="0%" y="0" width="33.33%" height="100%" fill="transparent" style="cursor: grab;" />
@@ -271,6 +271,9 @@ export function renderGameView(container, nav) {
           guessBg.style.backgroundColor = rgbStr;
           if (outerBg) outerBg.style.background = rgbStr;
           
+          const centerLine = document.getElementById('center-line');
+          if (centerLine) centerLine.setAttribute('stroke', rgbStr);
+          
           const roundText = document.getElementById('round-text');
           if (roundText) roundText.style.color = contrastBg;
           
@@ -291,6 +294,9 @@ export function renderGameView(container, nav) {
           submitBtn.style.color = rgbStr;
           submitBtn.style.backgroundColor = contrastBg;
         }
+        
+        const centerLine = document.getElementById('center-line');
+        if (centerLine) centerLine.setAttribute('stroke', rgbStr);
       }
       
       const satFillTop = document.getElementById('sat-fill-top');
