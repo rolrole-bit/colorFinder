@@ -106,22 +106,62 @@ export function renderGameView(container, nav) {
           </div>
         </div>
         
-        <div class="vertical-sliders-container">
-          <div class="custom-v-slider-wrapper" id="hue-wrapper">
-            <div class="slider-bg" id="hue-bg"></div>
-            <div class="slider-thumb" id="hue-thumb"></div>
-            <div class="slider-touch-area"></div>
-          </div>
-          <div class="custom-v-slider-wrapper" id="sat-wrapper">
-            <div class="slider-bg" id="sat-bg"></div>
-            <div class="slider-thumb" id="sat-thumb"></div>
-            <div class="slider-touch-area"></div>
-          </div>
-          <div class="custom-v-slider-wrapper" id="l-wrapper">
-            <div class="slider-bg" id="l-bg"></div>
-            <div class="slider-thumb" id="l-thumb"></div>
-            <div class="slider-touch-area"></div>
-          </div>
+        <div id="svg-sliders-container" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none;">
+          <svg id="sliders-svg" width="100%" height="100%" style="pointer-events: auto; touch-action: none;">
+            <defs>
+              <filter id="brutal-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="4" dy="4" stdDeviation="0" flood-color="#000" flood-opacity="1" />
+              </filter>
+              <linearGradient id="grad-h" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stop-color="#ff0000" />
+                <stop offset="17%" stop-color="#ff00ff" />
+                <stop offset="33%" stop-color="#0000ff" />
+                <stop offset="50%" stop-color="#00ffff" />
+                <stop offset="67%" stop-color="#00ff00" />
+                <stop offset="83%" stop-color="#ffff00" />
+                <stop offset="100%" stop-color="#ff0000" />
+              </linearGradient>
+              <linearGradient id="grad-s" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stop-color="#808080" id="sat-stop-0" />
+                <stop offset="100%" stop-color="#ff0000" id="sat-stop-1" />
+              </linearGradient>
+              <linearGradient id="grad-l" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stop-color="#000" />
+                <stop offset="50%" stop-color="#ff0000" id="light-stop-mid" />
+                <stop offset="100%" stop-color="#fff" />
+              </linearGradient>
+            </defs>
+            <g id="tracks-group">
+              <!-- Black border tracks -->
+              <path id="track-h-bg" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round" />
+              <path id="track-s-bg" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round" />
+              <path id="track-l-bg" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round" />
+              
+              <!-- Colored tracks -->
+              <path id="track-h" fill="none" stroke="url(#grad-h)" stroke-width="18" stroke-linecap="round" />
+              <path id="track-s" fill="none" stroke="url(#grad-s)" stroke-width="18" stroke-linecap="round" />
+              <path id="track-l" fill="none" stroke="url(#grad-l)" stroke-width="18" stroke-linecap="round" />
+              
+              <!-- Invisible touch areas (fatter for easier grabbing) -->
+              <path id="touch-h" fill="none" stroke="transparent" stroke-width="50" stroke-linecap="round" style="cursor: pointer;" />
+              <path id="touch-s" fill="none" stroke="transparent" stroke-width="50" stroke-linecap="round" style="cursor: pointer;" />
+              <path id="touch-l" fill="none" stroke="transparent" stroke-width="50" stroke-linecap="round" style="cursor: pointer;" />
+            </g>
+            <g id="thumbs-group">
+              <g id="thumb-h-group" style="pointer-events: none;" filter="url(#brutal-shadow)">
+                <circle cx="0" cy="0" r="22" fill="#fff" stroke="#000" stroke-width="4" />
+                <text x="0" y="2" text-anchor="middle" dominant-baseline="middle" font-family="Paperlogy" font-weight="800" font-size="16" fill="#000">H</text>
+              </g>
+              <g id="thumb-s-group" style="pointer-events: none;" filter="url(#brutal-shadow)">
+                <circle cx="0" cy="0" r="22" fill="#fff" stroke="#000" stroke-width="4" />
+                <text x="0" y="2" text-anchor="middle" dominant-baseline="middle" font-family="Paperlogy" font-weight="800" font-size="16" fill="#000">S</text>
+              </g>
+              <g id="thumb-l-group" style="pointer-events: none;" filter="url(#brutal-shadow)">
+                <circle cx="0" cy="0" r="22" fill="#fff" stroke="#000" stroke-width="4" />
+                <text x="0" y="2" text-anchor="middle" dominant-baseline="middle" font-family="Paperlogy" font-weight="800" font-size="16" fill="#000">L</text>
+              </g>
+            </g>
+          </svg>
         </div>
         
         <button id="submit-btn" class="submit-minimal-btn">DONE</button>
@@ -130,10 +170,34 @@ export function renderGameView(container, nav) {
 
     const guessBg = document.getElementById('guess-bg');
     const submitBtn = document.getElementById('submit-btn');
-    const hueWrapper = document.getElementById('hue-wrapper');
-    const satWrapper = document.getElementById('sat-wrapper');
-    const lightWrapper = document.getElementById('l-wrapper');
     const hexDisplay = document.getElementById('hex-display');
+    
+    // SVG Paths Initialization
+    const svgContainer = document.getElementById('svg-sliders-container');
+    const svgWidth = svgContainer.clientWidth;
+    const svgHeight = svgContainer.clientHeight;
+    
+    const padY = svgHeight * 0.15;
+    const bottomY = svgHeight - padY;
+    const topY = padY;
+    const midY = (bottomY + topY) / 2;
+    
+    // Sliders curve to the right, from bottom to top
+    const trackSpacing = 45;
+    const startX = 60; // Distance from left border
+    const endX = startX + 100; // Curve distance
+    
+    const paths = {
+      h: \`M \${startX} \${bottomY} C \${startX} \${midY}, \${endX} \${midY}, \${endX} \${topY}\`,
+      s: \`M \${startX + trackSpacing} \${bottomY} C \${startX + trackSpacing} \${midY}, \${endX + trackSpacing} \${midY}, \${endX + trackSpacing} \${topY}\`,
+      l: \`M \${startX + trackSpacing*2} \${bottomY} C \${startX + trackSpacing*2} \${midY}, \${endX + trackSpacing*2} \${midY}, \${endX + trackSpacing*2} \${topY}\`
+    };
+    
+    ['h', 's', 'l'].forEach(id => {
+      document.getElementById(\`track-\${id}\`).setAttribute('d', paths[id]);
+      document.getElementById(\`track-\${id}-bg\`).setAttribute('d', paths[id]);
+      document.getElementById(\`touch-\${id}\`).setAttribute('d', paths[id]);
+    });
     
     let currentDisplayedRGB = hslToRgb(currentH, currentS, currentL);
     let hexAnimFrame = null;
@@ -200,22 +264,36 @@ export function renderGameView(container, nav) {
         }
       }
       
-      satWrapper.style.background = `linear-gradient(to top, hsl(${currentH}, 0%, 50%) 0%, hsl(${currentH}, 100%, 50%) 100%)`;
-      lightWrapper.style.background = `linear-gradient(to top, #000 0%, hsl(${currentH}, ${currentS}%, 50%) 50%, #fff 100%)`;
+      const satStop0 = document.getElementById('sat-stop-0');
+      const satStop1 = document.getElementById('sat-stop-1');
+      if (satStop0) satStop0.setAttribute('stop-color', \`hsl(\${currentH}, 0%, 50%)\`);
+      if (satStop1) satStop1.setAttribute('stop-color', \`hsl(\${currentH}, 100%, 50%)\`);
+      
+      const lightStopMid = document.getElementById('light-stop-mid');
+      if (lightStopMid) lightStopMid.setAttribute('stop-color', \`hsl(\${currentH}, \${currentS}%, 50%)\`);
     };
 
-    const hueSlider = new CustomVerticalSlider(hueWrapper, {
+    const hueSlider = new CustomVerticalSlider({
       min: 0, max: 360, value: currentH,
+      pathElement: document.getElementById('track-h'),
+      thumbGroup: document.getElementById('thumb-h-group'),
+      touchArea: document.getElementById('touch-h'),
       onChange: (val) => { currentH = val; updateColor(); logSliderChange(); }
     });
     
-    const satSlider = new CustomVerticalSlider(satWrapper, {
+    const satSlider = new CustomVerticalSlider({
       min: 0, max: 100, value: currentS,
+      pathElement: document.getElementById('track-s'),
+      thumbGroup: document.getElementById('thumb-s-group'),
+      touchArea: document.getElementById('touch-s'),
       onChange: (val) => { currentS = val; updateColor(); logSliderChange(); }
     });
     
-    const lightSlider = new CustomVerticalSlider(lightWrapper, {
+    const lightSlider = new CustomVerticalSlider({
       min: 0, max: 100, value: currentL,
+      pathElement: document.getElementById('track-l'),
+      thumbGroup: document.getElementById('thumb-l-group'),
+      touchArea: document.getElementById('touch-l'),
       onChange: (val) => { currentL = val; updateColor(); logSliderChange(); }
     });
 
