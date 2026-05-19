@@ -124,7 +124,7 @@ export function renderGameView(container, nav) {
           </div>
         </div>
         
-        <button id="submit-btn" class="submit-minimal-btn">결정</button>
+        <button id="submit-btn" class="submit-minimal-btn">DONE</button>
       </div>
     `;
 

@@ -516,18 +516,19 @@ input[type="range"]::-webkit-slider-thumb:active {
   right: clamp(1rem, 5vw, 3rem);
   font-family: 'Paperlogy', sans-serif;
   font-weight: 800;
-  font-size: clamp(1.1rem, 2.5vh, 1.4rem);
-  letter-spacing: 3px;
+  font-size: clamp(1.8rem, 4vh, 2.5rem);
+  letter-spacing: 2px;
   color: #fff;
   background: #000; /* Will be overridden dynamically in JS */
   border: none;
-  padding: 1rem 2rem;
-  min-height: 56px;
-  border-radius: 8px;
+  padding: 1.2rem 3rem;
+  min-height: 70px;
+  border-radius: 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   cursor: pointer;
   z-index: 1001;
   text-transform: uppercase;
-  transition: transform 0.1s, opacity 0.3s;
+  transition: transform 0.1s, opacity 0.3s, box-shadow 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
