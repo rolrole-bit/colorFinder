@@ -132,15 +132,10 @@ export function renderGameView(container, nav) {
               </linearGradient>
             </defs>
             <g id="tracks-group">
-              <!-- Black border tracks -->
-              <path id="track-h-bg" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round" />
-              <path id="track-s-bg" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round" />
-              <path id="track-l-bg" fill="none" stroke="#000" stroke-width="26" stroke-linecap="round" />
-              
-              <!-- Colored tracks -->
-              <path id="track-h" fill="none" stroke="url(#grad-h)" stroke-width="18" stroke-linecap="round" />
-              <path id="track-s" fill="none" stroke="url(#grad-s)" stroke-width="18" stroke-linecap="round" />
-              <path id="track-l" fill="none" stroke="url(#grad-l)" stroke-width="18" stroke-linecap="round" />
+              <!-- Colored tracks (딱 붙게) -->
+              <path id="track-h" fill="none" stroke="url(#grad-h)" stroke-width="40" stroke-linecap="round" />
+              <path id="track-s" fill="none" stroke="url(#grad-s)" stroke-width="40" stroke-linecap="round" />
+              <path id="track-l" fill="none" stroke="url(#grad-l)" stroke-width="40" stroke-linecap="round" />
               
               <!-- Invisible touch areas (fatter for easier grabbing) -->
               <path id="touch-h" fill="none" stroke="transparent" stroke-width="50" stroke-linecap="round" style="cursor: pointer;" />
@@ -150,15 +145,12 @@ export function renderGameView(container, nav) {
             <g id="thumbs-group">
               <g id="thumb-h-group" style="pointer-events: none;" filter="url(#brutal-shadow)">
                 <circle cx="0" cy="0" r="22" fill="#fff" stroke="#000" stroke-width="4" />
-                <text x="0" y="2" text-anchor="middle" dominant-baseline="middle" font-family="Paperlogy" font-weight="800" font-size="16" fill="#000">H</text>
               </g>
               <g id="thumb-s-group" style="pointer-events: none;" filter="url(#brutal-shadow)">
                 <circle cx="0" cy="0" r="22" fill="#fff" stroke="#000" stroke-width="4" />
-                <text x="0" y="2" text-anchor="middle" dominant-baseline="middle" font-family="Paperlogy" font-weight="800" font-size="16" fill="#000">S</text>
               </g>
               <g id="thumb-l-group" style="pointer-events: none;" filter="url(#brutal-shadow)">
                 <circle cx="0" cy="0" r="22" fill="#fff" stroke="#000" stroke-width="4" />
-                <text x="0" y="2" text-anchor="middle" dominant-baseline="middle" font-family="Paperlogy" font-weight="800" font-size="16" fill="#000">L</text>
               </g>
             </g>
           </svg>
@@ -183,9 +175,9 @@ export function renderGameView(container, nav) {
     const midY = (bottomY + topY) / 2;
     
     // Sliders curve to the right, from bottom to top
-    const trackSpacing = 45;
-    const startX = 60; // Distance from left border
-    const endX = startX + 100; // Curve distance
+    const trackSpacing = 40; // 굵기(40)에 딱 맞춰 간격을 주어 붙어있게 함
+    const startX = 40; // Distance from left border
+    const endX = startX + 220; // Curve distance (더 많이 휘게 변경)
     
     const paths = {
       h: `M ${startX} ${bottomY} C ${startX} ${midY}, ${endX} ${midY}, ${endX} ${topY}`,
@@ -195,7 +187,6 @@ export function renderGameView(container, nav) {
     
     ['h', 's', 'l'].forEach(id => {
       document.getElementById(`track-${id}`).setAttribute('d', paths[id]);
-      document.getElementById(`track-${id}-bg`).setAttribute('d', paths[id]);
       document.getElementById(`touch-${id}`).setAttribute('d', paths[id]);
     });
     
