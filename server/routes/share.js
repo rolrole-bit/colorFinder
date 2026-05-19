@@ -124,7 +124,6 @@ body{min-height:100vh;display:flex;align-items:center;justify-content:center;fon
   <div class="comment">${desc}</div>
   <a href="${gameUrl}" class="btn">나도 도전하기</a>
   <div class="board">
-    <div class="board-title">🏆 전체 ${totalPlayers}명 중 ${myRank}위</div>
     ${boardHTML}
   </div>
 </div>
