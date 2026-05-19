@@ -155,7 +155,7 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
     <div id="share-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); justify-content:center; align-items:center;">
       <div style="background:#1a1a2e; border-radius:16px; padding:2rem; max-width:360px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
         <div style="font-size:1.3rem; font-weight:700; color:#fff; margin-bottom:0.5rem;">📤 공유하기</div>
-        <div id="share-toast" style="font-size:0.85rem; color:#7fda89; margin-bottom:1rem;">✅ 점수 이미지가 클립보드에 복사되었습니다!</div>
+        <div id="share-toast" style="font-size:0.85rem; color:#aaa; margin-bottom:1rem;">SNS를 선택하거나 URL을 복사하세요</div>
         
         <!-- 공유 URL -->
         <div style="display:flex; gap:0.5rem; margin-bottom:1.2rem;">
@@ -230,85 +230,61 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
     }, 400);
   });
 
-  // 공유하기 → 클립보드 이미지 복사 + OG URL 공유 모달
-  document.getElementById('share-btn').addEventListener('click', async () => {
-    const shareBtn = document.getElementById('share-btn');
-    shareBtn.disabled = true;
-    shareBtn.textContent = '캡처 중...';
-    
+  /**
+   * 클립보드 복사 (HTTPS 없이도 동작하는 폴백 포함)
+   */
+  function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    // HTTP 환경 폴백
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  }
+
+  // 공유하기 → OG URL 생성 + SNS 직접 공유 모달
+  document.getElementById('share-btn').addEventListener('click', () => {
     // OG 공유 URL 생성
     const comment = getScoreComment(state.score);
     const sharePageUrl = `${window.location.origin}/share?score=${state.score}&name=${encodeURIComponent(state.playerName)}&comment=${encodeURIComponent(comment)}`;
+    const shareText = `DYE MASTER에서 ${state.score.toLocaleString()}점! 🎨 나의 색감을 증명하세요!`;
     
-    try {
-      // html2canvas 동적 로드
-      if (!window.html2canvas) {
-        await new Promise((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-          script.onload = resolve;
-          script.onerror = reject;
-          document.head.appendChild(script);
-        });
-      }
-      
-      // 하단 버튼 숨기고 캡처
-      const btnBar = shareBtn.parentElement;
-      btnBar.style.display = 'none';
-      
-      const canvas = await window.html2canvas(document.getElementById('score-panel'), {
-        backgroundColor: '#000',
-        scale: 2,
-        useCORS: true
+    // URL + 텍스트 인코딩
+    const encodedUrl = encodeURIComponent(sharePageUrl);
+    const encodedText = encodeURIComponent(shareText);
+    
+    // 공유 URL 세팅
+    document.getElementById('share-url-input').value = sharePageUrl;
+    
+    // SNS 공유 링크 (클릭 시 바로 해당 SNS로 이동)
+    document.getElementById('share-twitter').href = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+    document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+    
+    // Instagram은 공유 API 없음 → URL 복사 후 안내
+    const instaBtn = document.getElementById('share-instagram');
+    instaBtn.href = '#';
+    instaBtn.onclick = (e) => {
+      e.preventDefault();
+      copyToClipboard(sharePageUrl).then(() => {
+        alert('URL이 복사되었습니다!\nInstagram 스토리나 게시물에 붙여넣기 하세요.');
       });
-      
-      btnBar.style.display = 'flex';
-      
-      // 클립보드로 이미지 복사
-      const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-      const toast = document.getElementById('share-toast');
-      try {
-        await navigator.clipboard.write([
-          new ClipboardItem({ 'image/png': blob })
-        ]);
-        toast.textContent = '✅ 점수 이미지가 클립보드에 복사되었습니다!';
-        toast.style.color = '#7fda89';
-      } catch (e) {
-        toast.textContent = '⚠️ 이미지 복사 실패. URL을 직접 복사해 주세요.';
-        toast.style.color = '#ffa94d';
-      }
-      
-      // 공유 URL 세팅
-      document.getElementById('share-url-input').value = sharePageUrl;
-      
-      // SNS 공유 링크 (OG URL 포함)
-      const shareText = encodeURIComponent(`DYE MASTER에서 ${state.score.toLocaleString()}점! 🎨 나의 색감을 증명하세요!`);
-      const encodedUrl = encodeURIComponent(sharePageUrl);
-      
-      document.getElementById('share-twitter').href = `https://twitter.com/intent/tweet?text=${shareText}&url=${encodedUrl}`;
-      document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-      document.getElementById('share-instagram').addEventListener('click', (e) => {
-        e.preventDefault();
-        navigator.clipboard.writeText(sharePageUrl).then(() => {
-          alert('URL이 복사되었습니다!\nInstagram 스토리나 게시물에 붙여넣기 하세요.');
-        });
-      }, { once: true });
-      
-      // 모달 표시
-      document.getElementById('share-modal').style.display = 'flex';
-      
-    } catch (err) {
-      console.error('[Share]', err);
-    } finally {
-      shareBtn.textContent = '📤 공유하기';
-      shareBtn.disabled = false;
-    }
+    };
+    
+    // 모달 표시
+    document.getElementById('share-modal').style.display = 'flex';
   });
   
   // URL 복사 버튼
   document.getElementById('copy-url-btn').addEventListener('click', () => {
     const urlInput = document.getElementById('share-url-input');
-    navigator.clipboard.writeText(urlInput.value).then(() => {
+    copyToClipboard(urlInput.value).then(() => {
       const btn = document.getElementById('copy-url-btn');
       btn.textContent = '✅ 복사됨';
       setTimeout(() => { btn.textContent = 'URL 복사'; }, 1500);

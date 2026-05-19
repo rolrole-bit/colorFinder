@@ -158,5 +158,29 @@
     "difficulty": "Hard",
     "session_id": "9dbc6a2e-df63-45d4-837c-09fde1d8f562",
     "created_at": "2026-05-19T05:47:51.648Z"
+  },
+  {
+    "player_name": "76",
+    "origin_game": "마비노기 모바일",
+    "score": 2157,
+    "difficulty": "Hard",
+    "session_id": "e159942f-7d25-49ec-aa4b-c58d8c7826c7",
+    "created_at": "2026-05-19T05:57:44.598Z"
+  },
+  {
+    "player_name": "닝닝",
+    "origin_game": "마비노기 모바일",
+    "score": 1558,
+    "difficulty": "Hard",
+    "session_id": "d7d30876-ba1c-4f23-af71-c0cd2428c40f",
+    "created_at": "2026-05-19T05:59:16.840Z"
+  },
+  {
+    "player_name": "더블드래곤",
+    "origin_game": "마비노기 모바일",
+    "score": 1874,
+    "difficulty": "Hard",
+    "session_id": "ace4d59a-915f-463b-a460-02a19cf7ad77",
+    "created_at": "2026-05-19T06:00:08.413Z"
   }
 ]
