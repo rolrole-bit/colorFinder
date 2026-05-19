@@ -16,88 +16,52 @@ export function getRandomColor() {
 }
 
 /**
- * RGB 값을 HSB(HSV)로 변환합니다.
+ * RGB → CIE Lab 변환 (sRGB 감마 보정, D65 백색점)
  * @param {number} r (0-255)
  * @param {number} g (0-255)
  * @param {number} b (0-255)
- * @returns {{h: number, s: number, b: number}} h: 0-360, s: 0-100, b: 0-100
+ * @returns {{L: number, a: number, b: number}}
  */
-export function rgbToHsv(r, g, b) {
-  r /= 255;
-  g /= 255;
-  b /= 255;
-  
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const d = max - min;
-  
-  let h = 0;
-  let s = (max === 0 ? 0 : d / max);
-  let v = max;
-  
-  if (max !== min) {
-    switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
-    }
-    h /= 6;
-  }
-  
+export function rgbToLab(r, g, b) {
+  let rl = r / 255, gl = g / 255, bl = b / 255;
+  rl = rl > 0.04045 ? Math.pow((rl + 0.055) / 1.055, 2.4) : rl / 12.92;
+  gl = gl > 0.04045 ? Math.pow((gl + 0.055) / 1.055, 2.4) : gl / 12.92;
+  bl = bl > 0.04045 ? Math.pow((bl + 0.055) / 1.055, 2.4) : bl / 12.92;
+
+  let x = (rl * 0.4124564 + gl * 0.3575761 + bl * 0.1804375) / 0.95047;
+  let y = (rl * 0.2126729 + gl * 0.7151522 + bl * 0.0721750) / 1.00000;
+  let z = (rl * 0.0193339 + gl * 0.1191920 + bl * 0.9503041) / 1.08883;
+
+  const f = t => t > 0.008856 ? Math.cbrt(t) : (7.787 * t + 16 / 116);
   return {
-    h: Math.round(h * 360),
-    s: Math.round(s * 100),
-    b: Math.round(v * 100)
+    L: 116 * f(y) - 16,
+    a: 500 * (f(x) - f(y)),
+    b: 200 * (f(y) - f(z))
   };
 }
 
 /**
- * 두 RGB 색상 간의 정확도를 HSB(HSV) 원뿔(Cone) 공간에서의 거리를 기반으로 점수를 계산합니다.
- * 인간의 시각적 인지에 훨씬 가까운 유사도 점수를 산출합니다.
+ * 두 RGB 색상 간의 정확도를 CIE76 ΔE* 기반으로 점수를 계산합니다.
+ * 인간의 시각적 인지와 일치하는 색차 공식을 사용합니다.
  * 
  * @param {{r: number, g: number, b: number}} target - 목표 색상
  * @param {{r: number, g: number, b: number}} user - 유저가 선택한 색상
  * @returns {number} 0 ~ 1000 (정수)
  */
 export function calculateScore(target, user) {
-  const tHsv = rgbToHsv(target.r, target.g, target.b);
-  const uHsv = rgbToHsv(user.r, user.g, user.b);
-  
-  // Normalize values to 0.0 ~ 1.0
-  const h1 = tHsv.h / 360.0;
-  const s1 = tHsv.s / 100.0;
-  const v1 = tHsv.b / 100.0;
-  
-  const h2 = uHsv.h / 360.0;
-  const s2 = uHsv.s / 100.0;
-  const v2 = uHsv.b / 100.0;
-  
-  // Convert polar HSV coordinates to Cartesian coordinates in the HSV Cone
-  // This inherently handles the fact that hue doesn't matter when saturation is 0,
-  // and neither hue nor saturation matter when brightness is 0.
-  const x1 = s1 * v1 * Math.cos(h1 * 2 * Math.PI);
-  const y1 = s1 * v1 * Math.sin(h1 * 2 * Math.PI);
-  const z1 = v1;
-  
-  const x2 = s2 * v2 * Math.cos(h2 * 2 * Math.PI);
-  const y2 = s2 * v2 * Math.sin(h2 * 2 * Math.PI);
-  const z2 = v2;
-  
-  const dx = x1 - x2;
-  const dy = y1 - y2;
-  const dz = z1 - z2;
-  
-  // Calculate Euclidean distance
-  const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
-  // Maximum possible distance in this cone is 2.0 (e.g., Red (1,0,1) to Cyan (-1,0,1))
-  const maxDist = 2.0; 
-  
-  const accuracy = Math.max(0, (maxDist - dist) / maxDist); // 0.0 ~ 1.0
-  
-  // Apply a power curve to heavily penalize far colors and reward close matches
-  // Power of 4 gives a very satisfying, realistic human-perception curve
-  const baseScore = Math.pow(accuracy, 4) * 1000;
-  
+  const lab1 = rgbToLab(target.r, target.g, target.b);
+  const lab2 = rgbToLab(user.r, user.g, user.b);
+
+  const deltaE = Math.sqrt(
+    Math.pow(lab1.L - lab2.L, 2) +
+    Math.pow(lab1.a - lab2.a, 2) +
+    Math.pow(lab1.b - lab2.b, 2)
+  );
+
+  const maxDelta = 100;
+  const accuracy = Math.max(0, (maxDelta - deltaE) / maxDelta);
+  const baseScore = Math.pow(accuracy, 2.5) * 1000;
+
   return Math.floor(Math.max(0, Math.min(1000, baseScore)));
 }
 

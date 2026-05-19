@@ -11,7 +11,15 @@
   <link rel="stylesheet" href="./src/index.css" />
 </head>
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <div id="loading-screen" style="position:fixed;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#0a0a0a;z-index:9999;font-family:'Inter',sans-serif;">
+      <div style="font-size:2rem;font-weight:700;color:#fff;letter-spacing:4px;margin-bottom:1.5rem;">DYE MASTER</div>
+      <div style="width:120px;height:3px;background:#222;border-radius:2px;overflow:hidden;">
+        <div style="width:40%;height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:2px;animation:loadbar 1s ease infinite;"></div>
+      </div>
+      <style>@keyframes loadbar{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}</style>
+    </div>
+  </div>
   <script type="module" src="./src/main.js"></script>
 </body>
 </html>

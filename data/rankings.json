@@ -102,5 +102,29 @@
     "difficulty": "Hard",
     "session_id": "ee5a8ec9-f29a-4933-bab7-fc7e4e5f3740",
     "created_at": "2026-05-19T05:19:51.929Z"
+  },
+  {
+    "player_name": "정종필",
+    "origin_game": "마비노기 모바일",
+    "score": 1300,
+    "difficulty": "Normal",
+    "session_id": "292d6e64-4f54-4b2e-911a-f7f3b8dc3aa2",
+    "created_at": "2026-05-19T05:25:30.328Z"
+  },
+  {
+    "player_name": "김호용",
+    "origin_game": "마비노기 모바일",
+    "score": 1665,
+    "difficulty": "Hard",
+    "session_id": "9f961de9-8f4d-452b-9421-9a27559e36bc",
+    "created_at": "2026-05-19T05:25:36.057Z"
+  },
+  {
+    "player_name": "한상원",
+    "origin_game": "마비노기 모바일",
+    "score": 830,
+    "difficulty": "Hard",
+    "session_id": "0bc9cd41-d779-43ce-bc0f-968a24afcd68",
+    "created_at": "2026-05-19T05:26:00.231Z"
   }
 ]
