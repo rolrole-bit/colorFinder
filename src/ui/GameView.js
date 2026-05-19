@@ -231,45 +231,46 @@ export function renderGameView(container, nav) {
       document.removeEventListener('pointermove', logPointerMove);
       const behavior = analyzeBehavior();
       
-      const state = getState();
-      let roundScore = 0;
-      const sessionId = nav.getServerSessionId();
-      
-      if (sessionId) {
-        try {
-          const result = await submitRound(sessionId, state.userColor);
-          roundScore = result.score;
-          
-          if (result.nextTargetColor) {
-            nav.setServerNextTargetColor(result.nextTargetColor);
-          }
-          
-          if (result.isLastRound) {
-            state._serverFinalScore = result.finalScore;
-            state._serverMultiplier = result.multiplier;
-          }
-        } catch (err) {
-          console.error('[Server] 라운드 제출 실패:', err);
-          roundScore = Math.floor(calculateScore(state.targetColor, state.userColor));
-        }
-      } else {
-        roundScore = Math.floor(calculateScore(state.targetColor, state.userColor));
-      }
-      
-      if (!isValidRoundScore(roundScore)) roundScore = 0;
-      if (!behavior.isHuman) roundScore = 0;
-      
-      addRoundResult(roundScore, state.targetColor, state.userColor);
-      setScore(roundScore);
-      
+      // 페이드 아웃 즉시 시작
       const panel = document.querySelector('.vertical-sliders-container');
       const btn = document.getElementById('submit-btn');
       if (panel) panel.classList.add('fade-out');
       if (btn) btn.classList.add('fade-out');
       
-      setTimeout(() => {
-        nav.toResultView();
-      }, 300);
+      // API 호출과 페이드를 동시 실행
+      const state = getState();
+      const sessionId = nav.getServerSessionId();
+      
+      const apiPromise = (async () => {
+        let roundScore = 0;
+        if (sessionId) {
+          try {
+            const result = await submitRound(sessionId, state.userColor);
+            roundScore = result.score;
+            if (result.nextTargetColor) nav.setServerNextTargetColor(result.nextTargetColor);
+            if (result.isLastRound) {
+              state._serverFinalScore = result.finalScore;
+              state._serverMultiplier = result.multiplier;
+            }
+          } catch (err) {
+            console.error('[Server] 라운드 제출 실패:', err);
+            roundScore = Math.floor(calculateScore(state.targetColor, state.userColor));
+          }
+        } else {
+          roundScore = Math.floor(calculateScore(state.targetColor, state.userColor));
+        }
+        if (!isValidRoundScore(roundScore)) roundScore = 0;
+        if (!behavior.isHuman) roundScore = 0;
+        return roundScore;
+      })();
+      
+      const fadePromise = new Promise(resolve => setTimeout(resolve, 300));
+      
+      const [roundScore] = await Promise.all([apiPromise, fadePromise]);
+      
+      addRoundResult(roundScore, state.targetColor, state.userColor);
+      setScore(roundScore);
+      nav.toResultView();
     });
   }
 }
