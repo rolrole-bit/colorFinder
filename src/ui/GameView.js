@@ -112,7 +112,7 @@ export function renderGameView(container, nav) {
           <svg id="sliders-svg" width="100%" height="100%" style="pointer-events: auto; touch-action: none;">
             <defs>
               <filter id="track-blur" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="20" />
+                <feGaussianBlur stdDeviation="80" />
               </filter>
               <!-- Top to Bottom Gradients -->
               <linearGradient id="grad-h" x1="0" y1="0" x2="0" y2="1">
@@ -138,19 +138,19 @@ export function renderGameView(container, nav) {
             <!-- Scrollable Tapes -->
             <g id="tapes-group" filter="url(#track-blur)" opacity="0.9">
               <g id="tape-h">
-                <rect x="16.66%" y="-1500" width="40" height="1500" transform="translate(-20, 0)" fill="url(#grad-h)" />
-                <rect x="16.66%" y="0" width="40" height="1500" transform="translate(-20, 0)" fill="url(#grad-h)" />
-                <rect x="16.66%" y="1500" width="40" height="1500" transform="translate(-20, 0)" fill="url(#grad-h)" />
+                <rect x="0" y="-1500" width="33.34%" height="1500" fill="url(#grad-h)" />
+                <rect x="0" y="0" width="33.34%" height="1500" fill="url(#grad-h)" />
+                <rect x="0" y="1500" width="33.34%" height="1500" fill="url(#grad-h)" />
               </g>
               <g id="tape-s">
-                <rect x="50%" y="-3000" width="40" height="3000" transform="translate(-20, 0)" id="sat-fill-top" />
-                <rect x="50%" y="0" width="40" height="1500" transform="translate(-20, 0)" fill="url(#grad-s)" />
-                <rect x="50%" y="1500" width="40" height="3000" transform="translate(-20, 0)" fill="#808080" />
+                <rect x="33.33%" y="-3000" width="33.34%" height="3000" id="sat-fill-top" />
+                <rect x="33.33%" y="0" width="33.34%" height="1500" fill="url(#grad-s)" />
+                <rect x="33.33%" y="1500" width="33.34%" height="3000" fill="#808080" />
               </g>
               <g id="tape-l">
-                <rect x="83.33%" y="-3000" width="40" height="3000" transform="translate(-20, 0)" fill="#ffffff" />
-                <rect x="83.33%" y="0" width="40" height="1500" transform="translate(-20, 0)" fill="url(#grad-l)" />
-                <rect x="83.33%" y="1500" width="40" height="3000" transform="translate(-20, 0)" fill="#000000" />
+                <rect x="66.66%" y="-3000" width="33.34%" height="3000" fill="#ffffff" />
+                <rect x="66.66%" y="0" width="33.34%" height="1500" fill="url(#grad-l)" />
+                <rect x="66.66%" y="1500" width="33.34%" height="3000" fill="#000000" />
               </g>
             </g>
 
