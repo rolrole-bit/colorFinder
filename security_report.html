@@ -84,7 +84,8 @@ footer{text-align:center;padding:3rem;color:#444;font-size:.75rem;border-top:1px
   <a href="#refactor">6. 리팩토링 &amp; 데드코드 제거</a>
   <a href="#owasp">7. OWASP Top 10 컴플라이언스</a>
   <a href="#verdict">8. 공개 배포 적합성 판정</a>
-  <a href="#deploy">9. 시놀로지 NAS 배포 가이드</a>
+  <a href="#windows">9. Windows 배포 가이드 (원클릭)</a>
+  <a href="#deploy">10. 시놀로지 NAS 배포 가이드</a>
 </div>
 
 <!-- 1. 요약 -->
@@ -319,9 +320,57 @@ server {
 </div>
 </section>
 
-<!-- 9. 시놀로지 배포 -->
+<!-- 9. Windows 배포 -->
+<section id="windows">
+<h2><span class="num">09</span>Windows 배포 가이드 (원클릭)</h2>
+<p>tools/install.bat을 더블클릭하면 아래 6단계가 자동 실행됩니다.</p>
+
+<h3>자동 설치 스크립트</h3>
+<div class="code"># 프로젝트 폴더에서 실행
+tools\install.bat</div>
+
+<h3>install.bat이 수행하는 작업</h3>
+<table>
+<thead><tr><th>#</th><th>단계</th><th>내용</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Node.js 확인</td><td>미설치 시 nodejs.org 자동 열기</td></tr>
+<tr><td>2</td><td>npm install</td><td>express, helmet, dotenv 설치</td></tr>
+<tr><td>3</td><td>.env 생성</td><td>로컬 IP 자동 감지, CORS 설정</td></tr>
+<tr><td>4</td><td>방화벽 규칙</td><td>포트 8080 인바운드 허용 (UAC)</td></tr>
+<tr><td>5</td><td>data 디렉토리</td><td>rankings.json 초기화</td></tr>
+<tr><td>6</td><td>서버 시작</td><td>자동 시작 + 브라우저 열기</td></tr>
+</tbody>
+</table>
+
+<h3>수동 설치 (install.bat 없이)</h3>
+<div class="code"># 1. Node.js LTS 설치 (https://nodejs.org)
+# 2. 프로젝트 폴더에서:
+npm install --production
+copy .env.example .env
+# 3. .env 편집 (CORS_ORIGINS에 내부 IP 추가)
+# 4. 서버 시작
+node server/index.js
+# 또는 start.bat 더블클릭</div>
+
+<h3>Windows 서비스로 등록 (선택)</h3>
+<div class="card">
+<div class="card-title">PM2 또는 NSSM으로 부팅 시 자동 시작</div>
+<p>서버를 항상 실행하려면 PM2 또는 NSSM(Non-Sucking Service Manager)을 사용합니다.</p>
+</div>
+<div class="code"># PM2 방식
+npm install -g pm2
+pm2 start server/index.js --name dyemaster
+pm2 save
+pm2-startup install
+
+# NSSM 방식 (https://nssm.cc)
+nssm install DyeMaster "C:\Program Files\nodejs\node.exe" "E:\경로\server\index.js"
+nssm start DyeMaster</div>
+</section>
+
+<!-- 10. 시놀로지 배포 -->
 <section id="deploy">
-<h2><span class="num">09</span>시놀로지 NAS 배포 가이드</h2>
+<h2><span class="num">10</span>시놀로지 NAS 배포 가이드</h2>
 <p>이전 버전(정적 파일)과 달리 v3.0은 Node.js 서버가 필수입니다. 아래 순서대로 진행하세요.</p>
 
 <h3>STEP 1. Node.js 설치</h3>
