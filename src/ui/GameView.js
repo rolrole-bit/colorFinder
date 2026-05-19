@@ -188,15 +188,15 @@ export function renderGameView(container, nav) {
     const endX = startX + 100; // Curve distance
     
     const paths = {
-      h: \`M \${startX} \${bottomY} C \${startX} \${midY}, \${endX} \${midY}, \${endX} \${topY}\`,
-      s: \`M \${startX + trackSpacing} \${bottomY} C \${startX + trackSpacing} \${midY}, \${endX + trackSpacing} \${midY}, \${endX + trackSpacing} \${topY}\`,
-      l: \`M \${startX + trackSpacing*2} \${bottomY} C \${startX + trackSpacing*2} \${midY}, \${endX + trackSpacing*2} \${midY}, \${endX + trackSpacing*2} \${topY}\`
+      h: `M ${startX} ${bottomY} C ${startX} ${midY}, ${endX} ${midY}, ${endX} ${topY}`,
+      s: `M ${startX + trackSpacing} ${bottomY} C ${startX + trackSpacing} ${midY}, ${endX + trackSpacing} ${midY}, ${endX + trackSpacing} ${topY}`,
+      l: `M ${startX + trackSpacing*2} ${bottomY} C ${startX + trackSpacing*2} ${midY}, ${endX + trackSpacing*2} ${midY}, ${endX + trackSpacing*2} ${topY}`
     };
     
     ['h', 's', 'l'].forEach(id => {
-      document.getElementById(\`track-\${id}\`).setAttribute('d', paths[id]);
-      document.getElementById(\`track-\${id}-bg\`).setAttribute('d', paths[id]);
-      document.getElementById(\`touch-\${id}\`).setAttribute('d', paths[id]);
+      document.getElementById(`track-${id}`).setAttribute('d', paths[id]);
+      document.getElementById(`track-${id}-bg`).setAttribute('d', paths[id]);
+      document.getElementById(`touch-${id}`).setAttribute('d', paths[id]);
     });
     
     let currentDisplayedRGB = hslToRgb(currentH, currentS, currentL);
@@ -266,11 +266,11 @@ export function renderGameView(container, nav) {
       
       const satStop0 = document.getElementById('sat-stop-0');
       const satStop1 = document.getElementById('sat-stop-1');
-      if (satStop0) satStop0.setAttribute('stop-color', \`hsl(\${currentH}, 0%, 50%)\`);
-      if (satStop1) satStop1.setAttribute('stop-color', \`hsl(\${currentH}, 100%, 50%)\`);
+      if (satStop0) satStop0.setAttribute('stop-color', `hsl(${currentH}, 0%, 50%)`);
+      if (satStop1) satStop1.setAttribute('stop-color', `hsl(${currentH}, 100%, 50%)`);
       
       const lightStopMid = document.getElementById('light-stop-mid');
-      if (lightStopMid) lightStopMid.setAttribute('stop-color', \`hsl(\${currentH}, \${currentS}%, 50%)\`);
+      if (lightStopMid) lightStopMid.setAttribute('stop-color', `hsl(${currentH}, ${currentS}%, 50%)`);
     };
 
     const hueSlider = new CustomVerticalSlider({
