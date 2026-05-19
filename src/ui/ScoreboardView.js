@@ -92,7 +92,7 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
   let breakdownHTML = '';
   if (state.roundResults && state.roundResults.length > 0) {
     breakdownHTML = `
-      <div style="display: flex; flex-direction: row; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-start; font-size: 1.1rem; font-weight: 400; letter-spacing: 1px; margin-top: 1rem; color: #fff; text-align: left;">
+      <div style="display: flex; flex-direction: row; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-start; font-size: 1.1rem; font-weight: 400; letter-spacing: -0.5px; margin-top: 1rem; color: #fff; text-align: left;">
         ${state.roundResults.map((r, i) => `<div>ROUND ${i + 1} : <span class="animated-gradient-text" style="font-weight:800; font-size: 1.2em; display: inline-block;">${r.score.toLocaleString()}</span>${i < state.roundResults.length - 1 ? ',' : ''}</div>`).join('')}
       </div>
     `;
@@ -115,12 +115,12 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
 
           <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; width: 100%;">
             <!-- 플레이어 이름 -->
-            <div style="font-size: clamp(1rem, 3vw, 1.4rem); font-weight: 300; color: #fff; letter-spacing: 2px; margin-bottom: 0.5rem; text-align: left;">
+            <div style="font-size: clamp(1rem, 3vw, 1.4rem); font-weight: 300; color: #fff; letter-spacing: -0.5px; margin-bottom: 0.5rem; text-align: left;">
               <span style="font-weight: 700;">${playerNameSafe}</span>님의 점수는
             </div>
             
             <div style="display: flex; flex-direction: column; text-align: left; align-items: flex-start;">
-              <div class="magazine-score" style="margin-top: 0; font-size: clamp(5rem, 18vw, 10rem); text-align: left;">
+              <div class="magazine-score" style="margin-top: 0; font-size: clamp(5rem, 18vw, 10rem); text-align: left; letter-spacing: -0.04em;">
                 <div class="animated-gradient-text" style="line-height: 1;">
                   <span class="animated-score" data-target="${state.score}">0</span>
                 </div>
@@ -128,12 +128,12 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
             </div>
             ${breakdownHTML}
             
-            <div id="bonus-text" style="font-size: 1.4rem; font-weight: 700; opacity: 0; letter-spacing: 2px; white-space: nowrap; display: block; margin-top: 1rem; color: #fff; transition: opacity 0.8s ease; text-align: left;">
+            <div id="bonus-text" style="font-size: 1.4rem; font-weight: 700; opacity: 0; letter-spacing: -0.5px; white-space: nowrap; display: block; margin-top: 1rem; color: #fff; transition: opacity 0.8s ease; text-align: left;">
               ${getDifficultyName(state.difficulty)} BONUS X ${Number(appliedMultiplier.toFixed(2))}
             </div>
             
             <!-- 한줄평 -->
-            <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.85rem, 2.5vw, 1.1rem); font-weight: 400; color: #fff; letter-spacing: 1px; text-align: left; max-width: 500px; line-height: 1.6; word-break: keep-all; opacity: 0; transition: opacity 1s ease 0.5s; font-style: italic;">
+            <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.85rem, 2.5vw, 1.1rem); font-weight: 400; color: #fff; letter-spacing: -0.5px; text-align: left; max-width: 500px; line-height: 1.6; word-break: keep-all; opacity: 0; transition: opacity 1s ease 0.5s; font-style: italic;">
               ${comment}
             </div>
           </div>
