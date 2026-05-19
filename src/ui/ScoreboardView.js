@@ -251,9 +251,12 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
 
   // 공유하기 → OG URL 생성 + SNS 직접 공유 모달
   document.getElementById('share-btn').addEventListener('click', () => {
-    // OG 공유 URL 생성
+    // OG 공유 URL 생성 (색상 포함)
     const comment = getScoreComment(state.score);
-    const sharePageUrl = `${window.location.origin}/share?score=${state.score}&name=${encodeURIComponent(state.playerName)}&comment=${encodeURIComponent(comment)}`;
+    const tc = state.targetColor;
+    const uc = state.userColor;
+    const colorParam = `&tc=${tc.r},${tc.g},${tc.b}&uc=${uc.r},${uc.g},${uc.b}`;
+    const sharePageUrl = `${window.location.origin}/share?score=${state.score}&name=${encodeURIComponent(state.playerName)}&comment=${encodeURIComponent(comment)}${colorParam}`;
     const shareText = `DYE MASTER에서 ${state.score.toLocaleString()}점! 🎨 나의 색감을 증명하세요!`;
     
     // URL + 텍스트 인코딩

@@ -127,6 +127,16 @@ app.get('/share', (req, res) => {
   const comment = (req.query.comment || '').substring(0, 100).replace(/[<>"'&]/g, '');
   const gameUrl = `${req.protocol}://${req.get('host')}/`;
 
+  // 색상 파싱 (tc=r,g,b / uc=r,g,b)
+  const parseRGB = (str) => {
+    const parts = (str || '').split(',').map(Number);
+    return (parts.length === 3 && parts.every(n => !isNaN(n)))
+      ? `rgb(${parts[0]},${parts[1]},${parts[2]})`
+      : null;
+  };
+  const tcRGB = parseRGB(req.query.tc) || 'rgb(102,126,234)';
+  const ucRGB = parseRGB(req.query.uc) || 'rgb(118,75,162)';
+
   const title = `🎨 ${name}님의 DYE MASTER 점수: ${score.toLocaleString()}점`;
   const desc = comment || `색감 테스트에서 ${score.toLocaleString()}점을 획득했습니다! 나의 색감을 증명해 보세요.`;
 
@@ -148,25 +158,32 @@ app.get('/share', (req, res) => {
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0a;font-family:'Inter',sans-serif;color:#fff}
-.card{text-align:center;padding:3rem 2rem;max-width:400px;width:90%;background:linear-gradient(135deg,rgba(102,126,234,0.15),rgba(118,75,162,0.15));border:1px solid rgba(255,255,255,0.1);border-radius:24px;backdrop-filter:blur(10px)}
-.label{font-size:.9rem;color:#aaa;letter-spacing:2px;margin-bottom:.5rem}
-.name{font-size:1.3rem;font-weight:700;margin-bottom:.3rem}
-.score{font-size:5rem;font-weight:900;line-height:1;background:linear-gradient(135deg,#667eea,#764ba2,#f093fb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:.5rem 0}
-.comment{font-size:.95rem;color:#bbb;font-style:italic;margin:1rem 0 2rem;line-height:1.5}
-.btn{display:inline-block;padding:1rem 3rem;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;text-decoration:none;border-radius:50px;font-size:1.1rem;font-weight:700;letter-spacing:1px;transition:transform .2s,box-shadow .2s}
-.btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(102,126,234,0.4)}
-.sub{font-size:.75rem;color:#555;margin-top:1.5rem}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;color:#fff;overflow:hidden;position:relative}
+.bg{position:fixed;inset:0;z-index:0}
+.bg-half{position:absolute;top:0;bottom:0;width:50%}
+.bg-left{left:0;background:${tcRGB}}
+.bg-right{right:0;background:${ucRGB}}
+.bg-blur{position:fixed;inset:0;z-index:1;backdrop-filter:blur(60px);-webkit-backdrop-filter:blur(60px);background:rgba(0,0,0,0.3)}
+.card{position:relative;z-index:2;text-align:center;padding:3rem 2rem;max-width:400px;width:90%;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.12);border-radius:24px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.label{font-size:.85rem;color:rgba(255,255,255,0.6);letter-spacing:3px;margin-bottom:.5rem;text-transform:uppercase}
+.name{font-size:1.2rem;font-weight:600;margin-bottom:.3rem;color:rgba(255,255,255,0.9)}
+.score{font-size:5rem;font-weight:900;line-height:1;color:#fff;text-shadow:0 4px 20px rgba(0,0,0,0.3);margin:.5rem 0}
+.comment{font-size:.9rem;color:rgba(255,255,255,0.7);font-style:italic;margin:1rem 0 2rem;line-height:1.6}
+.btn{display:inline-block;padding:1rem 3rem;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;text-decoration:none;border-radius:50px;font-size:1.05rem;font-weight:700;letter-spacing:1px;transition:all .2s;backdrop-filter:blur(10px)}
+.btn:hover{background:rgba(255,255,255,0.25);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,0.3)}
+.sub{font-size:.7rem;color:rgba(255,255,255,0.35);margin-top:1.5rem;letter-spacing:2px}
 </style>
 </head>
 <body>
+<div class="bg"><div class="bg-half bg-left"></div><div class="bg-half bg-right"></div></div>
+<div class="bg-blur"></div>
 <div class="card">
   <div class="label">DYE MASTER</div>
   <div class="name">${name}님의 점수</div>
   <div class="score">${score.toLocaleString()}</div>
   <div class="comment">${desc}</div>
-  <a href="${gameUrl}" class="btn">🎨 나도 도전하기</a>
-  <div class="sub">색감 테스트 게임</div>
+  <a href="${gameUrl}" class="btn">나도 도전하기</a>
+  <div class="sub">DYE MASTER</div>
 </div>
 </body>
 </html>`);
