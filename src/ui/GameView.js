@@ -84,11 +84,11 @@ export function renderGameView(container, nav) {
     
     const sOffset = 20 + Math.floor(Math.random() * 35);
     const sDir = Math.random() > 0.5 ? 1 : -1;
-    let currentS = Math.max(0, Math.min(100, tS + sOffset * sDir));
+    let currentS = Math.max(15, Math.min(85, tS + sOffset * sDir));
     
     const lOffset = 20 + Math.floor(Math.random() * 35);
     const lDir = Math.random() > 0.5 ? 1 : -1;
-    let currentL = Math.max(0, Math.min(100, tL + lOffset * lDir));
+    let currentL = Math.max(15, Math.min(85, tL + lOffset * lDir));
     
     const initHsl = `hsl(${currentH}, ${currentS}%, ${currentL}%)`;
     

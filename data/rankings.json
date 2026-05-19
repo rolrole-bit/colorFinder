@@ -70,5 +70,21 @@
     "difficulty": "Normal",
     "session_id": "008b9645-1b73-4a13-8722-465a8a9bc7e9",
     "created_at": "2026-05-19T03:03:07.014Z"
+  },
+  {
+    "player_name": "213",
+    "origin_game": "마비노기 모바일",
+    "score": 1734,
+    "difficulty": "Hard",
+    "session_id": "5eaa76a0-b650-4c99-852e-dcc4b22f20d1",
+    "created_at": "2026-05-19T05:16:17.908Z"
+  },
+  {
+    "player_name": "지도라곤",
+    "origin_game": "마비노기 모바일",
+    "score": 1580,
+    "difficulty": "Hard",
+    "session_id": "10f2bdfd-6c36-449e-94b0-67154a632a50",
+    "created_at": "2026-05-19T05:17:34.301Z"
   }
 ]
