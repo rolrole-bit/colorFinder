@@ -407,16 +407,21 @@ input[type="range"]::-webkit-slider-thumb:active {
   font-size: 1.2em;
   color: inherit;
   opacity: 0.85;
-  width: 28px;
-  min-width: 28px;
+  width: 32px;
+  min-width: 32px;
+  margin-right: 0.5rem;
+  text-align: right;
 }
 
 .rank-item .rank-name {
   flex-grow: 1;
+  padding-left: 0.3rem;
 }
 
 .rank-item .rank-score {
   font-weight: 800;
+  padding-left: 0.5rem;
+  white-space: nowrap;
 }
 
 /* === NEW: Memorize Phase Text === */
