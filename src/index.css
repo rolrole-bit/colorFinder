@@ -459,13 +459,13 @@ input[type="range"]::-webkit-slider-thumb:active {
   /* Fix for WebKit overflow:hidden + border-radius + mix-blend-mode bug */
   isolation: isolate;
   -webkit-mask-image: -webkit-radial-gradient(white, black);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .game-box-container::after {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  border: 1px solid rgba(0, 0, 0, 0.6);
   border-radius: 40px;
   pointer-events: none;
   z-index: 50;
@@ -491,14 +491,15 @@ input[type="range"]::-webkit-slider-thumb:active {
 
 .slider-thumb {
   position: absolute;
-  left: 0;
-  width: 100%; /* Perfectly span the entire width of the column */
-  height: 2px;
-  background: #fff;
-  transform: translateY(-50%); /* Perfect pixel-exact vertical centering */
+  left: 15%;
+  width: 70%;
+  height: 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-50%);
   pointer-events: none;
   z-index: 2;
-  box-shadow: 0 0 4px rgba(0,0,0,0.5); /* subtle shadow for visibility */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
 .slider-touch-area {
