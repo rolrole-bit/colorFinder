@@ -21,8 +21,7 @@ import { getContrastYIQ, animateValue } from './AnimationUtils.js';
  */
 export async function renderScoreBoardView(container, appliedMultiplier = 1.0, nav) {
   const state = getState();
-  const gameRanks = await getGameRankings();
-  const playerRanks = await getPlayerRankings();
+  const [gameRanks, playerRanks] = await Promise.all([getGameRankings(), getPlayerRankings()]);
 
   // [SECURITY] XSS 방어
   let gameRanksHTML = gameRanks.map((r, i) => `

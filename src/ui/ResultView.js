@@ -77,8 +77,8 @@ export function renderInterimResultView(container, nav) {
   document.getElementById('next-round-btn').addEventListener('click', () => {
     const panel = document.getElementById('interim-panel');
     panel.style.opacity = '0';
-    panel.style.transition = 'opacity 0.4s ease';
-    setTimeout(async () => {
+    panel.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => {
       if (state.currentRound < state.maxRounds) {
         nextRound();
         nav.toGameView();
@@ -106,9 +106,10 @@ export function renderInterimResultView(container, nav) {
         
         setScore(finalScore);
         
-        await saveRecord(state.playerName, state.originGame, finalScore, state.difficulty);
+        // 캐시 무효화만 (서버 저장은 round/submit에서 완료됨)
+        saveRecord(state.playerName, state.originGame, finalScore, state.difficulty);
         nav.toScoreboardView(multiplier);
       }
-    }, 400);
+    }, 300);
   });
 }

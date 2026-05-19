@@ -223,6 +223,9 @@ export function renderGameView(container, nav) {
     updateColor();
 
     submitBtn.addEventListener('click', async () => {
+      if (submitBtn.disabled) return;
+      submitBtn.disabled = true;
+      
       playSubmitSound();
       isGuessing = false;
       document.removeEventListener('pointermove', logPointerMove);
@@ -266,7 +269,7 @@ export function renderGameView(container, nav) {
       
       setTimeout(() => {
         nav.toResultView();
-      }, 400);
+      }, 300);
     });
   }
 }
