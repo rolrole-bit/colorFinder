@@ -12,21 +12,21 @@ import { playBonusBounceSound, playScoreImpactSound } from '../utils/SoundUtils.
 import { getContrastYIQ, animateValue } from './AnimationUtils.js';
 
 /**
- * 점수 기반 한줄평 (10단계, 일본 애니메이션 선생님 교훈 톤)
+ * 점수 기반 한줄평 (10단계, 심사위원 평가 톤)
  * @param {number} score - 최종 점수
  * @returns {string}
  */
 function getScoreComment(score) {
-  if (score >= 2700) return "「전설이 되었구나... 너야말로 진정한 色の達人(이로노 타츠진)이다.」";
-  if (score >= 2400) return "「경이로운 실력... 네 눈에는 색의 심연이 보이는 것이냐.」";
-  if (score >= 2100) return "「놀랍다! 네 색감은 이미 장인의 경지에 들어섰구나.」";
-  if (score >= 1800) return "「대단하군... 색의 본질을 꿰뚫어 보고 있어.」";
-  if (score >= 1500) return "「훌륭해. 너의 눈은 이미 범인을 넘어섰다.」";
-  if (score >= 1200) return "「제법이군! 색의 흐름을 읽기 시작했구나.」";
-  if (score >= 900) return "「좋아, 네 안의 색감이 깨어나고 있어. 계속 정진하거라.」";
-  if (score >= 600) return "「나쁘지 않군. 색의 조각이 보이기 시작한 거야.」";
-  if (score >= 300) return "「아직 갈 길이 멀다. 하지만 포기하지 않는 자만이 색을 읽을 수 있지.」";
-  return "「흠... 색을 보는 눈이 아직 열리지 않았구나. 수련이 필요해.」";
+  if (score >= 2700) return "색감의 끝에 도달한 자. 당신은 전설입니다.";
+  if (score >= 2400) return "압도적 정밀도. 프로페셔널 수준의 색채 감각입니다.";
+  if (score >= 2100) return "탁월합니다. 색의 미세한 결까지 읽어내고 있습니다.";
+  if (score >= 1800) return "상당한 실력입니다. 대부분의 색을 정확히 포착하고 있습니다.";
+  if (score >= 1500) return "평균 이상의 색감. 훈련하면 더 높은 곳에 갈 수 있습니다.";
+  if (score >= 1200) return "색의 방향은 잡고 있습니다. 채도와 명도에 더 집중해 보세요.";
+  if (score >= 900) return "기본기는 있습니다. 미세한 차이를 구별하는 연습이 필요합니다.";
+  if (score >= 600) return "색의 윤곽이 보이기 시작했습니다. 조금 더 집중해 보세요.";
+  if (score >= 300) return "아직 색과 친해지는 중입니다. 다시 도전해 보세요.";
+  return "색감 훈련이 필요합니다. 포기하지 마세요, 누구나 처음은 있으니까요.";
 }
 
 /**

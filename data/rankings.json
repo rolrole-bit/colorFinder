@@ -142,5 +142,13 @@
     "difficulty": "Normal",
     "session_id": "947e67aa-f4ce-4748-8e7f-06eec0ae80b0",
     "created_at": "2026-05-19T05:35:11.623Z"
+  },
+  {
+    "player_name": "5454",
+    "origin_game": "마비노기 모바일",
+    "score": 1120,
+    "difficulty": "Hard",
+    "session_id": "12a06f1f-1393-4b6e-a9d0-ba29bb8941b9",
+    "created_at": "2026-05-19T05:41:01.455Z"
   }
 ]
