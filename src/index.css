@@ -103,21 +103,21 @@ body {
 .bg-tape-1 {
   left: 0;
   background: linear-gradient(to bottom, #ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000);
-  background-size: 100% 33.333%;
+  background-size: 100% 100vh;
   animation: bgTapeScroll1 20s linear infinite;
 }
 
 .bg-tape-2 {
   left: 33.33%;
   background: linear-gradient(to bottom, #ff0000, #808080, #ff0000);
-  background-size: 100% 50%;
+  background-size: 100% 100vh;
   animation: bgTapeScroll2 15s linear infinite reverse;
 }
 
 .bg-tape-3 {
   left: 66.66%;
   background: linear-gradient(to bottom, #ffffff, #ff0000, #000000, #ffffff);
-  background-size: 100% 33.333%;
+  background-size: 100% 100vh;
   animation: bgTapeScroll3 25s linear infinite;
 }
 
