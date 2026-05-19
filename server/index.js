@@ -80,16 +80,6 @@ app.use(helmet({
 
 app.use(express.json({ limit: '100kb' }));
 
-app.use((err, req, res, next) => {
-  if (err.type === 'entity.too.large') {
-    return res.status(413).json({ error: 'Payload too large' });
-  }
-  if (err.type === 'entity.parse.failed') {
-    return res.status(400).json({ error: 'Invalid JSON' });
-  }
-  next(err);
-});
-
 // ═══════════════════════════════════════════
 // [SECURITY] 4. 디렉토리/파일 접근 차단
 // ═══════════════════════════════════════════
@@ -167,6 +157,13 @@ app.use('/api/*', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
+  // JSON 파싱 에러 처리
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'Payload too large' });
+  }
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'Invalid JSON' });
+  }
   console.error('[ERROR]', err.message);
   // [SECURITY] 프로덕션에서는 스택 트레이스 숨김
   const detail = NODE_ENV === 'production' ? 'Internal server error' : err.message;
