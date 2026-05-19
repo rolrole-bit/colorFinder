@@ -1,17 +1,24 @@
 /**
- * DYE MASTER 서버 진입점 v2.1 (Security Hardened)
- * Express + JSON DB 기반 서버사이드 랭킹 시스템
+ * DYE MASTER 서버 진입점 v3.0 (Production-Ready)
+ * Express + Helmet + dotenv + JSON DB
+ * 
+ * 보안 체크리스트:
+ * ✅ Helmet.js (검증된 보안 헤더 라이브러리)
+ * ✅ dotenv (환경변수 분리)
+ * ✅ CORS 화이트리스트 (.env 기반)
+ * ✅ Rate Limiting (IP 기반)
+ * ✅ 디렉토리/파일 접근 차단
+ * ✅ JSON 페이로드 크기 제한
+ * ✅ Trust Proxy 설정 (리버스 프록시 대응)
  */
 
+import 'dotenv/config';
 import express from 'express';
+import helmet from 'helmet';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { cleanupSessions } from './db.js';
-import {
-  rateLimit,
-  securityHeaders,
-  blockServerDirectory
-} from './utils/security.js';
+import { rateLimit, blockServerDirectory } from './utils/security.js';
 
 import sessionRoutes from './routes/session.js';
 import roundRoutes from './routes/round.js';
@@ -22,18 +29,55 @@ const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // ═══════════════════════════════════════════
-// [SECURITY] 보안 미들웨어 (순서 중요)
+// [SECURITY] 1. Trust Proxy (리버스 프록시 뒤에서 운용 시)
 // ═══════════════════════════════════════════
 
-// 1. 보안 헤더 (모든 응답에 적용)
-app.use(securityHeaders);
+if (process.env.TRUST_PROXY === 'true') {
+  app.set('trust proxy', 1);
+}
 
-// 2. JSON 바디 크기 제한 (100KB) — DoS 방어
+// ═══════════════════════════════════════════
+// [SECURITY] 2. Helmet.js — 검증된 보안 헤더 (15종+)
+// ═══════════════════════════════════════════
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:"],
+      connectSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"]
+    }
+  },
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: { policy: 'same-origin' },
+  crossOriginResourcePolicy: { policy: 'same-origin' },
+  dnsPrefetchControl: { allow: false },
+  frameguard: { action: 'deny' },
+  hsts: NODE_ENV === 'production' ? { maxAge: 31536000, includeSubDomains: true } : false,
+  ieNoOpen: true,
+  noSniff: true,
+  originAgentCluster: true,
+  permittedCrossDomainPolicies: { permittedPolicies: 'none' },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  xssFilter: true
+}));
+
+// ═══════════════════════════════════════════
+// [SECURITY] 3. JSON 바디 크기 제한 (100KB)
+// ═══════════════════════════════════════════
+
 app.use(express.json({ limit: '100kb' }));
 
-// 3. 잘못된 JSON 파싱 에러 핸들링
 app.use((err, req, res, next) => {
   if (err.type === 'entity.too.large') {
     return res.status(413).json({ error: 'Payload too large' });
@@ -44,17 +88,22 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-// 4. server/, data/, node_modules/ 접근 차단
+// ═══════════════════════════════════════════
+// [SECURITY] 4. 디렉토리/파일 접근 차단
+// ═══════════════════════════════════════════
+
 app.use(blockServerDirectory);
 
-// 5. CORS (같은 호스트만 허용)
+// ═══════════════════════════════════════════
+// [SECURITY] 5. CORS (.env 기반 화이트리스트)
+// ═══════════════════════════════════════════
+
+const allowedOrigins = (process.env.CORS_ORIGINS || `http://localhost:${PORT}`)
+  .split(',')
+  .map(s => s.trim());
+
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  // 로컬 개발 환경만 허용
-  const allowedOrigins = [
-    `http://localhost:${PORT}`,
-    `http://127.0.0.1:${PORT}`
-  ];
   if (origin && allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
   }
@@ -64,7 +113,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// 6. 요청 로깅 (IP 포함)
+// ═══════════════════════════════════════════
+// [SECURITY] 6. 요청 로깅
+// ═══════════════════════════════════════════
+
 app.use((req, res, next) => {
   if (req.url.startsWith('/api/')) {
     const ip = req.ip || req.connection.remoteAddress;
@@ -74,14 +126,12 @@ app.use((req, res, next) => {
 });
 
 // ═══════════════════════════════════════════
-// 정적 파일 (기존 index.html, src/, css/ 등)
+// 정적 파일
 // ═══════════════════════════════════════════
 
 const projectRoot = join(__dirname, '..');
 app.use(express.static(projectRoot, {
-  // dotfiles 접근 차단 (.env, .git 등)
   dotfiles: 'deny',
-  // 디렉토리 목록 비활성화
   index: 'index.html'
 }));
 
@@ -89,47 +139,44 @@ app.use(express.static(projectRoot, {
 // [SECURITY] Rate Limited API 라우트
 // ═══════════════════════════════════════════
 
-// 세션 시작: 분당 5회 (봇 세션 폭탄 방어)
-app.use('/api/session', rateLimit(5, 60 * 1000, 'session'), sessionRoutes);
+const rlSession = parseInt(process.env.RATE_LIMIT_SESSION) || 5;
+const rlRound = parseInt(process.env.RATE_LIMIT_ROUND) || 20;
+const rlRanking = parseInt(process.env.RATE_LIMIT_RANKING) || 30;
 
-// 라운드 제출: 분당 20회
-app.use('/api/round', rateLimit(20, 60 * 1000, 'round'), roundRoutes);
+app.use('/api/session', rateLimit(rlSession, 60 * 1000, 'session'), sessionRoutes);
+app.use('/api/round', rateLimit(rlRound, 60 * 1000, 'round'), roundRoutes);
+app.use('/api/rankings', rateLimit(rlRanking, 60 * 1000, 'ranking'), rankingRoutes);
 
-// 랭킹 조회: 분당 30회
-app.use('/api/rankings', rateLimit(30, 60 * 1000, 'ranking'), rankingRoutes);
-
-// 헬스 체크
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'ok', 
+    version: '3.0',
+    env: NODE_ENV,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // ═══════════════════════════════════════════
-// 404 핸들러 (API 전용)
+// 404 + 글로벌 에러 핸들러
 // ═══════════════════════════════════════════
 
 app.use('/api/*', (req, res) => {
   res.status(404).json({ error: 'Not found' });
 });
 
-// ═══════════════════════════════════════════
-// 글로벌 에러 핸들러
-// ═══════════════════════════════════════════
-
 app.use((err, req, res, next) => {
   console.error('[ERROR]', err.message);
-  res.status(500).json({ error: 'Internal server error' });
+  // [SECURITY] 프로덕션에서는 스택 트레이스 숨김
+  const detail = NODE_ENV === 'production' ? 'Internal server error' : err.message;
+  res.status(500).json({ error: detail });
 });
 
 // ═══════════════════════════════════════════
-// 세션 정리 스케줄 (1시간마다)
+// 세션 정리 (1시간마다)
 // ═══════════════════════════════════════════
 
 setInterval(() => {
-  try {
-    cleanupSessions();
-  } catch (e) {
-    console.error('[cleanup]', e);
-  }
+  try { cleanupSessions(); } catch (e) { console.error('[cleanup]', e); }
 }, 60 * 60 * 1000);
 
 // ═══════════════════════════════════════════
@@ -138,10 +185,11 @@ setInterval(() => {
 
 app.listen(PORT, () => {
   console.log(`
-  ╔══════════════════════════════════════════╗
-  ║   🎨 DYE MASTER Server v2.1 (Secured)   ║
-  ║   http://localhost:${PORT}                 ║
-  ║   Security: Rate-Limit + Headers + Guard ║
-  ╚══════════════════════════════════════════╝
+  ╔══════════════════════════════════════════════╗
+  ║   🎨 DYE MASTER Server v3.0 (Production)    ║
+  ║   http://localhost:${PORT}                     ║
+  ║   ENV: ${NODE_ENV.padEnd(12)}                       ║
+  ║   Helmet: ✅  dotenv: ✅  RateLimit: ✅       ║
+  ╚══════════════════════════════════════════════╝
   `);
 });

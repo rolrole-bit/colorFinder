@@ -56,38 +56,9 @@ setInterval(() => {
 }, 5 * 60 * 1000);
 
 // ═══════════════════════════════════════════
-// 보안 헤더 미들웨어
+// 보안 헤더 → Helmet.js로 이관 (v3.0)
+// 이전: 수동 6종 → 현재: Helmet 15종+ 자동 적용
 // ═══════════════════════════════════════════
-
-export function securityHeaders(req, res, next) {
-  // XSS 방어
-  res.set('X-Content-Type-Options', 'nosniff');
-  res.set('X-XSS-Protection', '1; mode=block');
-  
-  // 클릭재킹 방어
-  res.set('X-Frame-Options', 'DENY');
-  
-  // MIME 스니핑 방어
-  res.set('Content-Type-Options', 'nosniff');
-  
-  // 리퍼러 정책
-  res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  
-  // 권한 정책 (카메라, 마이크 등 차단)
-  res.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  
-  // CSP (Content Security Policy)
-  res.set('Content-Security-Policy', 
-    "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline'; " +
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-    "font-src 'self' https://fonts.gstatic.com; " +
-    "img-src 'self' data:; " +
-    "connect-src 'self'"
-  );
-  
-  next();
-}
 
 // ═══════════════════════════════════════════
 // server/ 디렉토리 접근 차단

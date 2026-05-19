@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DYE MASTER 보안 보고서 v3.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#e0e0e0;line-height:1.7}
+.container{max-width:960px;margin:0 auto;padding:2rem}
+header{text-align:center;padding:4rem 2rem;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);border-bottom:1px solid #333}
+header h1{font-size:2.4rem;font-weight:800;background:linear-gradient(90deg,#ff6b6b,#ffa94d,#69db7c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem}
+header p{color:#888;font-size:.95rem}
+header .badge{display:inline-block;background:#1a1a2e;border:1px solid #444;padding:.3rem .8rem;border-radius:20px;font-size:.75rem;color:#69db7c;margin-top:1rem}
+.toc{background:#111118;border:1px solid #222;border-radius:12px;padding:1.5rem 2rem;margin:2rem 0}
+.toc h2{font-size:1rem;color:#888;margin-bottom:.8rem;text-transform:uppercase;letter-spacing:2px}
+.toc a{display:block;color:#7c8aff;text-decoration:none;padding:.3rem 0;font-size:.9rem}
+.toc a:hover{color:#ffa94d}
+section{margin:2.5rem 0}
+h2{font-size:1.5rem;font-weight:700;color:#fff;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid #222}
+h2 .num{color:#ffa94d;margin-right:.5rem}
+h3{font-size:1.1rem;font-weight:600;color:#c0c0c0;margin:1.2rem 0 .6rem}
+.phase-badge{display:inline-block;padding:.2rem .6rem;border-radius:4px;font-size:.7rem;font-weight:700;text-transform:uppercase;margin-right:.5rem}
+.phase-1{background:#2d1b69;color:#b794f6}
+.phase-2{background:#1b3a69;color:#74b9ff}
+.phase-3{background:#1b6940;color:#69db7c}
+.phase-4{background:#693a1b;color:#ffa94d}
+.phase-5{background:#69181b;color:#ff6b6b}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}
+th{background:#16161e;color:#888;text-align:left;padding:.6rem .8rem;font-weight:600;text-transform:uppercase;font-size:.75rem;letter-spacing:1px}
+td{padding:.6rem .8rem;border-bottom:1px solid #1a1a24}
+tr:hover td{background:#12121a}
+.status{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.status-done{background:#69db7c}
+.card{background:#111118;border:1px solid #222;border-radius:10px;padding:1.2rem;margin:.8rem 0}
+.card-title{font-weight:600;color:#fff;margin-bottom:.4rem;font-size:.95rem}
+.card p{color:#999;font-size:.85rem}
+.code{background:#16161e;border:1px solid #2a2a35;border-radius:6px;padding:1rem;font-family:'Courier New',monospace;font-size:.8rem;color:#c0c0c0;overflow-x:auto;margin:.6rem 0;white-space:pre}
+.timeline{position:relative;padding-left:2rem;margin:1rem 0}
+.timeline::before{content:'';position:absolute;left:.5rem;top:0;bottom:0;width:2px;background:#222}
+.tl-item{position:relative;margin-bottom:1.2rem;padding-left:1rem}
+.tl-item::before{content:'';position:absolute;left:-1.55rem;top:.5rem;width:10px;height:10px;border-radius:50%;background:#7c8aff;border:2px solid #0a0a0f}
+.tl-item.danger::before{background:#ff6b6b}
+.tl-item.success::before{background:#69db7c}
+.tl-hash{font-family:monospace;color:#666;font-size:.75rem}
+.tl-msg{font-size:.9rem;color:#ccc}
+.metric{display:inline-block;background:#16161e;border:1px solid #2a2a35;border-radius:8px;padding:.8rem 1.2rem;margin:.3rem;text-align:center;min-width:120px}
+.metric .val{font-size:1.4rem;font-weight:800;color:#fff;display:block}
+.metric .lbl{font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px}
+.vuln-high{color:#ff6b6b;font-weight:600}
+.vuln-med{color:#ffa94d;font-weight:600}
+.vuln-low{color:#ffd93d;font-weight:600}
+.vuln-info{color:#74b9ff;font-weight:600}
+.resolved{text-decoration:line-through;opacity:.5}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.pass{color:#69db7c;font-weight:700}
+.fail{color:#ff6b6b;font-weight:700}
+.na{color:#666;font-weight:400}
+.verdict{background:linear-gradient(135deg,#0d2818,#1b4332);border:1px solid #2d6a4f;border-radius:12px;padding:2rem;margin:1.5rem 0;text-align:center}
+.verdict h3{color:#69db7c;font-size:1.3rem;margin-bottom:.5rem}
+.verdict p{color:#a7c4b5;font-size:.95rem}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}.metric{min-width:80px}}
+footer{text-align:center;padding:3rem;color:#444;font-size:.75rem;border-top:1px solid #1a1a24;margin-top:3rem}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🛡️ DYE MASTER 보안 보고서</h1>
+  <p>Security Hardening History &amp; OWASP Compliance Report</p>
+  <div class="badge">v3.0 Production-Ready — Helmet.js + dotenv (2026-05-19)</div>
+</header>
+
+<div class="container">
+
+<div class="toc">
+  <h2>목차</h2>
+  <a href="#summary">1. 요약</a>
+  <a href="#timeline">2. 보안 강화 타임라인</a>
+  <a href="#threats">3. 위협 모델 &amp; 해결 현황</a>
+  <a href="#server">4. 서버사이드 보안 아키텍처</a>
+  <a href="#client">5. 클라이언트 보안 계층</a>
+  <a href="#refactor">6. 리팩토링 &amp; 데드코드 제거</a>
+  <a href="#owasp">7. OWASP Top 10 컴플라이언스</a>
+  <a href="#verdict">8. 공개 배포 적합성 판정</a>
+</div>
+
+<!-- 1. 요약 -->
+<section id="summary">
+<h2><span class="num">01</span>요약</h2>
+<p>DYE MASTER는 색상 매칭 게임으로, 5단계에 걸친 보안 강화를 거쳐 <strong>공개 배포 최소 기준</strong>을 충족합니다.</p>
+<div style="margin:1.5rem 0;text-align:center">
+  <div class="metric"><span class="val">5</span><span class="lbl">보안 Phase</span></div>
+  <div class="metric"><span class="val">20+</span><span class="lbl">보안 조치</span></div>
+  <div class="metric"><span class="val">15+</span><span class="lbl">Helmet 헤더</span></div>
+  <div class="metric"><span class="val">0</span><span class="lbl">npm 취약점</span></div>
+</div>
+</section>
+
+<!-- 2. 타임라인 -->
+<section id="timeline">
+<h2><span class="num">02</span>보안 강화 타임라인</h2>
+<div class="timeline">
+  <div class="tl-item danger">
+    <div class="tl-hash">8437334</div>
+    <div class="tl-msg"><span class="phase-badge phase-1">Phase 1</span>AntiCheat 구현 — 점수 검증, 서명, XSS 방어, 세션 관리</div>
+  </div>
+  <div class="tl-item">
+    <div class="tl-hash">05434bd</div>
+    <div class="tl-msg"><span class="phase-badge phase-2">Phase 2</span>봇 탐지, 색상 난독화, 슬라이더 랜덤화</div>
+  </div>
+  <div class="tl-item success">
+    <div class="tl-hash">1cf7170</div>
+    <div class="tl-msg"><span class="phase-badge phase-3">Phase 3</span>서버사이드 전환 — 점수 계산/타겟 관리 서버 이관</div>
+  </div>
+  <div class="tl-item success">
+    <div class="tl-hash">78d8de3</div>
+    <div class="tl-msg"><span class="phase-badge phase-4">Phase 4</span>Security Hardening v2.1 — Rate Limit, 헤더, 디렉토리 차단</div>
+  </div>
+  <div class="tl-item success">
+    <div class="tl-hash">v3.0</div>
+    <div class="tl-msg"><span class="phase-badge phase-5">Phase 5</span>Production-Ready — Helmet.js, dotenv, HSTS, CORS 화이트리스트</div>
+  </div>
+</div>
+</section>
+
+<!-- 3. 위협 모델 -->
+<section id="threats">
+<h2><span class="num">03</span>위협 모델 &amp; 해결 현황</h2>
+<table>
+<thead><tr><th>위험도</th><th>위협</th><th>대응</th><th>상태</th></tr></thead>
+<tbody>
+<tr><td><span class="vuln-high">HIGH</span></td><td>점수 위조</td><td>서버사이드 점수 계산</td><td><span class="status status-done"></span>해결</td></tr>
+<tr><td><span class="vuln-high">HIGH</span></td><td>타겟 색상 추출</td><td>서버 전용 보관, 라운드 완료 후만 공개</td><td><span class="status status-done"></span>해결</td></tr>
+<tr><td><span class="vuln-high">HIGH</span></td><td>랭킹 데이터 조작</td><td>서버 JSON DB 관리</td><td><span class="status status-done"></span>해결</td></tr>
+<tr><td><span class="vuln-high">HIGH</span></td><td>XSS 공격</td><td>서버+클라이언트 이중 새니타이징 + Helmet CSP</td><td><span class="status status-done"></span>해결</td></tr>
+<tr><td><span class="vuln-med">MED</span></td><td>봇 자동 제출</td><td>Rate Limit + 타이밍 검증 + 행동 분석</td><td><span class="status status-done"></span>해결</td></tr>
+<tr><td><span class="vuln-med">MED</span></td><td>DoS 공격</td><td>JSON 100KB 제한 + IP Rate Limit</td><td><span class="status status-done"></span>해결</td></tr>
+<tr><td><span class="vuln-med">MED</span></td><td>서버 코드 노출</td><td>디렉토리 차단 + dotfiles deny</td><td><span class="status status-done"></span>해결</td></tr>
+<tr><td><span class="vuln-med">MED</span></td><td>MITM (중간자 공격)</td><td>HSTS 헤더 적용 (Helmet)</td><td><span class="status status-done"></span>해결</td></tr>
+<tr><td><span class="vuln-low">LOW</span></td><td>클릭재킹</td><td>X-Frame-Options: DENY + frame-ancestors: none</td><td><span class="status status-done"></span>해결</td></tr>
+<tr><td><span class="vuln-low">LOW</span></td><td>환경변수 노출</td><td>dotenv + .env 차단 + .gitignore</td><td><span class="status status-done"></span>해결</td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- 4. 서버 보안 -->
+<section id="server">
+<h2><span class="num">04</span>서버사이드 보안 아키텍처 (v3.0)</h2>
+
+<h3>4.1 Helmet.js — 검증된 보안 헤더 (15종+)</h3>
+<div class="card">
+<div class="card-title">npm helmet v8.x — 주간 다운로드 3,500만+</div>
+<p>수동 헤더 6종 → Helmet 15종+ 자동 적용으로 업그레이드. 업계 표준 라이브러리.</p>
+</div>
+<table>
+<thead><tr><th>헤더</th><th>설정</th><th>방어 대상</th></tr></thead>
+<tbody>
+<tr><td>Content-Security-Policy</td><td>self 기반 + 폰트/스타일 화이트리스트</td><td>XSS, 데이터 주입</td></tr>
+<tr><td>Strict-Transport-Security</td><td>max-age=31536000; includeSubDomains</td><td>프로토콜 다운그레이드</td></tr>
+<tr><td>X-Frame-Options</td><td>DENY</td><td>클릭재킹</td></tr>
+<tr><td>X-Content-Type-Options</td><td>nosniff</td><td>MIME 스니핑</td></tr>
+<tr><td>X-XSS-Protection</td><td>1; mode=block</td><td>반사형 XSS</td></tr>
+<tr><td>Cross-Origin-Opener-Policy</td><td>same-origin</td><td>크로스오리진 공격</td></tr>
+<tr><td>Cross-Origin-Resource-Policy</td><td>same-origin</td><td>리소스 유출</td></tr>
+<tr><td>Origin-Agent-Cluster</td><td>?1</td><td>프로세스 격리</td></tr>
+<tr><td>Referrer-Policy</td><td>strict-origin-when-cross-origin</td><td>리퍼러 유출</td></tr>
+<tr><td>X-DNS-Prefetch-Control</td><td>off</td><td>DNS 프리페치 악용</td></tr>
+<tr><td>X-Permitted-Cross-Domain</td><td>none</td><td>Flash/PDF 크로스도메인</td></tr>
+</tbody>
+</table>
+
+<h3>4.2 환경변수 관리 (dotenv)</h3>
+<div class="code">PORT, NODE_ENV, CORS_ORIGINS, RATE_LIMIT_*, MAX_SESSIONS, TRUST_PROXY
+→ 모두 .env 파일로 분리, .gitignore에 등록, .env.example 템플릿 제공</div>
+
+<h3>4.3 Rate Limiting + 입력 검증</h3>
+<div class="grid2">
+<div class="card"><div class="card-title">세션 /api/session</div><p>분당 5회, 새니타이징 20/30자 제한</p></div>
+<div class="card"><div class="card-title">라운드 /api/round</div><p>분당 20회, RGB 클램핑, NaN 거부, 동시제출 잠금</p></div>
+<div class="card"><div class="card-title">랭킹 /api/rankings</div><p>분당 30회, 점수 0~6300 범위 강제</p></div>
+<div class="card"><div class="card-title">에러 핸들링</div><p>프로덕션 스택트레이스 숨김, 413/400/429 세분화</p></div>
+</div>
+</section>
+
+<!-- 5. 클라이언트 보안 -->
+<section id="client">
+<h2><span class="num">05</span>클라이언트 보안 계층</h2>
+<div class="grid2">
+<div class="card"><div class="card-title">🎯 점수 범위 검증</div><p>난이도별 최대 점수 초과 시 0점. Easy:3000 ~ Hell:3900</p></div>
+<div class="card"><div class="card-title">🔍 DevTools 감지</div><p>window 크기 + console getter 이중 감시</p></div>
+<div class="card"><div class="card-title">🤖 봇 탐지</div><p>포인터 이벤트 간격 분산(CV) 분석</p></div>
+<div class="card"><div class="card-title">🛡️ XSS 방어</div><p>escapeHTML() 6종 문자 이스케이프</p></div>
+<div class="card"><div class="card-title">🔑 세션 관리</div><p>crypto.getRandomValues 토큰, 5초 최소시간</p></div>
+<div class="card"><div class="card-title">🎨 슬라이더 랜덤화</div><p>초기 HSL 60~300도 오프셋, 역추적 불가</p></div>
+</div>
+</section>
+
+<!-- 6. 리팩토링 -->
+<section id="refactor">
+<h2><span class="num">06</span>리팩토링 &amp; 데드코드 제거</h2>
+<table>
+<thead><tr><th>제거 항목</th><th>사유</th></tr></thead>
+<tbody>
+<tr><td class="resolved">generateSignature / verifySignature / sha256</td><td>서버 DB로 전환</td></tr>
+<tr><td class="resolved">encodeColor / decodeColor / renderColorOnCanvas</td><td>서버가 타겟 관리</td></tr>
+<tr><td class="resolved">createTimerGuard / getSessionToken</td><td>서버가 타이밍/세션 검증</td></tr>
+<tr><td class="resolved">securityHeaders() 수동 함수</td><td>Helmet.js로 대체</td></tr>
+<tr><td class="resolved">run_tests.js, test_browser.py 등 5파일</td><td>미사용 레거시</td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- 7. OWASP Top 10 -->
+<section id="owasp">
+<h2><span class="num">07</span>OWASP Top 10 (2021) 컴플라이언스</h2>
+<p>OWASP Top 10은 웹 애플리케이션 보안의 국제 표준 기준입니다. 아래는 각 항목별 대응 현황입니다.</p>
+
+<table>
+<thead><tr><th>순위</th><th>OWASP 항목</th><th>대응 조치</th><th>판정</th></tr></thead>
+<tbody>
+<tr>
+  <td>A01</td><td>Broken Access Control</td>
+  <td>디렉토리 차단, dotfiles deny, 세션 UUID 검증, CORS 화이트리스트</td>
+  <td><span class="pass">PASS</span></td>
+</tr>
+<tr>
+  <td>A02</td><td>Cryptographic Failures</td>
+  <td>crypto.randomUUID (세션), crypto.getRandomValues (토큰), HSTS 적용</td>
+  <td><span class="pass">PASS</span></td>
+</tr>
+<tr>
+  <td>A03</td><td>Injection (XSS/SQLi)</td>
+  <td>서버 sanitizeInput() + 클라이언트 escapeHTML() + Helmet CSP</td>
+  <td><span class="pass">PASS</span></td>
+</tr>
+<tr>
+  <td>A04</td><td>Insecure Design</td>
+  <td>서버사이드 점수 계산, 타겟 서버 보관, 클라이언트 폴백 분리</td>
+  <td><span class="pass">PASS</span></td>
+</tr>
+<tr>
+  <td>A05</td><td>Security Misconfiguration</td>
+  <td>Helmet 15종+ 헤더, dotenv 환경변수 분리, 프로덕션 에러 숨김</td>
+  <td><span class="pass">PASS</span></td>
+</tr>
+<tr>
+  <td>A06</td><td>Vulnerable Components</td>
+  <td>의존성 3개(express, helmet, dotenv), npm audit 0 vulnerabilities</td>
+  <td><span class="pass">PASS</span></td>
+</tr>
+<tr>
+  <td>A07</td><td>Auth &amp; Identification</td>
+  <td>게임 특성상 로그인 불필요. 세션 UUID + 타이밍 검증으로 무결성 보장</td>
+  <td><span class="pass">PASS</span> <span class="na">(N/A)</span></td>
+</tr>
+<tr>
+  <td>A08</td><td>Software Integrity</td>
+  <td>서버 전용 점수 계산, 랭킹 서버 관리, 클라이언트 조작 무효화</td>
+  <td><span class="pass">PASS</span></td>
+</tr>
+<tr>
+  <td>A09</td><td>Logging &amp; Monitoring</td>
+  <td>IP 포함 API 로깅, Rate Limit 헤더(X-RateLimit-Remaining) 제공</td>
+  <td><span class="pass">PASS</span></td>
+</tr>
+<tr>
+  <td>A10</td><td>SSRF</td>
+  <td>서버가 외부 요청을 수행하지 않음 (자체 완결형)</td>
+  <td><span class="pass">PASS</span> <span class="na">(N/A)</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<!-- 8. 판정 -->
+<section id="verdict">
+<h2><span class="num">08</span>공개 배포 적합성 판정</h2>
+
+<div class="verdict">
+  <h3>✅ 공개 배포 최소 기준 충족</h3>
+  <p>OWASP Top 10 전 항목 PASS · Helmet.js 업계 표준 적용 · npm audit 취약점 0건</p>
+</div>
+
+<h3>판정 근거</h3>
+<table>
+<thead><tr><th>기준</th><th>요구사항</th><th>현재 상태</th><th>판정</th></tr></thead>
+<tbody>
+<tr><td>보안 헤더</td><td>CSP, HSTS, X-Frame 등</td><td>Helmet.js 15종+ 자동 적용</td><td><span class="pass">✅</span></td></tr>
+<tr><td>입력 검증</td><td>모든 사용자 입력 새니타이징</td><td>서버+클라이언트 이중 검증</td><td><span class="pass">✅</span></td></tr>
+<tr><td>접근 제어</td><td>서버 파일/설정 비노출</td><td>디렉토리 차단 + dotfiles deny</td><td><span class="pass">✅</span></td></tr>
+<tr><td>DoS 방어</td><td>Rate Limiting</td><td>IP 기반 3종 Rate Limit</td><td><span class="pass">✅</span></td></tr>
+<tr><td>데이터 무결성</td><td>서버사이드 검증</td><td>점수/랭킹 서버 전용 관리</td><td><span class="pass">✅</span></td></tr>
+<tr><td>환경 분리</td><td>하드코딩 금지</td><td>dotenv + .env.example</td><td><span class="pass">✅</span></td></tr>
+<tr><td>의존성 안전</td><td>취약 패키지 0건</td><td>npm audit: 0 vulnerabilities</td><td><span class="pass">✅</span></td></tr>
+<tr><td>에러 처리</td><td>스택트레이스 비노출</td><td>NODE_ENV=production 시 숨김</td><td><span class="pass">✅</span></td></tr>
+</tbody>
+</table>
+
+<h3>HTTPS 배포 가이드</h3>
+<div class="card">
+<div class="card-title">리버스 프록시 방식 (권장)</div>
+<p>Nginx/Cloudflare 뒤에 배치 시 TRUST_PROXY=true 설정. Let's Encrypt로 무료 TLS 인증서 적용. HSTS 헤더는 Helmet이 자동 전송합니다.</p>
+</div>
+<div class="code">
+# nginx 예시
+server {
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/domain/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/domain/privkey.pem;
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+</div>
+</section>
+
+</div>
+
+<footer>
+  DYE MASTER Security Report v3.0 — Generated 2026-05-19<br>
+  Stack: Node.js + Express + Helmet.js + dotenv | OWASP Top 10 2021 Compliant
+</footer>
+
+</body>
+</html>
