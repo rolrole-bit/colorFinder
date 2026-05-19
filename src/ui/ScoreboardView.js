@@ -1,7 +1,8 @@
 /**
  * ScoreboardView - 최종 스코어보드 (랭킹 표시)
  * 
- * 담당: 최종 점수 애니메이션 + 게임/플레이어 랭킹 표시 + 공유 + 한줄평
+ * 담당: 최종 점수 애니메이션 + 게임/플레이어 랭킹 표시
+ * 공유 로직은 ShareManager.js, 한줄평은 ScoreComment.js로 분리
  */
 
 import { getState, resetGame, setDifficulty, getDifficultyName, getDifficultyMultiplier } from '../core/GameState.js';
@@ -10,24 +11,8 @@ import { toRGBString, rgbToHex } from '../utils/ColorUtils.js';
 import { escapeHTML, clearSession } from '../utils/AntiCheat.js';
 import { playBonusBounceSound, playScoreImpactSound } from '../utils/SoundUtils.js';
 import { getContrastYIQ, animateValue } from './AnimationUtils.js';
-
-/**
- * 점수 기반 한줄평 (10단계, 심사위원 평가 톤)
- * @param {number} score - 최종 점수
- * @returns {string}
- */
-function getScoreComment(score) {
-  if (score >= 2700) return "색감의 끝에 도달한 자. 당신은 전설입니다.";
-  if (score >= 2400) return "압도적 정밀도. 프로페셔널 수준의 색채 감각입니다.";
-  if (score >= 2100) return "탁월합니다. 색의 미세한 결까지 읽어내고 있습니다.";
-  if (score >= 1800) return "상당한 실력입니다. 대부분의 색을 정확히 포착하고 있습니다.";
-  if (score >= 1500) return "평균 이상의 색감. 훈련하면 더 높은 곳에 갈 수 있습니다.";
-  if (score >= 1200) return "색의 방향은 잡고 있습니다. 채도와 명도에 더 집중해 보세요.";
-  if (score >= 900) return "기본기는 있습니다. 미세한 차이를 구별하는 연습이 필요합니다.";
-  if (score >= 600) return "색의 윤곽이 보이기 시작했습니다. 조금 더 집중해 보세요.";
-  if (score >= 300) return "아직 색과 친해지는 중입니다. 다시 도전해 보세요.";
-  return "색감 훈련이 필요합니다. 포기하지 마세요, 누구나 처음은 있으니까요.";
-}
+import { getScoreComment } from '../utils/ScoreComment.js';
+import { bindShareEvents } from './ShareManager.js';
 
 /**
  * 최종 스코어보드 화면 렌더링
@@ -256,79 +241,6 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
     }, 400);
   });
 
-  /**
-   * 클립보드 복사 (HTTPS 없이도 동작하는 폴백 포함)
-   */
-  function copyToClipboard(text) {
-    if (navigator.clipboard && window.isSecureContext) {
-      return navigator.clipboard.writeText(text);
-    }
-    // HTTP 환경 폴백
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    return Promise.resolve();
-  }
-
-  // 공유하기 → OG URL 생성 + SNS 직접 공유 모달
-  document.getElementById('share-btn').addEventListener('click', () => {
-    // OG 공유 URL 생성 (모든 라운드 색상 포함)
-    const comment = getScoreComment(state.score);
-    // 라운드별 타겟/유저 색상 직렬화: tc=r,g,b|r,g,b|... uc=r,g,b|r,g,b|...
-    const rounds = state.roundResults || [];
-    const tcColors = rounds.map(r => `${r.targetColor.r},${r.targetColor.g},${r.targetColor.b}`).join('|');
-    const ucColors = rounds.map(r => `${r.userColor.r},${r.userColor.g},${r.userColor.b}`).join('|');
-    const colorParam = tcColors ? `&tc=${tcColors}&uc=${ucColors}` : '';
-    const sharePageUrl = `${window.location.origin}/share?score=${state.score}&name=${encodeURIComponent(state.playerName)}&comment=${encodeURIComponent(comment)}${colorParam}`;
-    const shareText = `DYE MASTER에서 ${state.score.toLocaleString()}점! 🎨 나의 색감을 증명하세요!`;
-    
-    // URL + 텍스트 인코딩
-    const encodedUrl = encodeURIComponent(sharePageUrl);
-    const encodedText = encodeURIComponent(shareText);
-    
-    // 공유 URL 세팅
-    document.getElementById('share-url-input').value = sharePageUrl;
-    
-    // SNS 공유 링크 (클릭 시 바로 해당 SNS로 이동)
-    document.getElementById('share-twitter').href = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
-    document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-    
-    // Instagram은 공유 API 없음 → URL 복사 후 안내
-    const instaBtn = document.getElementById('share-instagram');
-    instaBtn.href = '#';
-    instaBtn.onclick = (e) => {
-      e.preventDefault();
-      copyToClipboard(sharePageUrl).then(() => {
-        alert('URL이 복사되었습니다!\nInstagram 스토리나 게시물에 붙여넣기 하세요.');
-      });
-    };
-    
-    // 모달 표시
-    document.getElementById('share-modal').style.display = 'flex';
-  });
-  
-  // URL 복사 버튼
-  document.getElementById('copy-url-btn').addEventListener('click', () => {
-    const urlInput = document.getElementById('share-url-input');
-    copyToClipboard(urlInput.value).then(() => {
-      const btn = document.getElementById('copy-url-btn');
-      btn.textContent = '✅ 복사됨';
-      setTimeout(() => { btn.textContent = 'URL 복사'; }, 1500);
-    });
-  });
-  
-  // 모달 닫기
-  document.getElementById('share-close-btn').addEventListener('click', () => {
-    document.getElementById('share-modal').style.display = 'none';
-  });
-  document.getElementById('share-modal').addEventListener('click', (e) => {
-    if (e.target.id === 'share-modal') {
-      document.getElementById('share-modal').style.display = 'none';
-    }
-  });
+  // 공유 이벤트 바인딩 (ShareManager.js)
+  bindShareEvents(state, getScoreComment);
 }

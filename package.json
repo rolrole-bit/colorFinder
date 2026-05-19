@@ -1,6 +1,9 @@
 {
   "name": "dyemaster",
-  "version": "2.0.0",
+  "version": "3.0.0",
+  "description": "DYE MASTER - 당신의 색감을 증명하세요. 색 정확도 랭킹 게임.",
+  "author": "DYE MASTER Team",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "start": "node server/index.js",
