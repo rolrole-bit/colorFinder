@@ -140,6 +140,10 @@ export function renderInterimResultView(container, nav) {
         
         setScore(finalScore);
         
+        if (finalScore >= 2500) {
+          localStorage.setItem('hell_unlocked', 'true');
+        }
+        
         // 캐시 무효화만 (서버 저장은 round/submit에서 완료됨)
         saveRecord(state.playerName, state.originGame, finalScore, state.difficulty);
         nav.toScoreboardView(multiplier);
