@@ -251,11 +251,13 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
 
   // 공유하기 → OG URL 생성 + SNS 직접 공유 모달
   document.getElementById('share-btn').addEventListener('click', () => {
-    // OG 공유 URL 생성 (색상 포함)
+    // OG 공유 URL 생성 (모든 라운드 색상 포함)
     const comment = getScoreComment(state.score);
-    const tc = state.targetColor;
-    const uc = state.userColor;
-    const colorParam = `&tc=${tc.r},${tc.g},${tc.b}&uc=${uc.r},${uc.g},${uc.b}`;
+    // 라운드별 타겟/유저 색상 직렬화: tc=r,g,b|r,g,b|... uc=r,g,b|r,g,b|...
+    const rounds = state.roundResults || [];
+    const tcColors = rounds.map(r => `${r.targetColor.r},${r.targetColor.g},${r.targetColor.b}`).join('|');
+    const ucColors = rounds.map(r => `${r.userColor.r},${r.userColor.g},${r.userColor.b}`).join('|');
+    const colorParam = tcColors ? `&tc=${tcColors}&uc=${ucColors}` : '';
     const sharePageUrl = `${window.location.origin}/share?score=${state.score}&name=${encodeURIComponent(state.playerName)}&comment=${encodeURIComponent(comment)}${colorParam}`;
     const shareText = `DYE MASTER에서 ${state.score.toLocaleString()}점! 🎨 나의 색감을 증명하세요!`;
     
