@@ -94,28 +94,28 @@ body {
 .bg-tape {
   position: absolute;
   top: -100vh;
-  width: 40px;
+  width: 33.34%;
   height: 300vh;
-  filter: blur(25px);
+  filter: blur(80px);
   opacity: 0.85;
 }
 
 .bg-tape-1 {
-  left: calc(16.66% - 20px);
+  left: 0;
   background: linear-gradient(to bottom, #ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000);
   background-size: 100% 33.333%;
   animation: bgTapeScroll1 20s linear infinite;
 }
 
 .bg-tape-2 {
-  left: calc(50% - 20px);
+  left: 33.33%;
   background: linear-gradient(to bottom, #ff0000, #808080, #ff0000);
   background-size: 100% 50%;
   animation: bgTapeScroll2 15s linear infinite reverse;
 }
 
 .bg-tape-3 {
-  left: calc(83.33% - 20px);
+  left: 66.66%;
   background: linear-gradient(to bottom, #ffffff, #ff0000, #000000, #ffffff);
   background-size: 100% 33.333%;
   animation: bgTapeScroll3 25s linear infinite;
@@ -127,13 +127,13 @@ body {
 }
 
 @keyframes bgTapeScroll2 {
-  0% { transform: translateY(0); filter: blur(25px) hue-rotate(0deg); }
-  100% { transform: translateY(100vh); filter: blur(25px) hue-rotate(360deg); }
+  0% { transform: translateY(0); filter: blur(80px) hue-rotate(0deg); }
+  100% { transform: translateY(100vh); filter: blur(80px) hue-rotate(360deg); }
 }
 
 @keyframes bgTapeScroll3 {
-  0% { transform: translateY(0); filter: blur(25px) hue-rotate(0deg); }
-  100% { transform: translateY(100vh); filter: blur(25px) hue-rotate(-360deg); }
+  0% { transform: translateY(0); filter: blur(80px) hue-rotate(0deg); }
+  100% { transform: translateY(100vh); filter: blur(80px) hue-rotate(-360deg); }
 }
 
 #app {
