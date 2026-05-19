@@ -92,7 +92,7 @@ export function bindShareEvents(state, getComment) {
     const urlInput = document.getElementById('share-url-input');
     copyToClipboard(urlInput.value).then(() => {
       const btn = document.getElementById('copy-url-btn');
-      btn.textContent = '✅ 복사됨';
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><polyline points="20 6 9 17 4 12"/></svg> 복사됨';
       setTimeout(() => { btn.textContent = 'URL 복사'; }, 1500);
     });
   });

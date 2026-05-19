@@ -262,5 +262,13 @@
     "difficulty": "Hard",
     "session_id": "7805a847-3fb7-4705-8a3f-0254919b6de5",
     "created_at": "2026-05-19T06:49:45.404Z"
+  },
+  {
+    "player_name": "김바미",
+    "origin_game": "마비노기 모바일",
+    "score": 1239,
+    "difficulty": "Normal",
+    "session_id": "e28b2bf0-24ab-4cd8-807d-aa5ca0055c65",
+    "created_at": "2026-05-19T07:54:00.370Z"
   }
 ]
