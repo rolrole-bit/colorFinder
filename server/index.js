@@ -59,11 +59,11 @@ app.use(helmet({
     }
   },
   crossOriginEmbedderPolicy: false,
-  crossOriginOpenerPolicy: { policy: 'same-origin' },
-  crossOriginResourcePolicy: { policy: 'same-origin' },
+  crossOriginOpenerPolicy: false,
+  crossOriginResourcePolicy: false,
   dnsPrefetchControl: { allow: false },
   frameguard: { action: 'deny' },
-  hsts: NODE_ENV === 'production' ? { maxAge: 31536000, includeSubDomains: true } : false,
+  hsts: process.env.TRUST_PROXY === 'true' ? { maxAge: 31536000, includeSubDomains: true } : false,
   ieNoOpen: true,
   noSniff: true,
   originAgentCluster: true,
@@ -183,12 +183,12 @@ setInterval(() => {
 // 서버 시작
 // ═══════════════════════════════════════════
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`
   ╔══════════════════════════════════════════════╗
   ║   🎨 DYE MASTER Server v3.0 (Production)    ║
   ║   http://localhost:${PORT}                     ║
-  ║   ENV: ${NODE_ENV.padEnd(12)}                       ║
+  ║   http://10.28.42.23:${PORT}  (내부망)         ║
   ║   Helmet: ✅  dotenv: ✅  RateLimit: ✅       ║
   ╚══════════════════════════════════════════════╝
   `);
