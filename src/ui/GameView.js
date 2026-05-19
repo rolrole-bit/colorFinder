@@ -102,7 +102,7 @@ export function renderGameView(container, nav) {
         <!-- 블러 오버레이 추가 -->
         <div style="position: absolute; inset: 0; backdrop-filter: blur(80px); background: rgba(255,255,255,0.05); z-index: 5;"></div>
         
-        <div style="position: absolute; top: 2rem; right: 2rem; display: flex; gap: 1rem; z-index: 10;">
+        <div style="position: absolute; top: 2rem; right: 2rem; display: flex; gap: 1rem; z-index: 20;">
           <div id="hex-display" style="font-family: 'Paperlogy', sans-serif; font-size: 2rem; font-weight: 300; letter-spacing: 3px; padding: 0.5rem 1rem; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
             #000000
           </div>
