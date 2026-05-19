@@ -5,7 +5,7 @@
  */
 
 import { getState, resetGame, setDifficulty, getDifficultyName, getDifficultyMultiplier } from '../core/GameState.js';
-import { getGameRankings, getPlayerRankings } from '../core/Ranking.js';
+import { getGameRankings, getPlayerRankings, getTotalPlayers } from '../core/Ranking.js';
 import { toRGBString, rgbToHex } from '../utils/ColorUtils.js';
 import { escapeHTML, clearSession } from '../utils/AntiCheat.js';
 import { playBonusBounceSound, playScoreImpactSound } from '../utils/SoundUtils.js';
@@ -39,7 +39,7 @@ function getScoreComment(score) {
  */
 export async function renderScoreBoardView(container, appliedMultiplier = 1.0, nav) {
   const state = getState();
-  const [gameRanks, playerRanks] = await Promise.all([getGameRankings(), getPlayerRankings()]);
+  const [gameRanks, playerRanks, totalPlayers] = await Promise.all([getGameRankings(), getPlayerRankings(), getTotalPlayers()]);
 
   // [SECURITY] XSS 방어
   let gameRanksHTML = gameRanks.map((r, i) => `
@@ -52,13 +52,39 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
 
   if (gameRanks.length === 0) gameRanksHTML = '<li class="rank-item">기록이 없습니다.</li>';
 
-  let playerRanksHTML = playerRanks.map((r, i) => `
-    <li class="rank-item" style="border-color: currentColor;">
+  // 본인이 TOP5에 있는지 확인
+  const myName = state.playerName;
+  const myScore = state.score;
+  const myInTop5 = playerRanks.some(r => r.playerName === myName && r.score === myScore);
+  
+  let playerRanksHTML = playerRanks.map((r, i) => {
+    const isMe = (r.playerName === myName && r.score === myScore);
+    const meStyle = isMe 
+      ? 'background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-size: 1.1em; font-weight: 800; padding: 0.5rem 0.3rem;' 
+      : '';
+    return `
+    <li class="rank-item" style="border-color: currentColor; ${meStyle}">
       <span class="rank-num">${i + 1}</span>
       <span class="rank-name">${escapeHTML(r.playerName)} [${escapeHTML(r.originGame)}]</span>
       <span class="rank-score">${r.score.toLocaleString()}</span>
     </li>
-  `).join('');
+  `;}).join('');
+  
+  // TOP5 밖이면 구분선 + 본인 등수 추가
+  if (!myInTop5 && playerRanks.length > 0) {
+    // 모든 top5보다 낮으면 전체 등수 중 마지막 부근
+    let myRank = totalPlayers || playerRanks.length + 1;
+    for (let i = 0; i < playerRanks.length; i++) {
+      if (myScore >= playerRanks[i].score) { myRank = i + 1; break; }
+    }
+    playerRanksHTML += `
+    <li class="rank-item" style="border-color: currentColor; padding: 0.2rem 0; opacity: 0.3; font-size: 0.7em; text-align: center; letter-spacing: 3px;">⋯</li>
+    <li class="rank-item" style="border-color: currentColor; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-size: 1.1em; font-weight: 800; padding: 0.5rem 0.3rem;">
+      <span class="rank-num">${myRank}</span>
+      <span class="rank-name">${escapeHTML(myName)} [${escapeHTML(state.originGame)}]</span>
+      <span class="rank-score">${myScore.toLocaleString()}</span>
+    </li>`;
+  }
 
   if (playerRanks.length === 0) playerRanksHTML = '<li class="rank-item">기록이 없습니다.</li>';
 

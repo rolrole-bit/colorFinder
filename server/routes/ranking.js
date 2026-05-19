@@ -4,7 +4,7 @@
  */
 
 import { Router } from 'express';
-import { getGameRankings, getPlayerRankings } from '../db.js';
+import { getGameRankings, getPlayerRankings, getAllPlayerRankings } from '../db.js';
 
 const router = Router();
 
@@ -16,8 +16,9 @@ router.get('/', (req, res) => {
   try {
     const gameRankings = getGameRankings();
     const playerRankings = getPlayerRankings();
+    const totalPlayers = getAllPlayerRankings().length;
 
-    res.json({ gameRankings, playerRankings });
+    res.json({ gameRankings, playerRankings, totalPlayers });
   } catch (err) {
     console.error('[rankings]', err);
     res.status(500).json({ error: 'Internal server error' });

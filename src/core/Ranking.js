@@ -75,3 +75,11 @@ export async function getPlayerRankings() {
   const { playerRankings } = await getRankingsFromServer();
   return playerRankings;
 }
+
+/**
+ * 전체 플레이어 수 조회
+ */
+export async function getTotalPlayers() {
+  const { totalPlayers } = await getRankingsFromServer();
+  return totalPlayers || 0;
+}
