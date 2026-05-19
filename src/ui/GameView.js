@@ -260,12 +260,12 @@ export function renderGameView(container, nav) {
           const rgbStr = `rgb(${currentDisplayedRGB.r}, ${currentDisplayedRGB.g}, ${currentDisplayedRGB.b})`;
           const contrastBg = getContrastYIQ(currentDisplayedRGB.r, currentDisplayedRGB.g, currentDisplayedRGB.b);
           
-          hexDisplay.style.color = rgbStr;
-          hexDisplay.style.backgroundColor = contrastBg;
+          hexDisplay.style.color = contrastBg;
+          hexDisplay.style.backgroundColor = rgbStr;
           
           if (submitBtn) {
-            submitBtn.style.color = rgbStr;
-            submitBtn.style.backgroundColor = contrastBg;
+            submitBtn.style.color = contrastBg;
+            submitBtn.style.backgroundColor = rgbStr;
           }
           
           guessBg.style.backgroundColor = rgbStr;
@@ -287,12 +287,12 @@ export function renderGameView(container, nav) {
         guessBg.style.backgroundColor = rgbStr;
         if (outerBg) outerBg.style.background = rgbStr;
         if (hexDisplay) {
-          hexDisplay.style.color = rgbStr;
-          hexDisplay.style.backgroundColor = contrastBg;
+          hexDisplay.style.color = contrastBg;
+          hexDisplay.style.backgroundColor = rgbStr;
         }
         if (submitBtn) {
-          submitBtn.style.color = rgbStr;
-          submitBtn.style.backgroundColor = contrastBg;
+          submitBtn.style.color = contrastBg;
+          submitBtn.style.backgroundColor = rgbStr;
         }
         
         const centerLine = document.getElementById('center-line');
