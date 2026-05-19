@@ -698,7 +698,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
 }
 
 .entry-form {

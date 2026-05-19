@@ -115,7 +115,7 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
 
           <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
             <!-- 플레이어 이름 -->
-            <div style="font-size: clamp(1rem, 3vw, 1.4rem); font-weight: 300; color: #fff; letter-spacing: 2px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); margin-bottom: 0.5rem;">
+            <div style="font-size: clamp(1rem, 3vw, 1.4rem); font-weight: 300; color: #fff; letter-spacing: 2px; margin-bottom: 0.5rem;">
               <span style="font-weight: 700;">${playerNameSafe}</span>님의 점수는
             </div>
             
@@ -124,7 +124,7 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
                 <div class="animated-gradient-text" style="line-height: 1;">
                   <span class="animated-score" data-target="${state.score}">0</span>
                 </div>
-                <div id="bonus-text" style="font-size: 0.15em; font-weight: 300; opacity: 0; letter-spacing: 2px; white-space: nowrap; display: block; margin-top: 1.5rem; color: #fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); transition: opacity 0.8s ease;">
+                <div id="bonus-text" style="font-size: 0.15em; font-weight: 300; opacity: 0; letter-spacing: 2px; white-space: nowrap; display: block; margin-top: 1.5rem; color: #fff; transition: opacity 0.8s ease;">
                   ${getDifficultyName(state.difficulty)} Bonus &times; ${appliedMultiplier.toFixed(2)}
                 </div>
               </div>
