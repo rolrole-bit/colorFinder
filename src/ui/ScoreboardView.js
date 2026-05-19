@@ -172,15 +172,15 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
       </div>
       
       <div style="position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); width: calc(100% - 4rem); max-width: 1000px; z-index: 3000; text-align: center; display: flex; gap: 1rem;">
-        <button class="magazine-start-btn" id="retry-btn" style="flex: 1; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">다시 하기</button>
-        <button class="magazine-start-btn" id="share-btn" style="flex: 1; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; box-shadow: 0 10px 30px rgba(118,75,162,0.5);">📤 공유하기</button>
+        <button class="magazine-start-btn" id="retry-btn" style="flex: 1; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; gap:0.5rem;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>다시 하기</button>
+        <button class="magazine-start-btn" id="share-btn" style="flex: 1; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; box-shadow: 0 10px 30px rgba(118,75,162,0.5); display:flex; align-items:center; justify-content:center; gap:0.5rem;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>공유하기</button>
       </div>
     </div>
     
     <!-- 공유 모달 -->
     <div id="share-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); justify-content:center; align-items:center;">
       <div style="background:#1a1a2e; border-radius:16px; padding:2rem; max-width:360px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
-        <div style="font-size:1.3rem; font-weight:700; color:#fff; margin-bottom:0.5rem;">📤 공유하기</div>
+        <div style="font-size:1.3rem; font-weight:700; color:#fff; margin-bottom:0.5rem; display:flex; align-items:center; justify-content:center; gap:0.5rem;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>공유하기</div>
         <div id="share-toast" style="font-size:0.85rem; color:#aaa; margin-bottom:1rem;">SNS를 선택하거나 URL을 복사하세요</div>
         
         <!-- 공유 URL -->
