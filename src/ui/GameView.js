@@ -155,7 +155,7 @@ export function renderGameView(container, nav) {
             </g>
 
             <!-- Center Picking Line -->
-            <line id="center-line" x1="0" y1="50%" x2="100%" y2="50%" stroke="#fff" stroke-width="8" style="pointer-events: none; filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.6));" />
+            <line id="center-line" x1="0" y1="50%" x2="100%" y2="50%" stroke="#fff" stroke-width="8" style="pointer-events: none;" />
 
             <!-- Invisible Touch Areas -->
             <rect id="touch-h" x="0%" y="0" width="33.33%" height="100%" fill="transparent" style="cursor: grab;" />
