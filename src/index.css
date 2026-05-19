@@ -93,9 +93,9 @@ body {
 
 .bg-tape {
   position: absolute;
-  top: -100vh;
+  top: -200vh;
   width: 33.34%;
-  height: 300vh;
+  height: 500vh;
   filter: blur(80px);
   opacity: 0.85;
 }
@@ -104,36 +104,52 @@ body {
   left: 0;
   background: linear-gradient(to bottom, #ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000);
   background-size: 100% 100vh;
-  animation: bgTapeScroll1 20s linear infinite;
+  animation: bgTapeInteract1 24s infinite;
 }
 
 .bg-tape-2 {
   left: 33.33%;
   background: linear-gradient(to bottom, #ff0000, #808080, #ff0000);
   background-size: 100% 100vh;
-  animation: bgTapeScroll2 15s linear infinite reverse;
+  animation: bgTapeInteract2 30s infinite;
 }
 
 .bg-tape-3 {
   left: 66.66%;
   background: linear-gradient(to bottom, #ffffff, #ff0000, #000000, #ffffff);
   background-size: 100% 100vh;
-  animation: bgTapeScroll3 25s linear infinite;
+  animation: bgTapeInteract3 27s infinite;
 }
 
-@keyframes bgTapeScroll1 {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(100vh); }
+@keyframes bgTapeInteract1 {
+  0%   { transform: translateY(0); animation-timing-function: ease-in-out; }
+  15%  { transform: translateY(-80vh); animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
+  20%  { transform: translateY(-80vh); animation-timing-function: ease-in-out; }
+  40%  { transform: translateY(120vh); animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+  55%  { transform: translateY(40vh); animation-timing-function: ease-in-out; }
+  75%  { transform: translateY(-150vh); animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
+  85%  { transform: translateY(-150vh); animation-timing-function: ease-in-out; }
+  100% { transform: translateY(0); }
 }
 
-@keyframes bgTapeScroll2 {
-  0% { transform: translateY(0); filter: blur(80px) hue-rotate(0deg); }
-  100% { transform: translateY(100vh); filter: blur(80px) hue-rotate(360deg); }
+@keyframes bgTapeInteract2 {
+  0%   { transform: translateY(0); filter: blur(80px) hue-rotate(0deg); animation-timing-function: ease-in-out; }
+  25%  { transform: translateY(150vh); filter: blur(80px) hue-rotate(90deg); animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1); }
+  35%  { transform: translateY(100vh); filter: blur(80px) hue-rotate(120deg); animation-timing-function: ease-in-out; }
+  60%  { transform: translateY(-120vh); filter: blur(80px) hue-rotate(200deg); animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+  70%  { transform: translateY(-120vh); filter: blur(80px) hue-rotate(240deg); animation-timing-function: ease-in-out; }
+  90%  { transform: translateY(50vh); filter: blur(80px) hue-rotate(300deg); animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1); }
+  100% { transform: translateY(0); filter: blur(80px) hue-rotate(360deg); }
 }
 
-@keyframes bgTapeScroll3 {
-  0% { transform: translateY(0); filter: blur(80px) hue-rotate(0deg); }
-  100% { transform: translateY(100vh); filter: blur(80px) hue-rotate(-360deg); }
+@keyframes bgTapeInteract3 {
+  0%   { transform: translateY(0); filter: blur(80px) hue-rotate(0deg); animation-timing-function: ease-in-out; }
+  20%  { transform: translateY(-100vh); filter: blur(80px) hue-rotate(-50deg); animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
+  30%  { transform: translateY(-50vh); filter: blur(80px) hue-rotate(-100deg); animation-timing-function: ease-in-out; }
+  50%  { transform: translateY(180vh); filter: blur(80px) hue-rotate(-180deg); animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+  65%  { transform: translateY(180vh); filter: blur(80px) hue-rotate(-220deg); animation-timing-function: ease-in-out; }
+  85%  { transform: translateY(-20vh); filter: blur(80px) hue-rotate(-300deg); animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
+  100% { transform: translateY(0); filter: blur(80px) hue-rotate(-360deg); }
 }
 
 #app {
