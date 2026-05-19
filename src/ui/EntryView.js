@@ -21,7 +21,11 @@ import { scrambleTypingEffect } from './AnimationUtils.js';
  */
 export function renderEntryView(container, nav) {
   container.innerHTML = `
-    <div class="animated-gradient-bg" id="entry-bg"></div>
+    <div class="bg-tapes-container" id="entry-bg">
+      <div class="bg-tape bg-tape-1"></div>
+      <div class="bg-tape bg-tape-2"></div>
+      <div class="bg-tape bg-tape-3"></div>
+    </div>
     <div class="magazine-entry" id="entry-panel">
       <h1 class="magazine-title">DYE<br/>MASTER</h1>
       
