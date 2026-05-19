@@ -83,8 +83,8 @@ footer{text-align:center;padding:3rem;color:#444;font-size:.75rem;border-top:1px
 
 <div class="tab-bar">
   <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('security')">🛡️ 보안 리포트</button>
-    <button class="tab-btn" onclick="switchTab('install')">📦 설치 방법</button>
+    <button class="tab-btn active" data-tab="security">🛡️ 보안 리포트</button>
+    <button class="tab-btn" data-tab="install">📦 설치 방법</button>
   </div>
 </div>
 
@@ -508,15 +508,6 @@ pm2 restart dyemaster</div>
   Stack: Node.js + Express + Helmet.js + dotenv | OWASP Top 10 2021 Compliant
 </footer>
 
-<script>
-function switchTab(tab) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  event.target.classList.add('active');
-  window.scrollTo({top: 0, behavior: 'smooth'});
-}
-if (location.hash === '#install') switchTab('install');
-</script>
+<script src="./src/report-tabs.js"></script>
 </body>
 </html>
