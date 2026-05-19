@@ -127,11 +127,14 @@ app.get('/share', (req, res) => {
   const comment = (req.query.comment || '').substring(0, 100).replace(/[<>"'&]/g, '');
   const gameUrl = `${req.protocol}://${req.get('host')}/`;
 
-  // 플레이어 랭킹 가져오기
+  // 본인 등수 계산
   const playerRanks = getPlayerRankings();
-  const rankHTML = playerRanks.map((r, i) =>
-    `<div class="rank-row"><span class="rank-n">${i+1}</span><span class="rank-nm">${(r.playerName || '').substring(0,10).replace(/[<>"'&]/g, '')} <small>[${(r.originGame || '').substring(0,8).replace(/[<>"'&]/g, '')}]</small></span><span class="rank-s">${r.score.toLocaleString()}</span></div>`
-  ).join('');
+  const totalPlayers = playerRanks.length;
+  let myRank = totalPlayers + 1;
+  for (let i = 0; i < playerRanks.length; i++) {
+    if (score >= playerRanks[i].score) { myRank = i + 1; break; }
+  }
+  const rankText = `전체 ${totalPlayers}명 중 ${myRank}위`;
 
   // 다중 라운드 색상 파싱 (tc=r,g,b|r,g,b|r,g,b  uc=r,g,b|r,g,b|r,g,b)
   const parseColors = (str) => {
@@ -186,13 +189,7 @@ body{min-height:100vh;display:flex;align-items:center;justify-content:center;fon
 .comment{font-size:.85rem;color:rgba(255,255,255,0.65);font-style:italic;margin-bottom:2rem;line-height:1.6}
 .btn{display:inline-block;padding:.9rem 2.5rem;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);color:#fff;text-decoration:none;border-radius:50px;font-size:1rem;font-weight:700;letter-spacing:1px;transition:all .2s;backdrop-filter:blur(10px)}
 .btn:hover{background:rgba(255,255,255,0.25);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,0.3)}
-.ranking{margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid rgba(255,255,255,0.1);text-align:left}
-.ranking h4{font-size:.75rem;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:.6rem}
-.rank-row{display:flex;align-items:center;padding:.35rem 0;font-size:.8rem;color:rgba(255,255,255,0.7)}
-.rank-n{width:1.5rem;font-weight:900;color:rgba(255,255,255,0.7);font-size:.85rem}
-.rank-nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rank-nm small{color:rgba(255,255,255,0.35);font-size:.7rem}
-.rank-s{font-weight:800;font-size:.85rem;color:#fff}
+.my-rank{margin-top:1.5rem;font-size:.85rem;color:rgba(255,255,255,0.5);letter-spacing:1px}
 </style>
 </head>
 <body>
@@ -204,7 +201,7 @@ body{min-height:100vh;display:flex;align-items:center;justify-content:center;fon
   <div class="score">${score.toLocaleString()}</div>
   <div class="comment">${desc}</div>
   <a href="${gameUrl}" class="btn">나도 도전하기</a>
-  ${rankHTML ? `<div class="ranking"><h4>🏆 플레이어 랭킹</h4>${rankHTML}</div>` : ''}
+  <div class="my-rank">🏆 ${rankText}</div>
 </div>
 </body>
 </html>`);
