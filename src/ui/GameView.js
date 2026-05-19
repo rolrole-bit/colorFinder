@@ -149,7 +149,7 @@ export function renderGameView(container, nav) {
       if (hexDisplay) {
         const startRGB = { ...currentDisplayedRGB };
         const startTime = performance.now();
-        const duration = 1000;
+        const duration = 250;
         
         if (hexAnimFrame) cancelAnimationFrame(hexAnimFrame);
         
