@@ -109,21 +109,21 @@ body {
   left: -5%;
   background: linear-gradient(to bottom, #a8c0ff, #c2d5ff, #a8c0ff);
   background-size: 100% 400vh;
-  animation: bgTapeInteract1 24s infinite;
+  animation: bgTapeInteract1 24s infinite, pastelHueRotate 18s infinite ease-in-out;
 }
 
 .bg-tape-2 {
   left: 30%;
   background: linear-gradient(to bottom, #c2d5ff, #e2c2ff, #c2d5ff);
   background-size: 100% 400vh;
-  animation: bgTapeInteract2 30s infinite;
+  animation: bgTapeInteract2 30s infinite, pastelHueRotate 24s infinite ease-in-out;
 }
 
 .bg-tape-3 {
   left: 65%;
   background: linear-gradient(to bottom, #e2c2ff, #ffc2db, #e2c2ff);
   background-size: 100% 400vh;
-  animation: bgTapeInteract3 27s infinite;
+  animation: bgTapeInteract3 27s infinite, pastelHueRotate 30s infinite ease-in-out;
 }
 
 @keyframes bgTapeInteract1 {
@@ -157,15 +157,10 @@ body {
   100% { transform: translateY(0); }
 }
 
-@keyframes syncHueRotate {
-  0%   { filter: blur(80px) hue-rotate(180deg); animation-timing-function: ease-in-out; }
-  15%  { filter: blur(80px) hue-rotate(-108deg); animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
-  20%  { filter: blur(80px) hue-rotate(-108deg); animation-timing-function: ease-in-out; }
-  40%  { filter: blur(80px) hue-rotate(612deg); animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
-  55%  { filter: blur(80px) hue-rotate(324deg); animation-timing-function: ease-in-out; }
-  75%  { filter: blur(80px) hue-rotate(-360deg); animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
-  85%  { filter: blur(80px) hue-rotate(-360deg); animation-timing-function: ease-in-out; }
-  100% { filter: blur(80px) hue-rotate(180deg); }
+@keyframes pastelHueRotate {
+  0%   { filter: blur(140px) hue-rotate(-30deg); }
+  50%  { filter: blur(140px) hue-rotate(30deg); }
+  100% { filter: blur(140px) hue-rotate(-30deg); }
 }
 
 #app {
