@@ -1399,8 +1399,6 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
   text-rendering: optimizeLegibility !important;
-  backface-visibility: hidden !important;
-  transform: translateZ(0) !important;
 }
 
 .magazine-start-btn:disabled {
@@ -1432,17 +1430,17 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
-  transform: translateY(0) translateZ(0) !important;
+  transform: none !important;
 }
 
 .magazine-start-btn:not(:disabled):hover {
   background: rgba(255, 255, 255, 0.3) !important;
-  transform: translateY(-3px) translateZ(0) !important;
+  transform: translateY(-3px) !important;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.15) !important;
 }
 
 .magazine-start-btn:not(:disabled):active {
-  transform: translateY(1px) translateZ(0) !important;
+  transform: translateY(1px) !important;
   opacity: 1 !important;
 }
 
