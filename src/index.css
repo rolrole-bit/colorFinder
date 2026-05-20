@@ -102,19 +102,16 @@ body {
   left: -30%;
   width: 160%;
   height: 160%;
-  background: linear-gradient(120deg, 
-    #a8edea 0%,    
-    #fed6e3 20%,   
-    #e0c3fc 40%,   
-    #8ec5fc 60%,   
-    #fff1eb 80%,   
-    #a18cd1 100%   
-  );
-  background-size: 300% 300%;
+  background: 
+    radial-gradient(circle at 15% 20%, #fed6e3 0%, rgba(254, 214, 227, 0) 50%),
+    radial-gradient(circle at 85% 15%, #a8edea 0%, rgba(168, 237, 234, 0) 50%),
+    radial-gradient(circle at 50% 80%, #fff1eb 0%, rgba(255, 241, 235, 0) 60%),
+    linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 50%, #a18cd1 100%);
+  background-size: 180% 180%;
   filter: url(#liquid-noise);
   will-change: filter, background-position;
   opacity: 1;
-  animation: bgPan 40s infinite ease-in-out alternate;
+  animation: bgPan 30s infinite ease-in-out alternate;
 }
 
 @keyframes bgPan {
