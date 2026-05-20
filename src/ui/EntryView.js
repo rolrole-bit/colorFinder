@@ -20,6 +20,7 @@ import { scrambleTypingEffect } from './AnimationUtils.js';
  * @param {function} nav.setServerSession - 서버 세션 상태 설정
  */
 export function renderEntryView(container, nav) {
+  container.innerHTML = `
     <div class="bg-tapes-container" id="entry-bg">
       <div class="bg-tape bg-tape-1"></div>
       <div class="bg-tape bg-tape-2"></div>
