@@ -158,13 +158,16 @@ export function renderGameView(container, nav) {
                 <stop offset="100%" stop-color="#ff0000" />
               </linearGradient>
               <linearGradient id="grad-s" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#ff0000" id="sat-stop-1" />
-                <stop offset="100%" stop-color="#808080" id="sat-stop-0" />
+                <stop offset="0%" stop-color="#ff0000" id="sat-stop-0" />
+                <stop offset="50%" stop-color="#808080" id="sat-stop-1" />
+                <stop offset="100%" stop-color="#ff0000" id="sat-stop-2" />
               </linearGradient>
               <linearGradient id="grad-l" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#ffffff" />
-                <stop offset="50%" stop-color="#ff0000" id="light-stop-mid" />
-                <stop offset="100%" stop-color="#000000" />
+                <stop offset="25%" stop-color="#ff0000" id="light-stop-mid1" />
+                <stop offset="50%" stop-color="#000000" />
+                <stop offset="75%" stop-color="#ff0000" id="light-stop-mid2" />
+                <stop offset="100%" stop-color="#ffffff" />
               </linearGradient>
             </defs>
 
@@ -176,14 +179,14 @@ export function renderGameView(container, nav) {
                 <rect x="0" y="1500" width="33.34%" height="1500" fill="url(#grad-h)" />
               </g>
               <g id="tape-s">
-                <rect x="33.33%" y="-3000" width="33.34%" height="3000" id="sat-fill-top" />
+                <rect x="33.33%" y="-1500" width="33.34%" height="1500" fill="url(#grad-s)" />
                 <rect x="33.33%" y="0" width="33.34%" height="1500" fill="url(#grad-s)" />
-                <rect x="33.33%" y="1500" width="33.34%" height="3000" fill="#808080" />
+                <rect x="33.33%" y="1500" width="33.34%" height="1500" fill="url(#grad-s)" />
               </g>
               <g id="tape-l">
-                <rect x="66.66%" y="-3000" width="33.34%" height="3000" fill="#ffffff" />
+                <rect x="66.66%" y="-1500" width="33.34%" height="1500" fill="url(#grad-l)" />
                 <rect x="66.66%" y="0" width="33.34%" height="1500" fill="url(#grad-l)" />
-                <rect x="66.66%" y="1500" width="33.34%" height="3000" fill="#000000" />
+                <rect x="66.66%" y="1500" width="33.34%" height="1500" fill="url(#grad-l)" />
               </g>
             </g>
 
@@ -274,11 +277,7 @@ export function renderGameView(container, nav) {
         let dv = dy / this.trackLen;
         let v = (this.value - this.min) / (this.max - this.min);
         v += dv;
-        if (this.max === 360) {
-          v = v - Math.floor(v);
-        } else {
-          v = Math.max(0, Math.min(1, v));
-        }
+        v = v - Math.floor(v);
         this.value = this.min + v * (this.max - this.min);
         this.updateTransform();
         if (this.onChange) this.onChange(this.value);
@@ -358,15 +357,17 @@ export function renderGameView(container, nav) {
         if (centerLine) centerLine.setAttribute('stroke', rgbStr);
       }
       
-      const satFillTop = document.getElementById('sat-fill-top');
-      if (satFillTop) satFillTop.setAttribute('fill', `hsl(${currentH}, 100%, 50%)`);
       const satStop0 = document.getElementById('sat-stop-0');
       const satStop1 = document.getElementById('sat-stop-1');
-      if (satStop0) satStop0.setAttribute('stop-color', `hsl(${currentH}, 0%, 50%)`);
-      if (satStop1) satStop1.setAttribute('stop-color', `hsl(${currentH}, 100%, 50%)`);
-      
-      const lightStopMid = document.getElementById('light-stop-mid');
-      if (lightStopMid) lightStopMid.setAttribute('stop-color', `hsl(${currentH}, ${currentS}%, 50%)`);
+      const satStop2 = document.getElementById('sat-stop-2');
+      if (satStop0) satStop0.setAttribute('stop-color', `hsl(${currentH}, 100%, 50%)`);
+      if (satStop1) satStop1.setAttribute('stop-color', `hsl(${currentH}, 0%, 50%)`);
+      if (satStop2) satStop2.setAttribute('stop-color', `hsl(${currentH}, 100%, 50%)`);
+
+      const lightStopMid1 = document.getElementById('light-stop-mid1');
+      const lightStopMid2 = document.getElementById('light-stop-mid2');
+      if (lightStopMid1) lightStopMid1.setAttribute('stop-color', `hsl(${currentH}, ${currentS}%, 50%)`);
+      if (lightStopMid2) lightStopMid2.setAttribute('stop-color', `hsl(${currentH}, ${currentS}%, 50%)`);
     };
 
     const hueSlider = new TapeSlider({
@@ -377,17 +378,25 @@ export function renderGameView(container, nav) {
     });
     
     const satSlider = new TapeSlider({
-      min: 0, max: 100, value: currentS,
+      min: 0, max: 200, value: currentS,
       tapeGroup: document.getElementById('tape-s'),
       touchArea: document.getElementById('touch-s'),
-      onChange: (val) => { currentS = val; updateColor(); logSliderChange(); }
+      onChange: (val) => {
+        currentS = val > 100 ? 200 - val : val;
+        updateColor();
+        logSliderChange();
+      }
     });
-    
+
     const lightSlider = new TapeSlider({
-      min: 0, max: 100, value: currentL,
+      min: 0, max: 200, value: currentL,
       tapeGroup: document.getElementById('tape-l'),
       touchArea: document.getElementById('touch-l'),
-      onChange: (val) => { currentL = val; updateColor(); logSliderChange(); }
+      onChange: (val) => {
+        currentL = val > 100 ? 200 - val : val;
+        updateColor();
+        logSliderChange();
+      }
     });
 
     document.addEventListener('pointermove', logPointerMove);
@@ -431,12 +440,12 @@ export function renderGameView(container, nav) {
       const lVal = startL + easeDouble * 15;
 
       hueSlider.value = (Math.round(hVal) + 360) % 360;
-      satSlider.value = Math.max(0, Math.min(100, Math.round(sVal)));
-      lightSlider.value = Math.max(0, Math.min(100, Math.round(lVal)));
+      satSlider.value = (Math.round(sVal) + 200) % 200;
+      lightSlider.value = (Math.round(lVal) + 200) % 200;
 
       currentH = hueSlider.value;
-      currentS = satSlider.value;
-      currentL = lightSlider.value;
+      currentS = satSlider.value > 100 ? 200 - satSlider.value : satSlider.value;
+      currentL = lightSlider.value > 100 ? 200 - lightSlider.value : lightSlider.value;
 
       hueSlider.updateTransform();
       satSlider.updateTransform();
