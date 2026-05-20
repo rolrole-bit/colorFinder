@@ -53,7 +53,7 @@ export function renderInterimResultView(container, nav) {
         </div>
         
         <!-- 중앙 영역: 헥스코드 + 스코어 -->
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: auto;">
           <div style="display: flex; gap: 4rem; margin-bottom: 1rem;">
             <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${targetRGB}; background-color: ${leftContrast}; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px;">
               ${targetHex}
