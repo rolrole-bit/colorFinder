@@ -113,15 +113,19 @@ export function renderGameView(container, nav) {
     const tL = targetHslObj.l;
     
     const hueOffset = 60 + Math.floor(Math.random() * 240);
-    let currentH = (tH + hueOffset) % 360;
+    const endH = (tH + hueOffset) % 360;
     
     const sOffset = 20 + Math.floor(Math.random() * 35);
     const sDir = Math.random() > 0.5 ? 1 : -1;
-    let currentS = Math.max(15, Math.min(85, tS + sOffset * sDir));
+    const endS = Math.max(15, Math.min(85, tS + sOffset * sDir));
     
     const lOffset = 20 + Math.floor(Math.random() * 35);
     const lDir = Math.random() > 0.5 ? 1 : -1;
-    let currentL = Math.max(15, Math.min(85, tL + lOffset * lDir));
+    const endL = Math.max(15, Math.min(85, tL + lOffset * lDir));
+
+    let currentH = tH;
+    let currentS = tS;
+    let currentL = tL;
     
     const initHsl = `hsl(${currentH}, ${currentS}%, ${currentL}%)`;
     
@@ -387,10 +391,6 @@ export function renderGameView(container, nav) {
     document.addEventListener('pointermove', logPointerMove);
     updateColor();
 
-    const startH = currentH;
-    const startS = currentS;
-    const startL = currentL;
-
     const shuffleDuration = 1500;
     const shuffleStartTime = performance.now();
 
@@ -399,13 +399,13 @@ export function renderGameView(container, nav) {
       const progress = Math.min(elapsed / shuffleDuration, 1);
 
       if (progress >= 1 || !isMixing) {
-        hueSlider.value = startH;
-        satSlider.value = 100 - startS;
-        lightSlider.value = 100 - startL;
+        hueSlider.value = endH;
+        satSlider.value = 100 - endS;
+        lightSlider.value = 100 - endL;
 
-        currentH = startH;
-        currentS = startS;
-        currentL = startL;
+        currentH = endH;
+        currentS = endS;
+        currentL = endL;
 
         hueSlider.updateTransform();
         satSlider.updateTransform();
@@ -428,17 +428,17 @@ export function renderGameView(container, nav) {
       const progressS = calcEaseOut(progress, 0.2, 0.8);
       const progressL = calcEaseOut(progress, 0.4, 1.0);
 
-      const hVal = startH - 45 * (1 - progressH);
-      const sVal = startS - 25 * (1 - progressS);
-      const lVal = startL - 25 * (1 - progressL);
+      const hVal = tH + hueOffset * progressH;
+      const sVal = tS + (endS - tS) * progressS;
+      const lVal = tL + (endL - tL) * progressL;
 
-      hueSlider.value = (Math.round(hVal) + 360) % 360;
-      satSlider.value = (Math.round(sVal) + 200) % 200;
-      lightSlider.value = (Math.round(lVal) + 200) % 200;
+      currentH = (Math.round(hVal) + 360) % 360;
+      currentS = Math.round(sVal);
+      currentL = Math.round(lVal);
 
-      currentH = hueSlider.value;
-      currentS = satSlider.value > 100 ? satSlider.value - 100 : 100 - satSlider.value;
-      currentL = lightSlider.value > 100 ? lightSlider.value - 100 : 100 - lightSlider.value;
+      hueSlider.value = currentH;
+      satSlider.value = 100 - currentS;
+      lightSlider.value = 100 - currentL;
 
       hueSlider.updateTransform();
       satSlider.updateTransform();
