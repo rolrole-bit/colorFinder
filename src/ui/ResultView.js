@@ -48,7 +48,7 @@ export function renderInterimResultView(container, nav) {
         
         <!-- 상단 라운드 표시 -->
         <div style="display: flex; justify-content: flex-start; width: 100%; flex-shrink: 0; margin-bottom: auto; padding-left: 2vw;">
-          <div style="font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: ${leftContrast}; padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px; text-shadow: 0 1px 4px rgba(0,0,0,0.3);">
+          <div style="font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: ${leftContrast}; padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px;">
             ROUND ${state.currentRound} / ${state.maxRounds}
           </div>
         </div>
@@ -56,16 +56,16 @@ export function renderInterimResultView(container, nav) {
         <!-- 중앙 영역: 헥스코드 + 스코어 -->
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: auto;">
           <div style="display: flex; gap: 4rem; margin-bottom: 1rem;">
-            <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${leftContrast}; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px; text-shadow: 0 1px 6px rgba(0,0,0,0.25);">
+            <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${leftContrast}; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px;">
               ${targetHex}
             </div>
-            <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${rightContrast}; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px; text-shadow: 0 1px 6px rgba(0,0,0,0.25);">
+            <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${rightContrast}; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px;">
               ${userHex}
             </div>
           </div>
           
           <div class="magazine-score">
-            <div class="animated-gradient-text" style="line-height: 1; color: ${leftContrast}; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+            <div style="line-height: 1; color: ${leftContrast};">
               <span class="animated-score" data-target="${state.score}">0</span>
             </div>
           </div>
