@@ -103,9 +103,9 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
 
   container.innerHTML = `
     <div class="split-screen-result" id="score-panel">
-      <!-- 50:50 분할 배경 -->
-      <div class="split-screen-half" style="background: ${targetGradient};"></div>
-      <div class="split-screen-half" style="background: ${userGradient};"></div>
+      <!-- 50:50 분할 배경 (블러 처리) -->
+      <div class="split-screen-half" style="background: ${targetGradient}; filter: blur(40px); transform: scale(1.2);"></div>
+      <div class="split-screen-half" style="background: ${userGradient}; filter: blur(40px); transform: scale(1.2);"></div>
       
       <!-- 매거진 오버레이 -->
       <div class="magazine-overlay">
@@ -170,11 +170,15 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
     <div id="share-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); justify-content:center; align-items:center;">
       <div style="position:relative; max-width:380px; width:90%; animation: shareCardPop 0.3s ease-out;">
         <!-- 공유 카드 미리보기 -->
-        <div id="share-card-preview" style="text-align:center; padding:2.5rem 2rem 2rem; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); border-radius:24px; backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-          <div style="font-size:.8rem; color:rgba(255,255,255,0.5); letter-spacing:3px; margin-bottom:.4rem; text-transform:uppercase;">DYE MASTER</div>
-          <div id="share-card-name" style="font-size:1.15rem; font-weight:600; margin-bottom:.2rem; color:rgba(255,255,255,0.85);"></div>
-          <div id="share-card-score" style="font-size:4.5rem; font-weight:900; line-height:1; color:#fff; text-shadow:0 4px 20px rgba(0,0,0,0.3); margin:.3rem 0 .8rem;"></div>
-          <div id="share-card-comment" style="font-size:.85rem; color:rgba(255,255,255,0.65); font-style:italic; margin-bottom:1rem; line-height:1.6;"></div>
+        <div id="share-card-preview" style="text-align:center; padding:2.5rem 2rem 2rem; border:1px solid rgba(255,255,255,0.15); border-radius:24px; box-shadow:0 20px 60px rgba(0,0,0,0.3); position:relative; overflow:hidden;">
+          <div id="share-card-bg" style="position:absolute; inset:0; background:linear-gradient(135deg, ${targetRGB}, ${userRGB}); filter:blur(30px) saturate(150%); transform:scale(1.3); z-index:0;"></div>
+          <div style="position:absolute; inset:0; background:rgba(0,0,0,0.25); z-index:1;"></div>
+          <div style="position:relative; z-index:2;">
+            <div style="font-size:.8rem; color:rgba(255,255,255,0.5); letter-spacing:3px; margin-bottom:.4rem; text-transform:uppercase;">DYE MASTER</div>
+            <div id="share-card-name" style="font-size:1.15rem; font-weight:600; margin-bottom:.2rem; color:rgba(255,255,255,0.85);"></div>
+            <div id="share-card-score" style="font-size:4.5rem; font-weight:900; line-height:1; color:#fff; text-shadow:0 4px 20px rgba(0,0,0,0.3); margin:.3rem 0 .8rem;"></div>
+            <div id="share-card-comment" style="font-size:.85rem; color:rgba(255,255,255,0.65); font-style:italic; margin-bottom:1rem; line-height:1.6;"></div>
+          </div>
         </div>
         
         <!-- URL 복사 영역 -->
