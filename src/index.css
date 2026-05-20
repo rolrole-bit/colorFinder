@@ -96,29 +96,21 @@ body {
   background: #fdfdff;
 }
 
-.bg-tape {
+.entry-bg-mesh {
   position: absolute;
-  top: -10%;
-  width: 60%;
-  height: 120%;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
+  background: linear-gradient(135deg, 
+    #7da2ff 0%, 
+    #b5cbff 35%, 
+    #d8abff 70%, 
+    #ff94c2 100%
+  );
   filter: url(#liquid-noise);
   will-change: filter;
   opacity: 1;
-}
-
-.bg-tape-1 {
-  left: -15%;
-  background: linear-gradient(135deg, #7da2ff, #b5cbff);
-}
-
-.bg-tape-2 {
-  left: 20%;
-  background: linear-gradient(135deg, #b5cbff, #d8abff);
-}
-
-.bg-tape-3 {
-  left: 55%;
-  background: linear-gradient(135deg, #d8abff, #ff94c2);
 }
 
 #app {

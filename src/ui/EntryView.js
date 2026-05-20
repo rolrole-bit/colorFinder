@@ -22,18 +22,16 @@ import { scrambleTypingEffect } from './AnimationUtils.js';
 export function renderEntryView(container, nav) {
   container.innerHTML = `
     <div class="bg-tapes-container" id="entry-bg">
-      <div class="bg-tape bg-tape-1"></div>
-      <div class="bg-tape bg-tape-2"></div>
-      <div class="bg-tape bg-tape-3"></div>
+      <div class="entry-bg-mesh"></div>
       <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute; width:0; height:0; pointer-events:none; visibility:hidden;">
         <filter id="liquid-noise">
           <feTurbulence type="fractalNoise" baseFrequency="0.005 0.005" numOctaves="3" result="noise">
-            <animate attributeName="baseFrequency" values="0.003 0.003; 0.009 0.009; 0.003 0.003" dur="25s" repeatCount="indefinite" />
+            <animate attributeName="baseFrequency" values="0.003 0.003; 0.008 0.008; 0.003 0.003" dur="30s" repeatCount="indefinite" />
           </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="350" xChannelSelector="R" yChannelSelector="G" result="displaced">
-            <animate attributeName="scale" values="220; 350; 220" dur="20s" repeatCount="indefinite" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="300" xChannelSelector="R" yChannelSelector="G" result="displaced">
+            <animate attributeName="scale" values="180; 300; 180" dur="25s" repeatCount="indefinite" />
           </feDisplacementMap>
-          <feGaussianBlur in="displaced" stdDeviation="60" />
+          <feGaussianBlur in="displaced" stdDeviation="50" />
         </filter>
       </svg>
     </div>
