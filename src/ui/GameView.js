@@ -364,10 +364,26 @@ export function renderGameView(container, nav) {
         const invertedR = 255 - targetRGB.r;
         const invertedG = 255 - targetRGB.g;
         const invertedB = 255 - targetRGB.b;
-        const invertedRgbStr = `rgb(${invertedR}, ${invertedG}, ${invertedB})`;
         
-        submitBtn.style.backgroundColor = invertedRgbStr; // 배경이 명조 반전
-        submitBtn.style.color = immediateRgbStr; // 텍스트는 유저가 선택한 컬러 코드 그대로 유지
+        // 가독성 확보(콘트라스트 보강)를 위한 명도대비 알고리즘
+        const textYiq = ((targetRGB.r * 299) + (targetRGB.g * 587) + (targetRGB.b * 114)) / 1000;
+        let bgR, bgG, bgB;
+        if (textYiq >= 128) {
+          // 글자가 밝으면 배경을 극적으로 어둡게 내려서 가시성 확보
+          const factor = 0.35;
+          bgR = Math.round(invertedR * factor);
+          bgG = Math.round(invertedG * factor);
+          bgB = Math.round(invertedB * factor);
+        } else {
+          // 글자가 어두우면 배경을 극적으로 밝게 올려서 가시성 확보
+          bgR = Math.round(invertedR + (255 - invertedR) * 0.65);
+          bgG = Math.round(invertedG + (255 - invertedG) * 0.65);
+          bgB = Math.round(invertedB + (255 - invertedB) * 0.65);
+        }
+        const correctedBgRgbStr = `rgb(${bgR}, ${bgG}, ${bgB})`;
+        
+        submitBtn.style.backgroundColor = correctedBgRgbStr;
+        submitBtn.style.color = immediateRgbStr; // 글씨는 원래 유저 컬러 유지
 
         // 컬러 코드 텍스트 롤링 연출 (버튼 텍스트 갱신)
         const startRGB = { ...currentDisplayedRGB };
@@ -387,13 +403,26 @@ export function renderGameView(container, nav) {
           
           submitBtn.textContent = `DONE ${rgbToHex(currentDisplayedRGB.r, currentDisplayedRGB.g, currentDisplayedRGB.b)}`;
           
-          // 애니메이션 중에도 실시간으로 배경 반전 & 글씨 본래색 적용
+          // 애니메이션 중에도 실시간 콘트라스트 보정 알고리즘 적용
           const curInvertedR = 255 - currentDisplayedRGB.r;
           const curInvertedG = 255 - currentDisplayedRGB.g;
           const curInvertedB = 255 - currentDisplayedRGB.b;
           
-          submitBtn.style.backgroundColor = `rgb(${curInvertedR}, ${curInvertedG}, ${curInvertedB})`; // 배경: 명조 반전
-          submitBtn.style.color = `rgb(${currentDisplayedRGB.r}, ${currentDisplayedRGB.g}, ${currentDisplayedRGB.b})`; // 텍스트: 원래 색상
+          const curTextYiq = ((currentDisplayedRGB.r * 299) + (currentDisplayedRGB.g * 587) + (currentDisplayedRGB.b * 114)) / 1000;
+          let curBgR, curBgG, curBgB;
+          if (curTextYiq >= 128) {
+            const factor = 0.35;
+            curBgR = Math.round(curInvertedR * factor);
+            curBgG = Math.round(curInvertedG * factor);
+            curBgB = Math.round(curInvertedB * factor);
+          } else {
+            curBgR = Math.round(curInvertedR + (255 - curInvertedR) * 0.65);
+            curBgG = Math.round(curInvertedG + (255 - curInvertedG) * 0.65);
+            curBgB = Math.round(curInvertedB + (255 - curInvertedB) * 0.65);
+          }
+          
+          submitBtn.style.backgroundColor = `rgb(${curBgR}, ${curBgG}, ${curBgB})`;
+          submitBtn.style.color = `rgb(${currentDisplayedRGB.r}, ${currentDisplayedRGB.g}, ${currentDisplayedRGB.b})`;
           
           if (progress < 1) hexAnimFrame = requestAnimationFrame(animate);
         };
