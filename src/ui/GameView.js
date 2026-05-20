@@ -73,7 +73,40 @@ export function renderGameView(container, nav) {
     setPhase("GUESS");
     const state = getState();
     resetBehavior();
-    
+
+    const isFirstRound = state.currentRound === 1;
+    let tutorialHTML = '';
+    if (isFirstRound) {
+      tutorialHTML = `
+        <div id="tutorial-overlay" style="position: absolute; inset: 0; pointer-events: none; z-index: 15; transition: opacity 0.8s ease; opacity: 0.85;">
+          <!-- 1번째 H 화살표 -->
+          <div class="tutorial-arrow-item" style="position: absolute; left: 16.66%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+             <svg width="40" height="240" viewBox="0 0 40 240" fill="none">
+                <path d="M20 20 L20 220" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 6"/>
+                <path d="M10 30 L20 20 L30 30" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 210 L20 220 L30 210" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+             </svg>
+          </div>
+          <!-- 2번째 S 화살표 -->
+          <div class="tutorial-arrow-item" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+             <svg width="40" height="240" viewBox="0 0 40 240" fill="none">
+                <path d="M20 20 L20 220" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 6"/>
+                <path d="M10 30 L20 20 L30 30" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 210 L20 220 L30 210" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+             </svg>
+          </div>
+          <!-- 3번째 L 화살표 -->
+          <div class="tutorial-arrow-item" style="position: absolute; left: 83.33%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+             <svg width="40" height="240" viewBox="0 0 40 240" fill="none">
+                <path d="M20 20 L20 220" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 6"/>
+                <path d="M10 30 L20 20 L30 30" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 210 L20 220 L30 210" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+             </svg>
+          </div>
+        </div>
+      `;
+    }
+
     const targetHslObj = rgbToHsl(state.targetColor.r, state.targetColor.g, state.targetColor.b);
     const tH = targetHslObj.h;
     const tS = targetHslObj.s;
@@ -164,6 +197,7 @@ export function renderGameView(container, nav) {
           </svg>
         </div>
         
+        ${tutorialHTML}
         <button id="submit-btn" class="submit-minimal-btn">DONE</button>
       </div>
     `;
@@ -192,6 +226,16 @@ export function renderGameView(container, nav) {
       }
     }
 
+    function fadeTutorial() {
+      const tutorialOverlay = document.getElementById('tutorial-overlay');
+      if (tutorialOverlay && tutorialOverlay.style.opacity !== '0') {
+        tutorialOverlay.style.opacity = '0';
+        tutorialOverlay.addEventListener('transitionend', () => {
+          tutorialOverlay.remove();
+        }, { once: true });
+      }
+    }
+
     class TapeSlider {
       constructor({ min, max, value, tapeGroup, touchArea, onChange }) {
         this.min = min;
@@ -216,6 +260,7 @@ export function renderGameView(container, nav) {
         this.tapeGroup.setAttribute('transform', `translate(0, ${ty})`);
       }
       onDown(e) {
+        fadeTutorial();
         stopShuffle();
         this.isDragging = true;
         this.lastY = e.clientY;
