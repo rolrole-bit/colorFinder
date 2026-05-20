@@ -47,7 +47,7 @@ export function renderInterimResultView(container, nav) {
   if (perfects.length === 3) {
     feedbackText = "완벽하게 색상을 맞추셨습니다!";
   } else if (perfects.length === 0) {
-    feedbackText = "색조, 채도, 명도 모두 조금씩 조절이 필요합니다.";
+    feedbackText = "색조, 채도, 명도 모두 많은 조절과 노력이 필요합니다.";
   } else {
     const pStr = perfects.join("와 ");
     const fStr = flaws.join("와 ");
