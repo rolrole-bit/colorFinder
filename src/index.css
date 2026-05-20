@@ -98,19 +98,29 @@ body {
 
 .entry-bg-mesh {
   position: absolute;
-  top: -20%;
-  left: -20%;
-  width: 140%;
-  height: 140%;
-  background: linear-gradient(135deg, 
-    #7da2ff 0%, 
-    #b5cbff 35%, 
-    #d8abff 70%, 
-    #ff94c2 100%
+  top: -30%;
+  left: -30%;
+  width: 160%;
+  height: 160%;
+  background: linear-gradient(120deg, 
+    #a8edea 0%,    
+    #fed6e3 20%,   
+    #e0c3fc 40%,   
+    #8ec5fc 60%,   
+    #fff1eb 80%,   
+    #a18cd1 100%   
   );
+  background-size: 300% 300%;
   filter: url(#liquid-noise);
-  will-change: filter;
+  will-change: filter, background-position;
   opacity: 1;
+  animation: bgPan 40s infinite ease-in-out alternate;
+}
+
+@keyframes bgPan {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
 }
 
 #app {

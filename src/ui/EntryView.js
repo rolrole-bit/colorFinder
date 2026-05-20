@@ -28,10 +28,10 @@ export function renderEntryView(container, nav) {
           <feTurbulence type="fractalNoise" baseFrequency="0.005 0.005" numOctaves="3" result="noise">
             <animate attributeName="baseFrequency" values="0.003 0.003; 0.008 0.008; 0.003 0.003" dur="30s" repeatCount="indefinite" />
           </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="300" xChannelSelector="R" yChannelSelector="G" result="displaced">
-            <animate attributeName="scale" values="180; 300; 180" dur="25s" repeatCount="indefinite" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="250" xChannelSelector="R" yChannelSelector="G" result="displaced">
+            <animate attributeName="scale" values="150; 250; 150" dur="25s" repeatCount="indefinite" />
           </feDisplacementMap>
-          <feGaussianBlur in="displaced" stdDeviation="50" />
+          <feGaussianBlur in="displaced" stdDeviation="30" />
         </filter>
       </svg>
     </div>
