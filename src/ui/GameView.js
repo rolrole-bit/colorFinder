@@ -276,7 +276,7 @@ export function renderGameView(container, nav) {
         this.lastY = e.clientY;
         let dv = dy / this.trackLen;
         let v = (this.value - this.min) / (this.max - this.min);
-        v += dv;
+        v -= dv;
         v = v - Math.floor(v);
         this.value = this.min + v * (this.max - this.min);
         this.updateTransform();
