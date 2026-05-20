@@ -174,19 +174,12 @@ export function renderGameView(container, nav) {
           ${tutorialHTML}
         </div>
         
-        <div style="position: absolute; top: 2rem; right: 2rem; display: flex; gap: 1rem; z-index: 20;">
-          <div id="hex-display" style="font-family: 'Paperlogy', sans-serif; font-size: 2rem; font-weight: 300; letter-spacing: 3px; padding: 0.5rem 1rem; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
-            #000000
-          </div>
-        </div>
-        
         <button id="submit-btn" class="submit-minimal-btn">DONE</button>
       </div>
     `;
 
     const guessBg = document.getElementById('guess-bg');
     const submitBtn = document.getElementById('submit-btn');
-    const hexDisplay = document.getElementById('hex-display');
     
     let currentDisplayedRGB = hslToRgb(currentH, currentS, currentL);
     let hexAnimFrame = null;
@@ -349,13 +342,8 @@ export function renderGameView(container, nav) {
       if (submitBtn) {
         submitBtn.style.color = immediateContrast;
         submitBtn.style.backgroundColor = immediateRgbStr;
-      }
-      
-      if (hexDisplay) {
-        hexDisplay.style.color = immediateContrast;
-        hexDisplay.style.backgroundColor = immediateRgbStr;
 
-        // 컬러 코드 텍스트 롤링 연출
+        // 컬러 코드 텍스트 롤링 연출 (버튼 텍스트 갱신)
         const startRGB = { ...currentDisplayedRGB };
         const startTime = performance.now();
         const duration = 250;
@@ -371,7 +359,7 @@ export function renderGameView(container, nav) {
           currentDisplayedRGB.g = Math.round(startRGB.g + (targetRGB.g - startRGB.g) * easeOut);
           currentDisplayedRGB.b = Math.round(startRGB.b + (targetRGB.b - startRGB.b) * easeOut);
           
-          hexDisplay.textContent = rgbToHex(currentDisplayedRGB.r, currentDisplayedRGB.g, currentDisplayedRGB.b);
+          submitBtn.textContent = `DONE ${rgbToHex(currentDisplayedRGB.r, currentDisplayedRGB.g, currentDisplayedRGB.b)}`;
           
           if (progress < 1) hexAnimFrame = requestAnimationFrame(animate);
         };
