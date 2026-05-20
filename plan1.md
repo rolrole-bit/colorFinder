@@ -1,79 +1,40 @@
-# Plan 1: 보안 감사 - Core / Logic 방어
+# DYE MASTER 믹싱 연출 구현 계획 (plan1.md)
 
-## 작업 목적
-DYE MASTER 게임의 클라이언트 사이드 로직에서 발견된 보안 취약점을 방어하는 코드 구현
+## 1. 작업 목적
+본게임(추측 단계) 진입 시 0.5초간 슬라이더들이 랜덤하게 무작위로 섞이는(셔플/믹싱) 연출을 추가하여 오락성과 다이내믹한 느낌을 부여합니다. 플레이어가 믹싱 도중 개입(터치)하면 즉시 연출을 종료하고 사용자의 조작 모드로 즉시 전환하여 사용자 경험을 방해하지 않도록 설계합니다.
 
-## 핵심 기능
-1. 점수 범위 검증 (난이도별 상한/하한)
-2. LocalStorage 데이터 무결성 서명
-3. GameState 방어적 복사
-4. 타이머 무결성 교차 검증
-5. 입력값 새니타이징
+## 2. 핵심 기능
+- **0.5초간의 믹싱 연출**: 3개의 HSL 슬라이더가 0.5초 동안 프레임 단위로 무작위 값으로 변화하며, 그에 따른 컬러 프리뷰(`guessBg`, 헥스 표시 등)도 매끄럽게 동적 반영됩니다.
+- **조작 즉시 개입 차단 (Interrupt)**: 사용자가 터치스크린이나 마우스로 슬라이더 터치 영역(`pointerdown`)을 누르는 순간, 진행 중이던 믹싱 연출 타이머/프레임 루프를 즉각 취소(Cancel)하고 해당 슬라이더 조작 상태로 자연스럽게 인계합니다.
+- **자동 복구 및 제한**: 0.5초가 경과하면 믹싱을 스스로 멈추고 믹싱이 완전히 종료된 상태로 사용자의 수동 조작을 기다립니다.
 
-## 입력과 출력
-- **입력**: 플레이어 점수, 닉네임, 게임명, 난이도, 라운드 결과
-- **출력**: 검증된 데이터만 저장, 비정상 데이터 거부
+## 3. 입력과 출력
+- **입력**: 게임 전환 이벤트(Transition to Guess phase), 사용자 `pointerdown` 이벤트.
+- **출력**: 0.5초간 움직이는 3개의 SVG 슬라이더와 실시간 컬러 값 업데이트.
 
-## 파일 구조
-```
-/src
-  /core
-    GameState.js  ← 방어적 getter, setter 범위 검증
-    Ranking.js    ← 점수 상한 검증, HMAC 서명
-  /utils
-    AntiCheat.js  ← [NEW] 안티치트 유틸리티 모음
-```
+## 4. 파일 구조
+- [GameView.js](file:///e:/AI/DYE_MASTER/colorFinder/src/ui/GameView.js): `transitionToGuess` 함수 내부에 믹싱 애니메이션 루프 및 인터럽트 로직 추가.
 
-## 핵심 모듈: AntiCheat.js
+## 5. 핵심 모듈
+- **Shuffle Engine**: `requestAnimationFrame`을 이용하여 0.5초 동안 H, S, L의 값을 주기적으로 랜덤 변화시킴.
+- **Interrupt Controller**: 각 슬라이더의 `pointerdown` 핸들러 시작 시 믹싱 루프를 취소시키는 함수(`cancelShuffle()`) 실행.
 
-```js
-/**
- * AntiCheat 모듈
- * - 점수 범위 검증
- * - LocalStorage 서명/검증
- * - DevTools 감지
- * - 타이머 무결성 체크
- */
+## 6. 실행 흐름
+1. `transitionToGuess`가 시작되면 슬라이더 인스턴스들을 준비함.
+2. `startShuffle()`을 실행하여 0.5초간 `requestAnimationFrame` 루프를 돎.
+3. 루프 내에서 H, S, L을 계속 랜덤 값으로 변경하고 `updateTransform()`과 `updateColor()`를 갱신함.
+4. 만약 플레이어가 0.5초 내에 터치(`pointerdown`)하면 `cancelShuffle()`을 호출하여 프레임 루프를 파괴하고 바로 드래그가 제어권을 가져감.
+5. 터치하지 않은 경우, 0.5초가 지나면 믹싱 루프를 안전하게 닫고 사용자의 대기 상태로 들어감.
 
-// 난이도별 이론적 최대 점수
-const MAX_SCORES = {
-  Easy: 3000,    // 1000 × 3 × 1.0
-  Normal: 3960,  // 1000 × 3 × 1.1 (올림)
-  Hard: 3600,    // 1000 × 3 × 1.2
-  Hell: 3900     // 1000 × 3 × 1.3 (최대 배율)
-};
+## 7. 에러 처리
+- 애니메이션 취소 기능이 안전하게 동작하도록 `cancelAnimationFrame`을 중복 호출 방지 처리.
+- 믹싱이 끝났거나 사용자에 의해 중단된 경우 플래그(`isMixing = false`)를 해제하여 불필요한 연산이 발생하지 않도록 함.
 
-export function isValidScore(score, difficulty) {
-  const max = MAX_SCORES[difficulty] || 3000;
-  return Number.isFinite(score) && score >= 0 && score <= max;
-}
+## 8. 테스트 전략
+- 추측 화면 진입 시 슬라이더들이 0.5초간 화려하게 섞이는지 확인.
+- 섞이는 도중에 마우스를 가져가서 슬라이더를 바로 눌렀을 때, 즉시 멈추고 그 자리에서 바로 내 마우스를 따라서 부드럽게 드래그가 먹히는지 검증.
+- 0.5초 동안 가만히 놔두었을 때 0.5초 후에 슬라이더가 멈추고 이후 개별 조작이 잘 먹히는지 검증.
 
-export function isValidRoundScore(score) {
-  return Number.isFinite(score) && score >= 0 && score <= 1000;
-}
-```
-
-## 실행 흐름
-1. 라운드 종료 → `calculateScore()` 호출
-2. `isValidRoundScore()` 검증
-3. 3라운드 종료 → 배율 적용
-4. `isValidScore()` 최종 검증
-5. `saveRecord()` → 서명 포함 저장
-6. 로드 시 → 서명 검증 → 불일치 시 데이터 폐기
-
-## 에러 처리
-- 비정상 점수 → 조용히 무시 (공격자에게 힌트 제공 방지)
-- 서명 불일치 → 랭킹 데이터 초기화
-- 타이머 조작 감지 → 해당 라운드 점수 0처리
-
-## 테스트 전략
-- 정상 점수 범위 검증 (경계값 테스트)
-- 비정상 점수 거부 테스트 (음수, NaN, Infinity, 초과값)
-- 서명 위/변조 감지 테스트
-- 타이머 조작 시나리오 테스트
-
-## 완료 기준
-- [ ] 콘솔에서 `setScore(99999)` 호출 시 랭킹에 반영되지 않음
-- [ ] LocalStorage 직접 수정 시 서명 불일치로 거부됨
-- [ ] `getState()` 반환값 변경이 실제 state에 영향 없음
-- [ ] 정상 게임 플레이에는 영향 없음
+## 9. 완료 기준
+- 0.5초 동안 슬라이더 및 배경 컬러가 끊임없이 무작위 믹싱되어야 함.
+- 사용자 조작 감지(`pointerdown`) 즉시 애니메이션 프레임 중단 및 수동 제어 전환 성공.

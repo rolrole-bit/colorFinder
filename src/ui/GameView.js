@@ -179,6 +179,19 @@ export function renderGameView(container, nav) {
     let hexAnimFrame = null;
     let isGuessing = true;
 
+    let isMixing = true;
+    let shuffleFrameId = null;
+
+    function stopShuffle() {
+      if (isMixing) {
+        isMixing = false;
+        if (shuffleFrameId) {
+          cancelAnimationFrame(shuffleFrameId);
+          shuffleFrameId = null;
+        }
+      }
+    }
+
     class TapeSlider {
       constructor({ min, max, value, tapeGroup, touchArea, onChange }) {
         this.min = min;
@@ -203,6 +216,7 @@ export function renderGameView(container, nav) {
         this.tapeGroup.setAttribute('transform', `translate(0, ${ty})`);
       }
       onDown(e) {
+        stopShuffle();
         this.isDragging = true;
         this.lastY = e.clientY;
         this.touchArea.setPointerCapture(e.pointerId);
@@ -333,6 +347,35 @@ export function renderGameView(container, nav) {
 
     document.addEventListener('pointermove', logPointerMove);
     updateColor();
+
+    const shuffleDuration = 500;
+    const shuffleStartTime = performance.now();
+
+    function doShuffle(now) {
+      const elapsed = now - shuffleStartTime;
+      if (elapsed >= shuffleDuration || !isMixing) {
+        stopShuffle();
+        return;
+      }
+
+      hueSlider.value = Math.floor(Math.random() * 360);
+      satSlider.value = Math.floor(Math.random() * 100);
+      lightSlider.value = Math.floor(Math.random() * 100);
+
+      currentH = hueSlider.value;
+      currentS = satSlider.value;
+      currentL = lightSlider.value;
+
+      hueSlider.updateTransform();
+      satSlider.updateTransform();
+      lightSlider.updateTransform();
+
+      updateColor();
+
+      shuffleFrameId = requestAnimationFrame(doShuffle);
+    }
+
+    shuffleFrameId = requestAnimationFrame(doShuffle);
 
     submitBtn.addEventListener('click', async () => {
       if (submitBtn.disabled) return;
