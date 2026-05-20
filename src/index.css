@@ -1404,10 +1404,10 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 }
 
 .magazine-start-btn:disabled {
-  /* 비활성화 시: 배경 거의 투명, 매우 옅은 테두리와 텍스트로 시각적 존재감 낮춤 (낮은 콘트라스트) */
-  background: rgba(255, 255, 255, 0.05) !important;
-  color: rgba(255, 255, 255, 0.25) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  /* 비활성화 시: 밝은 파스텔 배경 위에서도 윤곽선이 뚜렷하게 보이도록 어두운(검은색) 반투명 색상 채택 */
+  background: rgba(0, 0, 0, 0.08) !important;
+  color: rgba(0, 0, 0, 0.35) !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
   opacity: 1 !important;
   cursor: not-allowed !important;
   transform: none !important;
