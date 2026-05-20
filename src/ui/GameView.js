@@ -259,7 +259,7 @@ export function renderGameView(container, nav) {
       updateTransform() {
         let v = (this.value - this.min) / (this.max - this.min);
         const cy = this.svgContainer.clientHeight / 2;
-        const ty = cy - (1 - v) * this.trackLen;
+        const ty = cy - v * this.trackLen;
         this.tapeGroup.setAttribute('transform', `translate(0, ${ty})`);
       }
       onDown(e) {
@@ -378,22 +378,22 @@ export function renderGameView(container, nav) {
     });
     
     const satSlider = new TapeSlider({
-      min: 0, max: 200, value: currentS,
+      min: 0, max: 200, value: 100 - currentS,
       tapeGroup: document.getElementById('tape-s'),
       touchArea: document.getElementById('touch-s'),
       onChange: (val) => {
-        currentS = val > 100 ? 200 - val : val;
+        currentS = val > 100 ? val - 100 : 100 - val;
         updateColor();
         logSliderChange();
       }
     });
 
     const lightSlider = new TapeSlider({
-      min: 0, max: 200, value: currentL,
+      min: 0, max: 200, value: 100 - currentL,
       tapeGroup: document.getElementById('tape-l'),
       touchArea: document.getElementById('touch-l'),
       onChange: (val) => {
-        currentL = val > 100 ? 200 - val : val;
+        currentL = val > 100 ? val - 100 : 100 - val;
         updateColor();
         logSliderChange();
       }
@@ -415,8 +415,8 @@ export function renderGameView(container, nav) {
 
       if (progress >= 1 || !isMixing) {
         hueSlider.value = startH;
-        satSlider.value = startS;
-        lightSlider.value = startL;
+        satSlider.value = 100 - startS;
+        lightSlider.value = 100 - startL;
 
         currentH = startH;
         currentS = startS;
@@ -444,8 +444,8 @@ export function renderGameView(container, nav) {
       lightSlider.value = (Math.round(lVal) + 200) % 200;
 
       currentH = hueSlider.value;
-      currentS = satSlider.value > 100 ? 200 - satSlider.value : satSlider.value;
-      currentL = lightSlider.value > 100 ? 200 - lightSlider.value : lightSlider.value;
+      currentS = satSlider.value > 100 ? satSlider.value - 100 : 100 - satSlider.value;
+      currentL = lightSlider.value > 100 ? lightSlider.value - 100 : 100 - lightSlider.value;
 
       hueSlider.updateTransform();
       satSlider.updateTransform();
