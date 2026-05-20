@@ -6,6 +6,7 @@
 
 import { getState, setScore, nextRound, getDifficultyMultiplier } from '../core/GameState.js';
 import { toRGBString, rgbToHex, rgbToHsl } from '../utils/ColorUtils.js';
+import { fireSideConfetti } from '../utils/ConfettiUtils.js';
 import { saveRecord } from '../core/Ranking.js';
 import { isSessionValid, clampScore } from '../utils/AntiCheat.js';
 import { getContrastYIQ, animateValue } from './AnimationUtils.js';
@@ -82,6 +83,11 @@ export function renderInterimResultView(container, nav) {
   if (animatedScore) {
     const target = parseInt(animatedScore.getAttribute('data-target'));
     animateValue(animatedScore, 0, target, 1200, true);
+    if (target >= 800) {
+      setTimeout(() => {
+        fireSideConfetti();
+      }, 600); // 점수가 어느 정도 올라갔을 때 터지도록 약간의 지연
+    }
   }
 
   document.getElementById('next-round-btn').addEventListener('click', () => {
