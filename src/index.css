@@ -1404,9 +1404,10 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 }
 
 .magazine-start-btn:disabled {
-  background: rgba(0, 0, 0, 0.4) !important;
-  color: rgba(255, 255, 255, 0.5) !important;
-  border: 2px solid transparent !important;
+  /* 비활성화 시: 배경 거의 투명, 매우 옅은 테두리와 텍스트로 시각적 존재감 낮춤 (낮은 콘트라스트) */
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   opacity: 1 !important;
   cursor: not-allowed !important;
   transform: none !important;
@@ -1414,11 +1415,13 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 }
 
 .magazine-start-btn:not(:disabled) {
-  /* 투명 배경에 흰색 텍스트와 흰색 테두리를 렌더링하면 텍스트 안티앨리어싱이 보호되며 완벽한 보색 반전 획득 */
-  background: transparent !important;
-  color: #ffffff !important;
-  border: 2px solid #ffffff !important;
-  mix-blend-mode: difference !important;
+  /* 활성화 시: 글자 깨짐 및 렌더링 오류를 유발하던 mix-blend-mode: difference 제거! */
+  /* 대신, 언제나 가장 눈에 확 띄는 순백색 꽉 찬 솔리드 버튼으로 명시적인 CTA 획득 */
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: none !important;
+  mix-blend-mode: normal !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
   opacity: 1 !important;
   
   /* 활성화 상태에서도 GPU 가속 및 앤티앨리어싱 유지 */
@@ -1429,12 +1432,14 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 
 .magazine-start-btn:not(:disabled):hover {
   transform: translateY(-4px) translateZ(0) !important;
-  box-shadow: 0 10px 20px rgba(255,255,255,0.15) !important;
+  box-shadow: 0 10px 30px rgba(255,255,255,0.4) !important;
+  background: #f0f0f0 !important;
   opacity: 1 !important;
 }
 
 .magazine-start-btn:not(:disabled):active {
   transform: translateY(2px) translateZ(0) !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
   opacity: 1 !important;
 }
 
