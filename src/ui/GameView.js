@@ -327,9 +327,18 @@ export function renderGameView(container, nav) {
         const roundedVal = Math.round(val);
         if (roundedVal !== this.lastTickedValue) {
           if (this.indicator && delta !== 0) {
-            this.indicator.classList.remove('tick-left', 'tick-right');
-            void this.indicator.offsetWidth; // force reflow
-            this.indicator.classList.add(delta > 0 ? 'tick-left' : 'tick-right');
+            if (this.indicatorAnimation) {
+              this.indicatorAnimation.cancel();
+            }
+            const rot = delta > 0 ? -25 : 25;
+            this.indicatorAnimation = this.indicator.animate([
+              { transform: 'rotate(0deg)' },
+              { transform: `rotate(${rot}deg)` },
+              { transform: 'rotate(0deg)' }
+            ], {
+              duration: 100,
+              easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+            });
           }
           
           playSliderTickSound();

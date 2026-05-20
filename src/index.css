@@ -1355,25 +1355,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   transition: transform 0.05s ease-out;
 }
 
-.dial-indicator-arrow.tick-left {
-  animation: tickLeft 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
 
-.dial-indicator-arrow.tick-right {
-  animation: tickRight 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes tickLeft {
-  0% { transform: rotate(0deg); }
-  50% { transform: rotate(-25deg); }
-  100% { transform: rotate(0deg); }
-}
-
-@keyframes tickRight {
-  0% { transform: rotate(0deg); }
-  50% { transform: rotate(25deg); }
-  100% { transform: rotate(0deg); }
-}
 
 .dial-value {
   position: absolute;
