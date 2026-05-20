@@ -331,7 +331,7 @@ export function renderGameView(container, nav) {
             const isPlaying = this.indicatorAnimation && 
                               (this.indicatorAnimation.playState === 'running' || this.indicatorAnimation.playState === 'pending');
             if (!isPlaying) {
-              const rot = delta > 0 ? -25 : 25;
+              const rot = delta > 0 ? -40 : 40;
               this.indicatorAnimation = this.indicator.animate([
                 { transform: 'rotate(0deg)' },
                 { transform: `rotate(${rot}deg)` },

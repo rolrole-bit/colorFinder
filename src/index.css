@@ -1345,7 +1345,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 .dial-indicator-arrow {
   font-size: clamp(0.7rem, 1.2vw, 0.95rem);
   color: #ffffff;
-  margin-top: -0.5rem;
+  margin-top: -0.2rem;
   z-index: 10;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
   pointer-events: none;
