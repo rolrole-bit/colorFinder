@@ -150,11 +150,11 @@ export function renderGameView(container, nav) {
               <!-- Top to Bottom Gradients -->
               <linearGradient id="grad-h" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#ff0000" />
-                <stop offset="17%" stop-color="#ff00ff" />
-                <stop offset="33%" stop-color="#0000ff" />
+                <stop offset="17%" stop-color="#ffff00" />
+                <stop offset="33%" stop-color="#00ff00" />
                 <stop offset="50%" stop-color="#00ffff" />
-                <stop offset="67%" stop-color="#00ff00" />
-                <stop offset="83%" stop-color="#ffff00" />
+                <stop offset="67%" stop-color="#0000ff" />
+                <stop offset="83%" stop-color="#ff00ff" />
                 <stop offset="100%" stop-color="#ff0000" />
               </linearGradient>
               <linearGradient id="grad-s" x1="0" y1="0" x2="0" y2="1">
