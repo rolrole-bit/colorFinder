@@ -109,56 +109,58 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
       
       <!-- 매거진 오버레이 -->
       <div class="magazine-overlay">
+        <div class="magazine-content">
 
-        <!-- 중앙 영역: 플레이어 이름 + 최종 스코어 + 한줄평 -->
-        <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; margin-bottom: 4rem; margin-top: 2rem; width: 100%; box-sizing: border-box; text-align: left;">
+          <!-- 중앙 영역: 플레이어 이름 + 최종 스코어 + 한줄평 -->
+          <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; margin-bottom: 4rem; margin-top: 2rem; width: 100%; box-sizing: border-box; text-align: left;">
 
-          <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; width: 100%;">
-            <!-- 플레이어 이름 -->
-            <div style="font-size: clamp(1rem, 3vw, 1.4rem); font-weight: 300; color: ${leftContrast}; letter-spacing: -0.5px; margin-bottom: 0.5rem; text-align: left;">
-              <span style="font-weight: 700;">${playerNameSafe}</span>님의 점수는
-            </div>
-            
-            <div style="display: flex; flex-direction: column; text-align: left; align-items: flex-start;">
-              <div class="magazine-score" style="margin-top: 0; font-size: clamp(5rem, 18vw, 10rem); text-align: left; letter-spacing: -0.04em;">
-                <div style="line-height: 1; color: ${leftContrast};">
-                  <span class="animated-score" data-target="${state.score}">0</span>
+            <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; width: 100%;">
+              <!-- 플레이어 이름 -->
+              <div style="font-size: clamp(1rem, 3vw, 1.4rem); font-weight: 300; color: ${leftContrast}; letter-spacing: -0.5px; margin-bottom: 0.5rem; text-align: left;">
+                <span style="font-weight: 700;">${playerNameSafe}</span>님의 점수는
+              </div>
+              
+              <div style="display: flex; flex-direction: column; text-align: left; align-items: flex-start;">
+                <div class="magazine-score" style="margin-top: 0; font-size: clamp(5rem, 18vw, 10rem); text-align: left; letter-spacing: -0.04em;">
+                  <div style="line-height: 1; color: ${leftContrast};">
+                    <span class="animated-score" data-target="${state.score}">0</span>
+                  </div>
                 </div>
               </div>
-            </div>
-            ${breakdownHTML}
-            
-            <div id="bonus-text" style="font-size: 1.4rem; font-weight: 700; opacity: 0; letter-spacing: -0.5px; white-space: nowrap; display: block; margin-top: 1rem; color: ${leftContrast}; transition: opacity 0.8s ease; text-align: left;">
-              ${getDifficultyName(state.difficulty)} BONUS X ${Number(appliedMultiplier.toFixed(2))}
-            </div>
-            
-            <!-- 한줄평 -->
-            <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.85rem, 2.5vw, 1.1rem); font-weight: 400; color: ${leftContrast}; letter-spacing: -0.5px; text-align: left; max-width: 500px; line-height: 1.6; word-break: keep-all; opacity: 0; transition: opacity 1s ease 0.5s; font-style: italic;">
-              ${comment}
+              ${breakdownHTML}
+              
+              <div id="bonus-text" style="font-size: 1.4rem; font-weight: 700; opacity: 0; letter-spacing: -0.5px; white-space: nowrap; display: block; margin-top: 1rem; color: ${leftContrast}; transition: opacity 0.8s ease; text-align: left;">
+                ${getDifficultyName(state.difficulty)} BONUS X ${Number(appliedMultiplier.toFixed(2))}
+              </div>
+              
+              <!-- 한줄평 -->
+              <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.85rem, 2.5vw, 1.1rem); font-weight: 400; color: ${leftContrast}; letter-spacing: -0.5px; text-align: left; max-width: 500px; line-height: 1.6; word-break: keep-all; opacity: 0; transition: opacity 1s ease 0.5s; font-style: italic;">
+                ${comment}
+              </div>
             </div>
           </div>
-        </div>
-        
-        <div class="magazine-scoreboard">
-          <div class="scoreboard-grid" style="margin-top: 0; padding-bottom: 5rem;">
-            <div class="score-card" style="background: none; border: none; border-top: 1px solid currentColor; padding: 1.5rem 0 0 0; color: ${leftContrast};">
-              <h3 style="color: inherit;">플레이어 랭킹</h3>
-              <ul class="rank-list" style="color: inherit;">
-                ${playerRanksHTML}
-              </ul>
-            </div>
-            
-            <div class="score-card" style="background: none; border: none; border-top: 1px solid currentColor; padding: 1.5rem 0 0 0; color: ${rightContrast};">
-              <h3 style="color: inherit;">게임별 랭킹</h3>
-              <ul class="rank-list" style="color: inherit;">
-                ${gameRanksHTML}
-              </ul>
+          
+          <div class="magazine-scoreboard">
+            <div class="scoreboard-grid" style="margin-top: 0; padding-bottom: 5rem;">
+              <div class="score-card" style="background: none; border: none; border-top: 1px solid currentColor; padding: 1.5rem 0 0 0; color: ${leftContrast};">
+                <h3 style="color: inherit;">플레이어 랭킹</h3>
+                <ul class="rank-list" style="color: inherit;">
+                  ${playerRanksHTML}
+                </ul>
+              </div>
+              
+              <div class="score-card" style="background: none; border: none; border-top: 1px solid currentColor; padding: 1.5rem 0 0 0; color: ${rightContrast};">
+                <h3 style="color: inherit;">게임별 랭킹</h3>
+                <ul class="rank-list" style="color: inherit;">
+                  ${gameRanksHTML}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
       </div>
       
-      <div style="position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); width: calc(100% - 4rem); max-width: 1000px; z-index: 3000; text-align: center; display: flex; gap: 1rem;">
+      <div style="position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); width: calc(100% - 4rem); max-width: 800px; z-index: 3000; text-align: center; display: flex; gap: 1rem;">
         <button class="magazine-start-btn" id="retry-btn" style="flex: 1; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; gap:0.5rem;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>다시 하기</button>
         <button class="magazine-start-btn" id="share-btn" style="flex: 1; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; box-shadow: 0 10px 30px rgba(118,75,162,0.5); display:flex; align-items:center; justify-content:center; gap:0.5rem;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>공유하기</button>
       </div>

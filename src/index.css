@@ -695,6 +695,15 @@ input[type="range"]::-webkit-slider-thumb:active {
   z-index: 1;
 }
 
+.magazine-content {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-between;
+}
+
 .magazine-score {
   font-size: clamp(5rem, 18vw, 20rem);
   font-weight: 800;
