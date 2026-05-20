@@ -366,9 +366,8 @@ export function renderGameView(container, nav) {
         const invertedB = 255 - targetRGB.b;
         const invertedRgbStr = `rgb(${invertedR}, ${invertedG}, ${invertedB})`;
         
-        const invertedYiq = ((invertedR * 299) + (invertedG * 587) + (invertedB * 114)) / 1000;
-        submitBtn.style.backgroundColor = invertedYiq < 128 ? '#f5f5f5' : '#0a0a0a';
-        submitBtn.style.color = invertedRgbStr;
+        submitBtn.style.backgroundColor = invertedRgbStr; // 배경이 명조 반전
+        submitBtn.style.color = immediateRgbStr; // 텍스트는 유저가 선택한 컬러 코드 그대로 유지
 
         // 컬러 코드 텍스트 롤링 연출 (버튼 텍스트 갱신)
         const startRGB = { ...currentDisplayedRGB };
@@ -388,14 +387,13 @@ export function renderGameView(container, nav) {
           
           submitBtn.textContent = `DONE ${rgbToHex(currentDisplayedRGB.r, currentDisplayedRGB.g, currentDisplayedRGB.b)}`;
           
-          // 애니메이션 중에도 실시간으로 반전 색상 적용
+          // 애니메이션 중에도 실시간으로 배경 반전 & 글씨 본래색 적용
           const curInvertedR = 255 - currentDisplayedRGB.r;
           const curInvertedG = 255 - currentDisplayedRGB.g;
           const curInvertedB = 255 - currentDisplayedRGB.b;
-          submitBtn.style.color = `rgb(${curInvertedR}, ${curInvertedG}, ${curInvertedB})`;
           
-          const curInvertedYiq = ((curInvertedR * 299) + (curInvertedG * 587) + (curInvertedB * 114)) / 1000;
-          submitBtn.style.backgroundColor = curInvertedYiq < 128 ? '#f5f5f5' : '#0a0a0a';
+          submitBtn.style.backgroundColor = `rgb(${curInvertedR}, ${curInvertedG}, ${curInvertedB})`; // 배경: 명조 반전
+          submitBtn.style.color = `rgb(${currentDisplayedRGB.r}, ${currentDisplayedRGB.g}, ${currentDisplayedRGB.b})`; // 텍스트: 원래 색상
           
           if (progress < 1) hexAnimFrame = requestAnimationFrame(animate);
         };
