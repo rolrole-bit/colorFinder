@@ -1042,3 +1042,19 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   display: inline-block;
   animation: score-impact 0.5s ease-out forwards;
 }
+
+/* 공유 카드 미리보기 모달 애니메이션 */
+@keyframes shareCardPop {
+  0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+#copy-url-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(118,75,162,0.5);
+}
+
+#share-close-btn:hover {
+  background: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.9);
+}
