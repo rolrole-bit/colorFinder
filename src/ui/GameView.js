@@ -125,8 +125,8 @@ export function renderGameView(container, nav) {
               <div style="position: relative; width: 100%; display: flex; justify-content: center;">
                 <div class="dial-knob" id="dial-h">
                   <div class="dial-wheel" id="dial-wheel-h"></div>
-                  <div class="dial-value" id="dial-h-value"></div>
                 </div>
+                <div class="dial-value" id="dial-h-value"></div>
                 ${getTutSvg(0)}
               </div>
               <div class="dial-indicator-arrow" id="dial-h-arrow">▲</div>
@@ -137,8 +137,8 @@ export function renderGameView(container, nav) {
               <div style="position: relative; width: 100%; display: flex; justify-content: center;">
                 <div class="dial-knob" id="dial-s">
                   <div class="dial-wheel" id="dial-wheel-s"></div>
-                  <div class="dial-value" id="dial-s-value"></div>
                 </div>
+                <div class="dial-value" id="dial-s-value"></div>
                 ${getTutSvg(1)}
               </div>
               <div class="dial-indicator-arrow" id="dial-s-arrow">▲</div>
@@ -149,8 +149,8 @@ export function renderGameView(container, nav) {
               <div style="position: relative; width: 100%; display: flex; justify-content: center;">
                 <div class="dial-knob" id="dial-b">
                   <div class="dial-wheel" id="dial-wheel-b"></div>
-                  <div class="dial-value" id="dial-b-value"></div>
                 </div>
+                <div class="dial-value" id="dial-b-value"></div>
                 ${getTutSvg(2)}
               </div>
               <div class="dial-indicator-arrow" id="dial-b-arrow">▲</div>
@@ -329,7 +329,7 @@ export function renderGameView(container, nav) {
           if (this.indicator && delta !== 0) {
             this.indicator.classList.remove('tick-left', 'tick-right');
             void this.indicator.offsetWidth; // force reflow
-            this.indicator.classList.add(delta > 0 ? 'tick-right' : 'tick-left');
+            this.indicator.classList.add(delta > 0 ? 'tick-left' : 'tick-right');
           }
           
           playSliderTickSound();
