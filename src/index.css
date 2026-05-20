@@ -682,7 +682,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   text-align: center;
   flex-shrink: 0;
   margin: 3vh 0;
-  mix-blend-mode: difference;
 }
 
 .magazine-scoreboard {
@@ -1451,43 +1450,33 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   opacity: 1 !important;
 }
 
-/* === SCOREBOARD CONTENT: Enforce Active mix-blend-mode: difference === */
-/* 매거진 컨텐츠 전체에 명도 반전 연산을 적용하여 스코어 화면의 가독성을 극대화 */
+/* === SCOREBOARD CONTENT: JS 기반 대비색(getContrastYIQ) 사용 === */
+/* mix-blend-mode: difference 제거 — JS에서 배경 명도를 계산하여 */
+/* 텍스트에 직접 #000 또는 #fff를 지정하므로 CSS 블렌딩 불필요 */
 .split-screen-result .magazine-content {
-  mix-blend-mode: difference;
-  filter: contrast(500%) brightness(150%);
+  /* blend mode 없음 — JS 인라인 color가 그대로 적용됨 */
 }
 
-/* 모든 텍스트와 자식 요소들을 순백색으로 지정하여 배경의 완벽한 보색을 유도 */
+/* 안티앨리어싱 서브픽셀 아티팩트 깨짐 현상 방지 (color 강제 제거) */
 .split-screen-result .magazine-content * {
-  color: #ffffff !important;
-  /* 안티앨리어싱 서브픽셀 아티팩트 깨짐 현상 완벽 방지 */
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
   text-rendering: optimizeLegibility !important;
 }
 
-/* 랭크 및 스코어 카드 테두리 선 명도 반전 처리 */
+/* 랭크 및 스코어 카드 테두리 선 — currentColor를 상속받아 자동 대비 */
 .split-screen-result .magazine-content .score-card {
-  border-top-color: #ffffff !important;
+  border-top-color: currentColor !important;
 }
 
 /* rank-item: backdrop-filter blur를 보호하기 위해 독립 스태킹 컨텍스트 생성 */
 .split-screen-result .magazine-content .rank-item {
-  border-color: rgba(255, 255, 255, 0.4) !important;
+  border-color: rgba(128, 128, 128, 0.4) !important;
   isolation: isolate;
-  mix-blend-mode: normal;
 }
 
-/* rank-item 내부의 텍스트에 다시 명도 반전을 주어 가독성 확보 */
+/* rank-item 내부 텍스트 — 부모의 color를 상속 */
 .split-screen-result .magazine-content .rank-item * {
-  mix-blend-mode: difference;
-  color: #ffffff !important;
-  filter: contrast(200%) brightness(120%);
+  color: inherit !important;
 }
 
-/* 보너스 텍스트 및 한줄평 인라인 스타일 오버라이드 */
-.split-screen-result .magazine-content #bonus-text,
-.split-screen-result .magazine-content #score-comment {
-  color: #ffffff !important;
-}
