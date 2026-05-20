@@ -350,8 +350,8 @@ export function renderGameView(container, nav) {
       if (roundText) roundText.style.color = immediateContrast;
 
       if (submitBtn) {
-        submitBtn.style.color = immediateContrast;
-        submitBtn.style.backgroundColor = immediateRgbStr;
+        submitBtn.style.backgroundColor = '#0a0a0a';
+        submitBtn.style.color = immediateRgbStr;
 
         // 컬러 코드 텍스트 롤링 연출 (버튼 텍스트 갱신)
         const startRGB = { ...currentDisplayedRGB };
