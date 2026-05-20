@@ -70,8 +70,8 @@ export function renderInterimResultView(container, nav) {
           </div>
         </div>
         
-        <div style="margin-top: auto; text-align: center; width: 100%; max-width: 400px; z-index: 100; pointer-events: auto;">
-          <button class="magazine-start-btn" id="next-round-btn" style="width: 100%;">${state.currentRound < state.maxRounds ? 'NEXT ROUND' : 'FINAL RESULT'}</button>
+        <div style="margin-top: auto; text-align: center; width: 100%; max-width: 400px; z-index: 100; pointer-events: auto; isolation: isolate;">
+          <button class="magazine-start-btn" id="next-round-btn" style="width: 100%; background: rgba(255,255,255,0.25) !important;">${state.currentRound < state.maxRounds ? 'NEXT ROUND' : 'FINAL RESULT'}</button>
         </div>
       </div>
     </div>
