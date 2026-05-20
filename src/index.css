@@ -1419,25 +1419,26 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 }
 
 .magazine-start-btn:not(:disabled) {
-  /* 활성화: 명도 반전(mix-blend-mode: difference) */
-  /* 투명 배경 + 흰색 텍스트/테두리 → difference 연산으로 배경의 보색을 자동 획득 */
-  background: transparent !important;
-  color: #ffffff !important;
-  border: 2px solid #ffffff !important;
-  mix-blend-mode: difference !important;
-  box-shadow: none !important;
+  /* 활성화: disabled와 같은 유리 스타일이지만 더 진하고 또렷하게 */
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(20px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
+  color: rgba(0, 0, 0, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+  mix-blend-mode: normal !important;
   opacity: 1 !important;
   border-radius: 12px !important;
   
-  /* 안티앨리어싱 보호 (서브픽셀 렌더링 아티팩트 방지) */
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
   transform: translateY(0) translateZ(0) !important;
 }
 
 .magazine-start-btn:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.85) !important;
   transform: translateY(-3px) translateZ(0) !important;
-  opacity: 0.85 !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.15) !important;
 }
 
 .magazine-start-btn:not(:disabled):active {
