@@ -406,7 +406,7 @@ export function renderGameView(container, nav) {
     const startS = currentS;
     const startL = currentL;
 
-    const shuffleDuration = 1000;
+    const shuffleDuration = 1500;
     const shuffleStartTime = performance.now();
 
     function doShuffle(now) {
@@ -431,20 +431,21 @@ export function renderGameView(container, nav) {
         return;
       }
 
-      // 힌트용 부드러운 순차 파동 애니메이션
-      const calcWave = (p, start, end) => {
-        if (p < start || p > end) return 0;
+      // 힌트용 부드러운 순차 단방향 감속(Ease-Out) 애니메이션
+      const calcEaseOut = (p, start, end) => {
+        if (p <= start) return 0;
+        if (p >= end) return 1;
         const normalized = (p - start) / (end - start);
-        return Math.sin(normalized * Math.PI);
+        return 1 - Math.pow(1 - normalized, 3);
       };
 
-      const easeH = calcWave(progress, 0.0, 0.7);
-      const easeS = calcWave(progress, 0.15, 0.85);
-      const easeL = calcWave(progress, 0.3, 1.0);
+      const progressH = calcEaseOut(progress, 0.0, 0.6);
+      const progressS = calcEaseOut(progress, 0.2, 0.8);
+      const progressL = calcEaseOut(progress, 0.4, 1.0);
 
-      const hVal = startH + easeH * 20;
-      const sVal = startS + easeS * 15;
-      const lVal = startL + easeL * 15;
+      const hVal = startH - 45 * (1 - progressH);
+      const sVal = startS - 25 * (1 - progressS);
+      const lVal = startL - 25 * (1 - progressL);
 
       hueSlider.value = (Math.round(hVal) + 360) % 360;
       satSlider.value = (Math.round(sVal) + 200) % 200;
