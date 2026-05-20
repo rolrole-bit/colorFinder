@@ -718,13 +718,15 @@ input[type="range"]::-webkit-slider-thumb:active {
   height: 100vh; /* Force it to fit */
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* flexbox overflow 스크롤 버그 해결을 위해 flex-start 사용 */
+  justify-content: center;
   align-items: flex-start;
-  padding: 6vh 10vw;
+  padding: 5vh 10vw;
   box-sizing: border-box;
-  overflow-y: auto; /* 콘텐츠가 뷰포트를 초과할 경우 올바르게 스크롤 제공 */
+  overflow-y: auto; /* Prevent scrolling but allow y-scroll if form is tall */
   overflow-x: hidden;
 }
+
+
 
 .magazine-title {
   font-family: 'Paperlogy', sans-serif;
@@ -732,7 +734,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   font-size: clamp(3rem, 10vh, 10vw);
   line-height: 0.9;
   letter-spacing: -0.02em;
-  margin-top: auto; /* 화면 공간이 충분할 때 중앙 정렬을 유도하기 위해 마진 분배 */
   margin-bottom: max(2vh, 1rem);
   text-align: left;
   mix-blend-mode: difference;
@@ -778,8 +779,6 @@ input[type="range"]::-webkit-slider-thumb:active {
 .entry-form {
   width: 100%;
   max-width: 600px;
-  margin-bottom: auto; /* 화면 공간이 충분할 때 중앙 정렬을 유도하기 위해 마진 분배 */
-  padding-bottom: 2rem; /* 스크롤 최하단 도달 시 버튼 아래에 세련된 여백 확보 */
 }
 
 .entry-form .form-group {
@@ -1405,44 +1404,44 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 }
 
 .magazine-start-btn:disabled {
-  /* 비활성화 시: 밝은 파스텔 배경 위에서도 윤곽선이 뚜렷하게 보이도록 어두운(검은색) 반투명 색상 채택 */
-  background: rgba(0, 0, 0, 0.08) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  color: rgba(0, 0, 0, 0.35) !important;
-  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  /* 비활성화: 반투명 유리(Frosted Glass) — 배경 블러 + 낮은 콘트라스트 */
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(20px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
+  color: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
   opacity: 1 !important;
   cursor: not-allowed !important;
   transform: none !important;
   mix-blend-mode: normal !important;
+  border-radius: 12px !important;
 }
 
 .magazine-start-btn:not(:disabled) {
-  /* 활성화 시: 글자 깨짐 및 렌더링 오류를 유발하던 mix-blend-mode: difference 제거! */
-  /* 대신, 언제나 가장 눈에 확 띄는 순백색 꽉 찬 솔리드 버튼으로 명시적인 CTA 획득 */
-  background: #ffffff !important;
-  color: #000000 !important;
-  border: none !important;
-  mix-blend-mode: normal !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+  /* 활성화: 명도 반전(mix-blend-mode: difference) */
+  /* 투명 배경 + 흰색 텍스트/테두리 → difference 연산으로 배경의 보색을 자동 획득 */
+  background: transparent !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  mix-blend-mode: difference !important;
+  box-shadow: none !important;
   opacity: 1 !important;
+  border-radius: 12px !important;
   
-  /* 활성화 상태에서도 GPU 가속 및 앤티앨리어싱 유지 */
+  /* 안티앨리어싱 보호 (서브픽셀 렌더링 아티팩트 방지) */
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
   transform: translateY(0) translateZ(0) !important;
 }
 
 .magazine-start-btn:not(:disabled):hover {
-  transform: translateY(-4px) translateZ(0) !important;
-  box-shadow: 0 10px 30px rgba(255,255,255,0.4) !important;
-  background: #f0f0f0 !important;
-  opacity: 1 !important;
+  transform: translateY(-3px) translateZ(0) !important;
+  opacity: 0.85 !important;
 }
 
 .magazine-start-btn:not(:disabled):active {
-  transform: translateY(2px) translateZ(0) !important;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
+  transform: translateY(1px) translateZ(0) !important;
   opacity: 1 !important;
 }
 
