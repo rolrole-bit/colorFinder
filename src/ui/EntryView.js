@@ -27,9 +27,13 @@ export function renderEntryView(container, nav) {
       <div class="bg-tape bg-tape-3"></div>
       <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute; width:0; height:0; pointer-events:none; visibility:hidden;">
         <filter id="liquid-noise">
-          <feTurbulence type="fractalNoise" baseFrequency="0.008" numOctaves="3" result="noise" />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="220" xChannelSelector="R" yChannelSelector="G" result="displaced" />
-          <feGaussianBlur in="displaced" stdDeviation="120" />
+          <feTurbulence type="fractalNoise" baseFrequency="0.005 0.005" numOctaves="3" result="noise">
+            <animate attributeName="baseFrequency" values="0.003 0.003; 0.009 0.009; 0.003 0.003" dur="25s" repeatCount="indefinite" />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="350" xChannelSelector="R" yChannelSelector="G" result="displaced">
+            <animate attributeName="scale" values="220; 350; 220" dur="20s" repeatCount="indefinite" />
+          </feDisplacementMap>
+          <feGaussianBlur in="displaced" stdDeviation="60" />
         </filter>
       </svg>
     </div>
