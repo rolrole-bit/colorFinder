@@ -31,7 +31,7 @@ export function renderEntryView(container, nav) {
           <feDisplacementMap in="SourceGraphic" in2="noise" scale="250" xChannelSelector="R" yChannelSelector="G" result="displaced">
             <animate attributeName="scale" values="150; 250; 150" dur="25s" repeatCount="indefinite" />
           </feDisplacementMap>
-          <feGaussianBlur in="displaced" stdDeviation="30" />
+          <feGaussianBlur in="displaced" stdDeviation="15" />
         </filter>
       </svg>
     </div>

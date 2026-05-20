@@ -103,15 +103,15 @@ body {
   width: 160%;
   height: 160%;
   background: 
-    radial-gradient(circle at 15% 20%, #fed6e3 0%, rgba(254, 214, 227, 0) 50%),
-    radial-gradient(circle at 85% 15%, #a8edea 0%, rgba(168, 237, 234, 0) 50%),
-    radial-gradient(circle at 50% 80%, #fff1eb 0%, rgba(255, 241, 235, 0) 60%),
-    linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 50%, #a18cd1 100%);
-  background-size: 180% 180%;
+    radial-gradient(circle at 30% 35%, #ff7eb9 0%, rgba(255, 126, 185, 0) 55%),
+    radial-gradient(circle at 75% 30%, #2bf0cc 0%, rgba(43, 240, 204, 0) 55%),
+    radial-gradient(circle at 45% 70%, #ffc837 0%, rgba(255, 200, 55, 0) 60%),
+    linear-gradient(135deg, #a18cd1 0%, #3a7bd5 100%);
+  background-size: 150% 150%;
   filter: url(#liquid-noise);
   will-change: filter, background-position;
   opacity: 1;
-  animation: bgPan 30s infinite ease-in-out alternate;
+  animation: bgPan 25s infinite ease-in-out alternate;
 }
 
 @keyframes bgPan {
