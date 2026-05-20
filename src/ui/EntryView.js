@@ -205,8 +205,40 @@ export function renderEntryView(container, nav) {
         
         setTimeout(() => {
           nav.toGameView();
-        }, 2000);
       }, 2000);
     }, 400);
   });
+
+  // 개발자용 퀵 스타트 버튼 (우상단)
+  const devBtn = document.createElement('button');
+  devBtn.textContent = 'DEV START (SKIP)';
+  devBtn.style.cssText = 'position: absolute; top: 1rem; right: 1rem; z-index: 100; padding: 0.5rem 1rem; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; cursor: pointer; font-family: monospace; font-size: 0.8rem; opacity: 0.6; transition: opacity 0.2s;';
+  devBtn.onmouseenter = () => devBtn.style.opacity = '1';
+  devBtn.onmouseleave = () => devBtn.style.opacity = '0.6';
+  devBtn.addEventListener('click', async () => {
+    // 기본값 강제 할당
+    playerNameInput.value = 'DevTester';
+    originGameInput.value = 'DevMode';
+    const selectedDifficulty = 'Normal';
+    
+    setPlayerInfo('DevTester', 'DevMode');
+    setDifficulty(selectedDifficulty);
+    initAudio();
+    startSession();
+    startDevToolsDetection();
+    
+    // 서버 세션 시작
+    try {
+      const serverSession = await startServerSession('DevTester', 'DevMode', selectedDifficulty);
+      nav.setServerSession(serverSession.sessionId, serverSession.targetColor);
+    } catch (err) {
+      console.error('[Server] 세션 시작 실패:', err);
+      nav.setServerSession(null, null);
+    }
+    
+    // 애니메이션 스킵 후 바로 게임 진입
+    nav.toGameView();
+  });
+  container.appendChild(devBtn);
 }
+
