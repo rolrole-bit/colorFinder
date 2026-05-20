@@ -112,20 +112,10 @@ export function renderGameView(container, nav) {
     const tS = targetHslObj.s;
     const tL = targetHslObj.l;
     
-    const hueOffset = 60 + Math.floor(Math.random() * 240);
-    const endH = (tH + hueOffset) % 360;
-    
-    const sOffset = 20 + Math.floor(Math.random() * 35);
-    const sDir = Math.random() > 0.5 ? 1 : -1;
-    const endS = Math.max(15, Math.min(85, tS + sOffset * sDir));
-    
-    const lOffset = 20 + Math.floor(Math.random() * 35);
-    const lDir = Math.random() > 0.5 ? 1 : -1;
-    const endL = Math.max(15, Math.min(85, tL + lOffset * lDir));
-
-    let currentH = tH;
-    let currentS = tS;
-    let currentL = tL;
+    // 초기 추측 컬러 자체를 완전 랜덤 컬러로 설정 (힌트 방지)
+    let currentH = Math.floor(Math.random() * 360);
+    let currentS = 10 + Math.floor(Math.random() * 80); // 10% ~ 90%
+    let currentL = 15 + Math.floor(Math.random() * 70); // 15% ~ 85%
     
     const initHsl = `hsl(${currentH}, ${currentS}%, ${currentL}%)`;
     
@@ -144,24 +134,30 @@ export function renderGameView(container, nav) {
             <!-- H 다이얼 (색상) -->
             <div class="dial-wrapper" id="dial-h-wrapper">
               <div class="dial-knob" id="dial-h">
+                <div class="dial-wheel" id="dial-wheel-h"></div>
                 <div class="dial-needle"></div>
               </div>
+              <div class="dial-indicator-arrow">▲</div>
               <div class="dial-value" id="dial-h-value">0°</div>
             </div>
             
             <!-- S 다이얼 (채도) -->
             <div class="dial-wrapper" id="dial-s-wrapper">
               <div class="dial-knob" id="dial-s">
+                <div class="dial-wheel" id="dial-wheel-s"></div>
                 <div class="dial-needle"></div>
               </div>
+              <div class="dial-indicator-arrow">▲</div>
               <div class="dial-value" id="dial-s-value">0%</div>
             </div>
             
             <!-- B 다이얼 (명도) -->
             <div class="dial-wrapper" id="dial-b-wrapper">
               <div class="dial-knob" id="dial-b">
+                <div class="dial-wheel" id="dial-wheel-b"></div>
                 <div class="dial-needle"></div>
               </div>
+              <div class="dial-indicator-arrow">▲</div>
               <div class="dial-value" id="dial-b-value">0%</div>
             </div>
           </div>
@@ -225,7 +221,7 @@ export function renderGameView(container, nav) {
         this.isDragging = false;
         this.centerX = 0;
         this.centerY = 0;
-        this.angleOffset = 0;
+        this.lastPointerAngle = 0;
         this.lastTickedValue = Math.round(value);
         
         this.updateTransform();
@@ -236,12 +232,11 @@ export function renderGameView(container, nav) {
       
       valueToAngle(val) {
         const pct = (val - this.min) / (this.max - this.min);
-        return (270 + pct * 360) % 360; // 12시 방향(270도)이 0% 기준
+        return pct * 360;
       }
       
       angleToValue(angle) {
-        let normAngle = (angle - 270 + 360) % 360;
-        const pct = normAngle / 360;
+        const pct = angle / 360;
         return this.min + pct * (this.max - this.min);
       }
       
@@ -250,13 +245,15 @@ export function renderGameView(container, nav) {
         const dy = clientY - this.centerY;
         const rad = Math.atan2(dy, dx);
         const deg = rad * (180 / Math.PI);
-        return (deg % 360 + 360) % 360;
+        // 12시가 0도 기준이 되도록 각도 보정
+        return (deg + 90 + 360) % 360;
       }
       
       updateTransform() {
-        const angle = this.valueToAngle(this.value);
-        let normAngle = (angle - 270 + 360) % 360;
-        this.dialKnob.style.transform = `rotate(${normAngle}deg)`;
+        const valAngle = this.valueToAngle(this.value);
+        // 하단 6시(180도) 화살표 방향에 선택한 컬러/수치가 오도록 회전각 배치
+        const knobRotation = (180 - valAngle + 360) % 360;
+        this.dialKnob.style.transform = `rotate(${knobRotation}deg)`;
         
         const rounded = Math.round(this.value);
         if (this.type === 'H') {
@@ -267,15 +264,15 @@ export function renderGameView(container, nav) {
       }
 
       updateContrast(contrastColor) {
-        // 다이얼이 UI처럼 보이지 않고 배경에 녹아들 수 있도록 contrastColor에 따라 투명도와 색상을 플랫하게 매핑
-        const isWhite = contrastColor === '#ffffff';
-        this.dialKnob.style.borderColor = isWhite ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.15)';
-        this.dialKnob.style.backgroundColor = isWhite ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+        const arrow = this.wrapperEl.querySelector('.dial-indicator-arrow');
+        if (arrow) {
+          arrow.style.color = contrastColor;
+        }
         
         const needle = this.dialKnob.querySelector('.dial-needle');
         if (needle) {
           needle.style.backgroundColor = contrastColor;
-          needle.style.boxShadow = 'none'; // 바늘의 입체감 있는 그림자 제거
+          needle.style.boxShadow = 'none';
         }
         
         if (this.valueDisplay) {
@@ -293,21 +290,32 @@ export function renderGameView(container, nav) {
         this.centerX = rect.left + rect.width / 2;
         this.centerY = rect.top + rect.height / 2;
         
-        const pointerAngle = this.getPointerAngle(e.clientX, e.clientY);
-        const currentAngle = this.valueToAngle(this.value);
-        this.angleOffset = pointerAngle - currentAngle;
+        this.lastPointerAngle = this.getPointerAngle(e.clientX, e.clientY);
       }
       
       onMove(e) {
         if (!this.isDragging) return;
         e.preventDefault();
         
-        const pointerAngle = this.getPointerAngle(e.clientX, e.clientY);
-        let targetAngle = pointerAngle - this.angleOffset;
-        targetAngle = (targetAngle % 360 + 360) % 360;
+        const currentPointerAngle = this.getPointerAngle(e.clientX, e.clientY);
         
-        let val = this.angleToValue(targetAngle);
-        val = Math.max(this.min, Math.min(this.max, val));
+        let delta = currentPointerAngle - this.lastPointerAngle;
+        if (delta > 180) delta -= 360;
+        if (delta < -180) delta += 360;
+        
+        this.lastPointerAngle = currentPointerAngle;
+        
+        const range = this.max - this.min;
+        // 시계방향 델타 -> knob 회전 증가 -> value_angle 감소 -> value 감소 (물리 1:1 트래킹)
+        const deltaValue = -(delta / 360) * range;
+        
+        let val = this.value + deltaValue;
+        if (this.type === 'H') {
+          val = (val % 360 + 360) % 360;
+        } else {
+          val = Math.max(this.min, Math.min(this.max, val));
+        }
+        
         this.value = val;
         this.updateTransform();
         
@@ -326,7 +334,7 @@ export function renderGameView(container, nav) {
           this.dialKnob.releasePointerCapture(e.pointerId);
         }
       }
-
+      
       setValue(val) {
         this.value = Math.max(this.min, Math.min(this.max, val));
         this.updateTransform();
@@ -382,6 +390,17 @@ export function renderGameView(container, nav) {
         hexAnimFrame = requestAnimationFrame(animate);
       }
       
+      // 채도(S) 및 명도(B) 다이얼의 휠 그라데이션 동적 업데이트 복구
+      const sWheel = document.getElementById('dial-wheel-s');
+      if (sWheel) {
+        sWheel.style.background = `conic-gradient(hsl(${currentH}, 0%, 50%), hsl(${currentH}, 100%, 50%))`;
+      }
+
+      const bWheel = document.getElementById('dial-wheel-b');
+      if (bWheel) {
+        bWheel.style.background = `conic-gradient(#000000, hsl(${currentH}, ${currentS}%, 50%), #ffffff, hsl(${currentH}, ${currentS}%, 50%), #000000)`;
+      }
+      
       // 다이얼 대비도 및 색상 톤 동적 실시간 매핑
       if (hueDial) hueDial.updateContrast(immediateContrast);
       if (satDial) satDial.updateContrast(immediateContrast);
@@ -409,57 +428,6 @@ export function renderGameView(container, nav) {
     document.addEventListener('pointermove', logPointerMove);
     updateColor();
 
-    const shuffleDuration = 1500;
-    const shuffleStartTime = performance.now();
-
-    function doShuffle(now) {
-      const elapsed = now - shuffleStartTime;
-      const progress = Math.min(elapsed / shuffleDuration, 1);
-
-      if (progress >= 1 || !isMixing) {
-        currentH = endH;
-        currentS = endS;
-        currentL = endL;
-
-        hueDial.setValue(endH);
-        satDial.setValue(endS);
-        lightDial.setValue(endL);
-        updateColor();
-
-        stopShuffle();
-        return;
-      }
-
-      // 힌트용 부드러운 순차 단방향 감속(Ease-Out) 애니메이션
-      const calcEaseOut = (p, start, end) => {
-        if (p <= start) return 0;
-        if (p >= end) return 1;
-        const normalized = (p - start) / (end - start);
-        return 1 - Math.pow(1 - normalized, 3);
-      };
-
-      const progressH = calcEaseOut(progress, 0.0, 0.6);
-      const progressS = calcEaseOut(progress, 0.2, 0.8);
-      const progressL = calcEaseOut(progress, 0.4, 1.0);
-
-      const hVal = tH + hueOffset * progressH;
-      const sVal = tS + (endS - tS) * progressS;
-      const lVal = tL + (endL - tL) * progressL;
-
-      currentH = (Math.round(hVal) + 360) % 360;
-      currentS = Math.round(sVal);
-      currentL = Math.round(lVal);
-
-      hueDial.setValue(currentH);
-      satDial.setValue(currentS);
-      lightDial.setValue(currentL);
-
-      updateColor();
-
-      shuffleFrameId = requestAnimationFrame(doShuffle);
-    }
-
-    shuffleFrameId = requestAnimationFrame(doShuffle);
 
     submitBtn.addEventListener('click', async () => {
       if (submitBtn.disabled) return;

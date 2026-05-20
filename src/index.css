@@ -1252,8 +1252,6 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 #share-close-btn:hover {
   background: rgba(255,255,255,0.15);
   color: rgba(255,255,255,0.9);
-}
-
 /* 중앙 슬라이더 래퍼 및 블러 영역 */
 .slider-panel-wrapper {
   position: absolute;
@@ -1313,8 +1311,8 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   width: clamp(90px, 12vw, 130px);
   height: clamp(90px, 12vw, 130px);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  border: none;
   box-shadow: none !important;
   cursor: grab;
   display: flex;
@@ -1323,7 +1321,6 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  transition: border-color 0.2s, background-color 0.2s;
 }
 
 .dial-knob:active {
@@ -1333,10 +1330,10 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 
 .dial-wheel {
   position: absolute;
-  inset: 4px;
+  inset: 0;
   border-radius: 50%;
   pointer-events: none;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+  box-shadow: none !important;
 }
 
 /* 다이얼별 그라데이션 테마 */
@@ -1381,7 +1378,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-size: clamp(1.2rem, 2vw, 1.8rem);
   font-weight: 900;
   color: #ffffff;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+  text-shadow: none !important;
   pointer-events: none;
   z-index: 5;
 }
@@ -1390,7 +1387,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-size: clamp(0.7rem, 1.2vw, 0.95rem);
   color: #ffffff;
   margin-top: 0.5rem;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+  text-shadow: none !important;
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
