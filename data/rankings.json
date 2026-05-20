@@ -422,5 +422,45 @@
     "difficulty": "Hard",
     "session_id": "6f5057c2-c247-4cdf-90f3-ad4e9a892002",
     "created_at": "2026-05-19T09:51:19.584Z"
+  },
+  {
+    "player_name": "김컬러",
+    "origin_game": "마비노기 모바일",
+    "score": 795,
+    "difficulty": "Hard",
+    "session_id": "b625e0a2-8ffd-45d0-9010-b350d0f3895c",
+    "created_at": "2026-05-20T02:20:55.500Z"
+  },
+  {
+    "player_name": "ㅇㄹ",
+    "origin_game": "로스트 아크",
+    "score": 1034,
+    "difficulty": "Hard",
+    "session_id": "6cda1e58-637f-4af8-a857-bb6066f0633f",
+    "created_at": "2026-05-20T02:51:30.428Z"
+  },
+  {
+    "player_name": "김마미",
+    "origin_game": "WOW",
+    "score": 1077,
+    "difficulty": "Hard",
+    "session_id": "bbaee362-53b9-4fb4-82be-a769c6a88a6e",
+    "created_at": "2026-05-20T03:22:14.818Z"
+  },
+  {
+    "player_name": "s",
+    "origin_game": "마비노기 모바일",
+    "score": 1552,
+    "difficulty": "Hard",
+    "session_id": "315985f4-3aaf-416b-83e9-e812617b5565",
+    "created_at": "2026-05-20T03:43:33.577Z"
+  },
+  {
+    "player_name": "카즈하",
+    "origin_game": "마비노기 모바일",
+    "score": 793,
+    "difficulty": "Hard",
+    "session_id": "ea238de5-c2e1-44ea-8fee-bda15d7492e3",
+    "created_at": "2026-05-20T04:01:45.072Z"
   }
 ]

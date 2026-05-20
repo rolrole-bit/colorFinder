@@ -36,30 +36,6 @@ export function renderInterimResultView(container, nav) {
   const sDiff = userHsl.s - targetHsl.s;
   const lDiff = userHsl.l - targetHsl.l;
 
-  const perfects = [];
-  const flaws = [];
-  
-  if (Math.abs(hDiff) <= 4) perfects.push("색조"); else flaws.push("색조");
-  if (Math.abs(sDiff) <= 4) perfects.push("채도"); else flaws.push("채도");
-  if (Math.abs(lDiff) <= 4) perfects.push("명도"); else flaws.push("명도");
-
-  let feedbackText = "";
-  if (perfects.length === 3) {
-    feedbackText = "완벽하게 색상을 맞추셨습니다!";
-  } else if (perfects.length === 0) {
-    feedbackText = "색조, 채도, 명도 모두 많은 조절과 노력이 필요합니다.";
-  } else {
-    const pStr = perfects.join("와 ");
-    const fStr = flaws.join("와 ");
-    feedbackText = `${pStr}는 완벽하나, ${fStr}가 다소 아쉽습니다.`;
-  }
-
-  const feedbackHTML = `
-    <div style="margin-top: 1.5rem; font-family: 'Paperlogy', sans-serif; font-size: 0.95rem; color: #fff; letter-spacing: 1px; line-height: 1.6; text-align: center; word-break: keep-all; font-weight: 300; background: rgba(0,0,0,0.2); padding: 0.8rem 1.2rem; border-radius: 12px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">
-      ${feedbackText}
-    </div>
-  `;
-
   container.innerHTML = `
     <div class="split-screen-result" id="interim-panel">
       <!-- 50:50 분할 배경 -->
@@ -92,7 +68,6 @@ export function renderInterimResultView(container, nav) {
               <span class="animated-score" data-target="${state.score}">0</span>
             </div>
           </div>
-          ${feedbackHTML}
         </div>
         
         <div style="margin-top: auto; text-align: center; width: 100%; max-width: 400px; z-index: 100; pointer-events: auto;">

@@ -1,40 +1,39 @@
-# DYE MASTER 인트로 연출 시퀀스 타겟 컬러 기반 셔플 스무딩 개선 계획 (plan1.md)
+# DYE MASTER 결과 피드백 제거 및 MIME Type/CORS/CSP 오류 해결 계획 (plan1.md)
 
 ## 1. 작업 목적
-인트로 힌트 연출 도중 화면이 갑자기 다른 컬러로 깜빡이거나("뿅" 하고 튀는 현상) 슬라이더 위상이 어긋나는 문제를 근본적으로 해결합니다. 이를 위해 조작 힌트 애니메이션의 내러티브를 "임의의 오프셋에서 시작해 제자리로 돌아오는" 방식이 아니라, **"정답 컬러(Target Color)에 완벽하게 맞춰진 상태에서 출발해, 차례차례 슬라이더가 움직이며 정답을 흩트려놓고 섞는(Shuffle) 과정"**으로 시각적 통일성을 부여합니다. 
+- **결과 피드백 제거**: 중간 결과 화면(`ResultView.js`)에서 가독성을 떨어뜨리고 불필요한 피드백 텍스트 박스("색조, 채도, 명도 모두 많은 조절과 노력이 필요합니다" 등)를 UI에서 완전히 제거합니다.
+- **MIME Type / MCP(CSP) 오류 수정**: Windows 환경 등 특정 Registry 설정 오류로 인해 Express 서버가 `.js` 파일을 `text/plain`으로 잘못 서빙하여 브라우저에서 모듈 로드가 차단되는 MIME Type Error(또는 이로 인해 파생되는 CSP 오류)를 서버 설정 개선을 통해 원천 방지합니다.
 
 ## 2. 핵심 기능
-- **시작점 동기화 (Target Color Base)**:
-  - GameView 진입 시 초기 `currentH`, `currentS`, `currentL` 값을 미리 섞어놓은 값이 아닌 타겟(정답) 색상의 `tH`, `tS`, `tL`로 일치시킵니다.
-  - 이를 통해 추측 화면에 진입하는 첫 렌더링 프레임에 어색한 위상 불일치가 발생하지 않습니다.
-- **셔플 분산 애니메이션 연출**:
-  - `doShuffle`의 이징(Ease-Out) 로직을 거치며 `progress = 0` 일 때 타겟 색상에서 출발하여, `progress = 1` 일 때 무작위 난수 오프셋 위치(`endH`, `endS`, `endL`)로 한 방향으로 부드럽게 흩뿌려지도록 계산식을 변경합니다.
-- **글리치 제거**:
-  - `current` 값과 `Slider.value` 간의 상호 대입 과정에서 발생하는 값의 왜곡을 방지하기 위해 애니메이션 루프 내에서 HSL 값을 직접 보간한 뒤 역산하여 슬라이더 값에 세팅합니다.
+- **피드백 UI 완전 제거**: `ResultView.js`에서 `feedbackText` 생성 로직 및 `feedbackHTML` 렌더링 코드를 제거합니다.
+- **MIME Type 강제 지정**: `server/index.js`에서 `express.static` 미들웨어 사용 시 `setHeaders` 옵션을 추가하여 `.js` 파일에 대해 `application/javascript; charset=utf-8` 헤더를 강제 설정합니다.
+- **CORS / CSP 보강**: Helmet CSP 및 CORS 설정 상에서 발생할 수 있는 잠재적 차단 문제를 방지하기 위해 정적 리소스 서빙 설정을 확실하게 다듬습니다.
 
 ## 3. 입력과 출력
-- **입력**: 1.5초간의 `progress` 진행도 및 난수로 계산된 `endH/S/L` 목적지.
-- **출력**: 좌/우가 완벽히 동일한 정답 컬러에서 시작해, 차례대로 슬라이더가 미끄러지며 컬러가 섞이는 시각적으로 매끄러운 트랜지션 연출.
+- **입력**: 중간 결과 화면 진입 시의 `score` 및 `targetColor`/`userColor` 정보.
+- **출력**: 피드백 카드 없이 깔끔하게 점수만 노출되는 중간 결과 UI. 올바른 MIME type을 탑재하여 브라우저에 서빙되는 JS 파일들.
 
 ## 4. 파일 구조
-- [GameView.js](file:///e:/AI/DYE_MASTER/colorFinder/src/ui/GameView.js): 초기 변수 `current` 선언부 및 `doShuffle` 함수 내부 보간 로직.
+- [ResultView.js](file:///e:/AI/DYE_MASTER/colorFinder/src/ui/ResultView.js): 피드백 렌더링 로직 제거.
+- [index.js](file:///e:/AI/DYE_MASTER/colorFinder/server/index.js): `express.static` 설정에 `setHeaders` 강제 지정 추가.
 
 ## 5. 핵심 모듈
-- **Target-to-Random Interpolator**: 난수 오프셋을 역이용하지 않고 정방향으로 분산시키는 새로운 애니메이션 수식 구조 적용.
+- **MIME Type Header Injector**: Express Static의 `setHeaders` 속성을 사용하여 브라우저의 엄격한 MIME type 검사(Strict MIME type checking)를 통과하도록 처리.
 
 ## 6. 실행 흐름
-1. 추측 단계(라운드) 진입. 슬라이더 위치와 배경색이 타겟(정답)과 완전히 일치.
-2. 애니메이션 돌입. H 슬라이더가 0.9초간 먼저 움직여 색조를 섞음.
-3. S 슬라이더가 0.3초부터 1.2초간 움직여 채도를 섞음.
-4. L 슬라이더가 0.6초부터 1.5초간 움직여 명도를 섞음.
-5. 연출이 모두 완료되면 사용자에게 조작 권한 양도.
+1. 클라이언트가 페이지 로드 시 `src/main.js` 및 하위 모듈 파일들을 요청.
+2. 서버는 `express.static`을 통해 정적 파일을 응답할 때 `.js` 확장자를 감지하여 `Content-Type: application/javascript; charset=utf-8` 헤더를 설정하여 전송.
+3. 브라우저에서 자바스크립트 모듈이 에러 없이 완벽히 로드 및 실행됨.
+4. 사용자가 라운드 진행 후 "DONE" 버튼을 눌러 중간 결과 화면으로 진입할 때, 피드백 카드 영역 없이 스코어와 매칭 색상 정보만 깔끔하게 노출.
 
 ## 7. 에러 처리
-- `progress >= 1` 도달 직후 최종 목적지 변수(`endH/S/L`)를 슬라이더 값에 하드 픽스하여 프레임 오차 누적을 차단함.
+- 파일 확장자 체크 시 대소문자를 구분하지 않도록 `endsWith('.js')` 대신 소문자 변환 후 체크하여 예외 차단.
 
 ## 8. 테스트 전략
-- 화면 전환 직후, 분할된 두 화면(타겟과 현재)이 동일한 색상에서 시작하는지 확인.
-- 컬러 코드가 뿅 하고 튀는 현상 없이 스르륵 바뀌며 분산되는지 모니터링.
+- 브라우저 개발자 도구(F12) 콘솔 창에 MIME Type 관련 로딩 오류가 발생하는지 확인.
+- 네트워크 탭에서 모든 `.js` 파일의 `Content-Type` 헤더가 `application/javascript` 인지 확인.
+- 라운드 매칭 완료 후 나타나는 중간 결과 화면에서 피드백 박스가 완전히 사라졌는지 눈으로 확인.
 
 ## 9. 완료 기준
-- 타겟 색상에서 무작위 위치로 단방향 셔플되는 인트로 연출이 위상 충돌 없이 부드럽게 구현됨.
+- 브라우저 로딩 시 MIME Type / CSP 관련 오류 없이 게임이 원활히 실행됨.
+- 중간 결과 화면에서 회색 피드백 박스가 렌더링되지 않음.

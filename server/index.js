@@ -128,7 +128,12 @@ app.use('/share', shareRoutes);
 const projectRoot = join(__dirname, '..');
 app.use(express.static(projectRoot, {
   dotfiles: 'deny',
-  index: 'index.html'
+  index: 'index.html',
+  setHeaders: (res, path) => {
+    if (path.toLowerCase().endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    }
+  }
 }));
 
 // ═══════════════════════════════════════════
