@@ -100,13 +100,46 @@ export function getDifficultyTime(difficulty) {
 }
 
 /**
- * 랜덤 RGB 색상 생성
+ * HSL → RGB 변환
+ * @param {number} h 0~1
+ * @param {number} s 0~1
+ * @param {number} l 0~1
+ * @returns {{r: number, g: number, b: number}}
+ */
+function hslToRgb(h, s, l) {
+  let r, g, b;
+  if (s === 0) {
+    r = g = b = l; // 무채색
+  } else {
+    const hue2rgb = (p, q, t) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    };
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1 / 3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1 / 3);
+  }
+  return {
+    r: Math.round(r * 255),
+    g: Math.round(g * 255),
+    b: Math.round(b * 255)
+  };
+}
+
+/**
+ * 랜덤 파스텔톤 컬러 생성
+ * 너무 어두운 색상 대신, 밝고 예쁜 파스텔톤 위주로 생성
  * @returns {{r: number, g: number, b: number}}
  */
 export function getRandomColor() {
-  return {
-    r: Math.floor(Math.random() * 256),
-    g: Math.floor(Math.random() * 256),
-    b: Math.floor(Math.random() * 256)
-  };
+  const h = Math.random();           // 모든 색상 (0~1)
+  const s = 0.6 + Math.random() * 0.4; // 채도: 60% ~ 100% (선명하게)
+  const l = 0.7 + Math.random() * 0.2; // 명도: 70% ~ 90% (밝게, 파스텔톤)
+  return hslToRgb(h, s, l);
 }

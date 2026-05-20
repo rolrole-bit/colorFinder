@@ -75,47 +75,14 @@ export function renderGameView(container, nav) {
     resetBehavior();
 
     const isFirstRound = state.currentRound === 1;
-    let tutorialHTML = '';
-    if (isFirstRound) {
-      tutorialHTML = `
-        <div id="tutorial-overlay" style="position: absolute; inset: 0; pointer-events: none; z-index: 15; transition: opacity 0.8s ease; opacity: 0.85;">
-          <style>
-            @keyframes hintSpin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
-            .tutorial-svg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140%; height: 140%; animation: hintSpin 8s linear infinite; }
-            .tutorial-dial-spacer { width: clamp(90px, 12vw, 130px); height: clamp(90px, 12vw, 130px); position: relative; display: flex; justify-content: center; align-items: center; }
-          </style>
-          <div style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; gap: clamp(1.2rem, 4vw, 3rem); padding-bottom: 2rem;">
-            <!-- H -->
-            <div class="tutorial-dial-spacer">
-              <svg class="tutorial-svg" viewBox="0 0 160 160" fill="none">
-                <path d="M 80 15 A 65 65 0 0 1 145 80" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
-                <path d="M 132 70 L 145 80 L 158 70" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M 80 145 A 65 65 0 0 1 15 80" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
-                <path d="M 2 90 L 15 80 L 28 90" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <!-- S -->
-            <div class="tutorial-dial-spacer">
-              <svg class="tutorial-svg" viewBox="0 0 160 160" fill="none">
-                <path d="M 80 15 A 65 65 0 0 1 145 80" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
-                <path d="M 132 70 L 145 80 L 158 70" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M 80 145 A 65 65 0 0 1 15 80" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
-                <path d="M 2 90 L 15 80 L 28 90" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <!-- B -->
-            <div class="tutorial-dial-spacer">
-              <svg class="tutorial-svg" viewBox="0 0 160 160" fill="none">
-                <path d="M 80 15 A 65 65 0 0 1 145 80" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
-                <path d="M 132 70 L 145 80 L 158 70" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M 80 145 A 65 65 0 0 1 15 80" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
-                <path d="M 2 90 L 15 80 L 28 90" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-      `;
-    }
+    const getTutSvg = (idx) => isFirstRound ? `
+      <svg id="tut-svg-${idx}" class="tutorial-svg-item" viewBox="0 0 160 160" fill="none" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(0deg); width: 130%; height: 130%; pointer-events: none; z-index: 10; opacity: 0;">
+        <path d="M 80 15 A 65 65 0 0 1 145 80" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
+        <path d="M 132 70 L 145 80 L 158 70" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 80 145 A 65 65 0 0 1 15 80" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
+        <path d="M 2 90 L 15 80 L 28 90" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    ` : '';
 
     const targetHslObj = rgbToHsl(state.targetColor.r, state.targetColor.g, state.targetColor.b);
     const tH = targetHslObj.h;
@@ -155,8 +122,11 @@ export function renderGameView(container, nav) {
           <div class="dials-container">
             <!-- H 다이얼 (색상) -->
             <div class="dial-wrapper" id="dial-h-wrapper">
-              <div class="dial-knob" id="dial-h">
-                <div class="dial-wheel" id="dial-wheel-h"></div>
+              <div style="position: relative; width: 100%; display: flex; justify-content: center;">
+                <div class="dial-knob" id="dial-h">
+                  <div class="dial-wheel" id="dial-wheel-h"></div>
+                </div>
+                ${getTutSvg(0)}
               </div>
               <div class="dial-indicator-arrow">▲</div>
               <div class="dial-value" id="dial-h-value">0°</div>
@@ -164,8 +134,11 @@ export function renderGameView(container, nav) {
             
             <!-- S 다이얼 (채도) -->
             <div class="dial-wrapper" id="dial-s-wrapper">
-              <div class="dial-knob" id="dial-s">
-                <div class="dial-wheel" id="dial-wheel-s"></div>
+              <div style="position: relative; width: 100%; display: flex; justify-content: center;">
+                <div class="dial-knob" id="dial-s">
+                  <div class="dial-wheel" id="dial-wheel-s"></div>
+                </div>
+                ${getTutSvg(1)}
               </div>
               <div class="dial-indicator-arrow">▲</div>
               <div class="dial-value" id="dial-s-value">0%</div>
@@ -173,15 +146,16 @@ export function renderGameView(container, nav) {
             
             <!-- B 다이얼 (명도) -->
             <div class="dial-wrapper" id="dial-b-wrapper">
-              <div class="dial-knob" id="dial-b">
-                <div class="dial-wheel" id="dial-wheel-b"></div>
+              <div style="position: relative; width: 100%; display: flex; justify-content: center;">
+                <div class="dial-knob" id="dial-b">
+                  <div class="dial-wheel" id="dial-wheel-b"></div>
+                </div>
+                ${getTutSvg(2)}
               </div>
               <div class="dial-indicator-arrow">▲</div>
               <div class="dial-value" id="dial-b-value">0%</div>
             </div>
           </div>
-          
-          ${tutorialHTML}
         </div>
         
         <button id="submit-btn" class="submit-minimal-btn">DONE</button>
@@ -208,13 +182,53 @@ export function renderGameView(container, nav) {
       }
     }
 
+    let tutorialSequenceId = null;
+    let tutorialActive = isFirstRound;
+
     function fadeTutorial() {
-      const tutorialOverlay = document.getElementById('tutorial-overlay');
-      if (tutorialOverlay && tutorialOverlay.style.opacity !== '0') {
-        tutorialOverlay.style.opacity = '0';
-        tutorialOverlay.addEventListener('transitionend', () => {
-          tutorialOverlay.remove();
-        }, { once: true });
+      if (!tutorialActive) return;
+      tutorialActive = false;
+      if (tutorialSequenceId) clearTimeout(tutorialSequenceId);
+      for (let i = 0; i < 3; i++) {
+        const svg = document.getElementById(`tut-svg-${i}`);
+        if (svg) {
+          svg.style.transition = 'opacity 0.3s';
+          svg.style.opacity = '0';
+        }
+      }
+    }
+
+    if (isFirstRound) {
+      let currentTut = 0;
+      const nextTutStep = () => {
+        if (!tutorialActive) return;
+        
+        for (let i = 0; i < 3; i++) {
+          const svg = document.getElementById(`tut-svg-${i}`);
+          if (svg) {
+            svg.style.transition = 'none';
+            svg.style.opacity = '0';
+            svg.style.transform = 'translate(-50%, -50%) rotate(0deg)';
+          }
+        }
+        
+        const activeSvg = document.getElementById(`tut-svg-${currentTut}`);
+        if (activeSvg) {
+          activeSvg.style.opacity = '1';
+          void activeSvg.offsetWidth; // force reflow
+          activeSvg.style.transition = 'transform 1.2s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.3s ease 0.9s';
+          activeSvg.style.transform = 'translate(-50%, -50%) rotate(360deg)';
+          activeSvg.style.opacity = '0';
+        }
+        
+        currentTut = (currentTut + 1) % 3;
+        tutorialSequenceId = setTimeout(nextTutStep, 1400);
+      };
+      tutorialSequenceId = setTimeout(nextTutStep, 300);
+      
+      const dialsContainer = document.querySelector('.dials-container');
+      if (dialsContainer) {
+        dialsContainer.addEventListener('pointerdown', fadeTutorial, { capture: true, once: true });
       }
     }
 
