@@ -80,8 +80,8 @@ export function renderGameView(container, nav) {
       tutorialHTML = `
         <div id="tutorial-overlay" style="position: absolute; inset: 0; pointer-events: none; z-index: 15; transition: opacity 0.8s ease; opacity: 0.85;">
           <style>
-            @keyframes hintSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-            .tutorial-svg { position: absolute; width: 140%; height: 140%; animation: hintSpin 8s linear infinite; filter: drop-shadow(0 0 4px rgba(0,0,0,0.5)); }
+            @keyframes hintSpin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+            .tutorial-svg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140%; height: 140%; animation: hintSpin 8s linear infinite; }
             .tutorial-dial-spacer { width: clamp(90px, 12vw, 130px); height: clamp(90px, 12vw, 130px); position: relative; display: flex; justify-content: center; align-items: center; }
           </style>
           <div style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; gap: clamp(1.2rem, 4vw, 3rem); padding-bottom: 2rem;">
