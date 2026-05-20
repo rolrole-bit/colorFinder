@@ -1264,21 +1264,16 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   z-index: 10;
   pointer-events: none;
   overflow: hidden;
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
+  border-left: none !important;
+  border-right: none !important;
+  box-shadow: none !important;
 }
 
 .slider-panel-blur {
-  position: absolute;
-  inset: 0;
-  backdrop-filter: blur(80px);
-  -webkit-backdrop-filter: blur(80px);
-  background: rgba(255, 255, 255, 0.04);
-  z-index: 5;
+  display: none !important;
 }
 
-/* 모바일 대응 미디어 쿼리 (가로폭이 좁은 기기) */
+/* 모바일 대응 미디어 쿼리 */
 @media (max-width: 768px) {
   .slider-panel-wrapper {
     left: 15%;
@@ -1318,10 +1313,9 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   width: clamp(90px, 12vw, 130px);
   height: clamp(90px, 12vw, 130px);
   border-radius: 50%;
-  background: #18181b;
-  border: 3px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 
-              inset 0 2px 4px rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: none !important;
   cursor: grab;
   display: flex;
   justify-content: center;
@@ -1329,14 +1323,12 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, background-color 0.2s;
 }
 
 .dial-knob:active {
   cursor: grabbing;
-  border-color: rgba(255, 255, 255, 0.35);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 
-              inset 0 2px 4px rgba(255, 255, 255, 0.08);
+  box-shadow: none !important;
 }
 
 .dial-wheel {
@@ -1372,14 +1364,14 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 
 .dial-needle {
   position: absolute;
-  top: 6px;
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
-  width: 4px;
+  width: 3px;
   height: clamp(10px, 1.5vw, 16px);
   background: #ffffff;
-  border-radius: 4px;
-  box-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 2px 4px rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+  box-shadow: none !important;
   z-index: 3;
 }
 
@@ -1409,11 +1401,10 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-size: clamp(0.8rem, 1.2vw, 1rem);
   font-weight: 800;
   color: rgba(255, 255, 255, 0.85);
-  margin-top: 0.1rem;
-  background: rgba(0, 0, 0, 0.25);
-  padding: 0.2rem 0.6rem;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 0.8rem;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
   pointer-events: none;
   min-width: 48px;
   text-align: center;

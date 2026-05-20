@@ -137,39 +137,31 @@ export function renderGameView(container, nav) {
       <div id="game-box" class="game-box-container" style="grid-template-columns: 1fr;">
         <div id="guess-bg" class="split-bg" style="background-color: ${initHsl};"></div>
         
-        <!-- 중앙 다이얼 제어 패널 (가로 폭 50%, 모바일 대응) -->
+        <!-- 중앙 다이얼 제어 패널 (가로 폭 50%, 모바일 대응, 그림자 및 경계선 없음) -->
         <div class="slider-panel-wrapper">
-          <!-- 블러 오버레이 추가 -->
-          <div class="slider-panel-blur"></div>
           
           <div class="dials-container">
             <!-- H 다이얼 (색상) -->
             <div class="dial-wrapper" id="dial-h-wrapper">
               <div class="dial-knob" id="dial-h">
-                <div class="dial-wheel" id="dial-wheel-h"></div>
                 <div class="dial-needle"></div>
               </div>
-              <div class="dial-indicator-arrow">▲</div>
               <div class="dial-value" id="dial-h-value">0°</div>
             </div>
             
             <!-- S 다이얼 (채도) -->
             <div class="dial-wrapper" id="dial-s-wrapper">
               <div class="dial-knob" id="dial-s">
-                <div class="dial-wheel" id="dial-wheel-s"></div>
                 <div class="dial-needle"></div>
               </div>
-              <div class="dial-indicator-arrow">▲</div>
               <div class="dial-value" id="dial-s-value">0%</div>
             </div>
             
             <!-- B 다이얼 (명도) -->
             <div class="dial-wrapper" id="dial-b-wrapper">
               <div class="dial-knob" id="dial-b">
-                <div class="dial-wheel" id="dial-wheel-b"></div>
                 <div class="dial-needle"></div>
               </div>
-              <div class="dial-indicator-arrow">▲</div>
               <div class="dial-value" id="dial-b-value">0%</div>
             </div>
           </div>
@@ -178,7 +170,7 @@ export function renderGameView(container, nav) {
         </div>
         
         <div style="position: absolute; top: 2rem; right: 2rem; display: flex; gap: 1rem; z-index: 20;">
-          <div id="hex-display" style="font-family: 'Paperlogy', sans-serif; font-size: 2rem; font-weight: 300; letter-spacing: 3px; padding: 0.5rem 1rem; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+          <div id="hex-display" style="font-family: 'Paperlogy', sans-serif; font-size: 2rem; font-weight: 300; letter-spacing: 3px; padding: 0.5rem 1rem; border-radius: 8px;">
             #000000
           </div>
         </div>
@@ -273,6 +265,23 @@ export function renderGameView(container, nav) {
           this.valueDisplay.textContent = `${rounded}%`;
         }
       }
+
+      updateContrast(contrastColor) {
+        // 다이얼이 UI처럼 보이지 않고 배경에 녹아들 수 있도록 contrastColor에 따라 투명도와 색상을 플랫하게 매핑
+        const isWhite = contrastColor === '#ffffff';
+        this.dialKnob.style.borderColor = isWhite ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.15)';
+        this.dialKnob.style.backgroundColor = isWhite ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+        
+        const needle = this.dialKnob.querySelector('.dial-needle');
+        if (needle) {
+          needle.style.backgroundColor = contrastColor;
+          needle.style.boxShadow = 'none'; // 바늘의 입체감 있는 그림자 제거
+        }
+        
+        if (this.valueDisplay) {
+          this.valueDisplay.style.color = contrastColor;
+        }
+      }
       
       onDown(e) {
         fadeTutorial();
@@ -316,6 +325,11 @@ export function renderGameView(container, nav) {
           this.isDragging = false;
           this.dialKnob.releasePointerCapture(e.pointerId);
         }
+      }
+
+      setValue(val) {
+        this.value = Math.max(this.min, Math.min(this.max, val));
+        this.updateTransform();
       }
     }
 
@@ -368,16 +382,10 @@ export function renderGameView(container, nav) {
         hexAnimFrame = requestAnimationFrame(animate);
       }
       
-      // 채도(S) 및 명도(B) 다이얼의 휠 그라데이션 동적 업데이트
-      const sWheel = document.getElementById('dial-wheel-s');
-      if (sWheel) {
-        sWheel.style.background = `conic-gradient(hsl(${currentH}, 0%, 50%), hsl(${currentH}, 100%, 50%))`;
-      }
-
-      const bWheel = document.getElementById('dial-wheel-b');
-      if (bWheel) {
-        bWheel.style.background = `conic-gradient(#000000, hsl(${currentH}, ${currentS}%, 50%), #ffffff, hsl(${currentH}, ${currentS}%, 50%), #000000)`;
-      }
+      // 다이얼 대비도 및 색상 톤 동적 실시간 매핑
+      if (hueDial) hueDial.updateContrast(immediateContrast);
+      if (satDial) satDial.updateContrast(immediateContrast);
+      if (lightDial) lightDial.updateContrast(immediateContrast);
     };
 
     const hueDial = new RotaryDial({
