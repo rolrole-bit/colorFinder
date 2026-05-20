@@ -718,15 +718,13 @@ input[type="range"]::-webkit-slider-thumb:active {
   height: 100vh; /* Force it to fit */
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start; /* flexbox overflow 스크롤 버그 해결을 위해 flex-start 사용 */
   align-items: flex-start;
-  padding: 5vh 10vw;
+  padding: 6vh 10vw;
   box-sizing: border-box;
-  overflow-y: auto; /* Prevent scrolling but allow y-scroll if form is tall */
+  overflow-y: auto; /* 콘텐츠가 뷰포트를 초과할 경우 올바르게 스크롤 제공 */
   overflow-x: hidden;
 }
-
-
 
 .magazine-title {
   font-family: 'Paperlogy', sans-serif;
@@ -734,6 +732,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   font-size: clamp(3rem, 10vh, 10vw);
   line-height: 0.9;
   letter-spacing: -0.02em;
+  margin-top: auto; /* 화면 공간이 충분할 때 중앙 정렬을 유도하기 위해 마진 분배 */
   margin-bottom: max(2vh, 1rem);
   text-align: left;
   mix-blend-mode: difference;
@@ -779,6 +778,8 @@ input[type="range"]::-webkit-slider-thumb:active {
 .entry-form {
   width: 100%;
   max-width: 600px;
+  margin-bottom: auto; /* 화면 공간이 충분할 때 중앙 정렬을 유도하기 위해 마진 분배 */
+  padding-bottom: 2rem; /* 스크롤 최하단 도달 시 버튼 아래에 세련된 여백 확보 */
 }
 
 .entry-form .form-group {
@@ -1406,6 +1407,8 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 .magazine-start-btn:disabled {
   /* 비활성화 시: 밝은 파스텔 배경 위에서도 윤곽선이 뚜렷하게 보이도록 어두운(검은색) 반투명 색상 채택 */
   background: rgba(0, 0, 0, 0.08) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
   color: rgba(0, 0, 0, 0.35) !important;
   border: 1px solid rgba(0, 0, 0, 0.15) !important;
   opacity: 1 !important;
