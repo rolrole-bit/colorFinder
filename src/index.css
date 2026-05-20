@@ -1110,13 +1110,13 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-family: 'Paperlogy', sans-serif;
   font-weight: 800;
   font-size: clamp(1.1rem, 2.5vh, 1.4rem);
-  color: #fff;
-  background: #000;
+  color: #fff !important;
+  background: #000 !important;
   border: none;
   padding: 1rem 2rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: transform 0.1s, opacity 0.3s;
+  transition: transform 0.1s, opacity 0.3s, background 0.3s;
   text-transform: uppercase;
   margin-top: max(1vh, 0.5rem);
   letter-spacing: 3px;
@@ -1127,9 +1127,17 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 }
 
 .magazine-start-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.35 !important;
   cursor: not-allowed;
   transform: none !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.magazine-start-btn:not(:disabled) {
+  background: #ffffff !important;
+  color: #000000 !important;
+  mix-blend-mode: difference;
 }
 
 .magazine-start-btn:not(:disabled):hover {
@@ -1368,4 +1376,40 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
     width: 76px;
     height: 76px;
   }
+}
+
+/* === START BUTTON: Enforce Active mix-blend-mode: difference === */
+.magazine-start-btn {
+  font-family: 'Paperlogy', sans-serif !important;
+  font-weight: 800 !important;
+  color: #fff !important;
+  background: #000 !important;
+  border: none !important;
+  transition: transform 0.1s, opacity 0.3s, background 0.3s !important;
+}
+
+.magazine-start-btn:disabled {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+  mix-blend-mode: normal !important;
+}
+
+.magazine-start-btn:not(:disabled) {
+  background: #ffffff !important;
+  color: #000000 !important;
+  mix-blend-mode: difference !important;
+  opacity: 1 !important;
+}
+
+.magazine-start-btn:not(:disabled):hover {
+  transform: translateY(-4px) !important;
+  opacity: 0.9 !important;
+}
+
+.magazine-start-btn:not(:disabled):active {
+  transform: translateY(2px) !important;
+  opacity: 1 !important;
 }
