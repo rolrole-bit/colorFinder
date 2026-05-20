@@ -166,21 +166,27 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
       </div>
     </div>
     
-    <!-- 공유 카드 미리보기 모달 (미리보기 카드 이미지 제외) -->\r
-    <div id="share-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); justify-content:center; align-items:center;">\r
-      <div style="position:relative; max-width:380px; width:90%; animation: shareCardPop 0.3s ease-out; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:24px; padding:2rem; backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); box-shadow:0 20px 50px rgba(0,0,0,0.3);">\r
-        <div style="font-size:1.1rem; font-weight:700; color:#fff; text-align:center; margin-bottom:1.2rem; letter-spacing:-0.5px;">공유 URL 복사</div>\r
-        \r
-        <!-- URL 복사 영역 -->\r
-        <div style="display:flex; gap:0.5rem; flex-direction:column; align-items:stretch;">\r
-          <input id="share-url-input" type="text" readonly style="padding:0.75rem 1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); color:rgba(255,255,255,0.9); font-size:0.8rem; outline:none; font-family:'Paperlogy',sans-serif; text-align:center; margin-bottom:0.4rem;">\r
-          <button id="copy-url-btn" style="padding:0.75rem 1.2rem; border:none; border-radius:12px; background:linear-gradient(135deg, #667eea, #764ba2); color:#fff; font-size:0.85rem; font-weight:700; cursor:pointer; font-family:'Paperlogy',sans-serif; letter-spacing:0.5px; transition:all 0.2s;">URL 복사</button>\r
-        </div>\r
-        \r
-        <!-- 닫기 -->\r
-        <button id="share-close-btn" style="width:100%; margin-top:0.8rem; padding:0.8rem; border:none; border-radius:12px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.6); font-size:0.9rem; cursor:pointer; font-family:'Paperlogy',sans-serif; transition:all 0.2s;">닫기</button>\r
-      </div>\r
-    </div>\r
+    <!-- 공유 카드 미리보기 모달 -->
+    <div id="share-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); justify-content:center; align-items:center;">
+      <div style="position:relative; max-width:380px; width:90%; animation: shareCardPop 0.3s ease-out;">
+        <!-- 공유 카드 미리보기 -->
+        <div id="share-card-preview" style="text-align:center; padding:2.5rem 2rem 2rem; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); border-radius:24px; backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+          <div style="font-size:.8rem; color:rgba(255,255,255,0.5); letter-spacing:3px; margin-bottom:.4rem; text-transform:uppercase;">DYE MASTER</div>
+          <div id="share-card-name" style="font-size:1.15rem; font-weight:600; margin-bottom:.2rem; color:rgba(255,255,255,0.85);"></div>
+          <div id="share-card-score" style="font-size:4.5rem; font-weight:900; line-height:1; color:#fff; text-shadow:0 4px 20px rgba(0,0,0,0.3); margin:.3rem 0 .8rem;"></div>
+          <div id="share-card-comment" style="font-size:.85rem; color:rgba(255,255,255,0.65); font-style:italic; margin-bottom:1rem; line-height:1.6;"></div>
+        </div>
+        
+        <!-- URL 복사 영역 -->
+        <div style="margin-top:1rem; display:flex; gap:0.5rem;">
+          <input id="share-url-input" type="text" readonly style="flex:1; padding:0.75rem 1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); color:rgba(255,255,255,0.8); font-size:0.8rem; outline:none; font-family:'Paperlogy',sans-serif; backdrop-filter:blur(10px);">
+          <button id="copy-url-btn" style="padding:0.75rem 1.2rem; border:none; border-radius:12px; background:linear-gradient(135deg, #667eea, #764ba2); color:#fff; font-size:0.85rem; font-weight:700; cursor:pointer; white-space:nowrap; font-family:'Paperlogy',sans-serif; letter-spacing:0.5px; transition:all 0.2s; box-shadow:0 4px 15px rgba(118,75,162,0.4);">URL 복사</button>
+        </div>
+        
+        <!-- 닫기 -->
+        <button id="share-close-btn" style="width:100%; margin-top:0.8rem; padding:0.8rem; border:none; border-radius:12px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.6); font-size:0.9rem; cursor:pointer; font-family:'Paperlogy',sans-serif; transition:all 0.2s;">닫기</button>
+      </div>
+    </div>
   `;
 
   // 한줄평 페이드 인

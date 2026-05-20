@@ -1252,6 +1252,8 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 #share-close-btn:hover {
   background: rgba(255,255,255,0.15);
   color: rgba(255,255,255,0.9);
+}
+
 /* 중앙 슬라이더 래퍼 및 블러 영역 */
 .slider-panel-wrapper {
   position: absolute;
@@ -1262,16 +1264,20 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   z-index: 10;
   pointer-events: none;
   overflow: hidden;
-  border-left: none !important;
-  border-right: none !important;
-  box-shadow: none !important;
+  border: none;
+  box-shadow: none;
 }
 
 .slider-panel-blur {
-  display: none !important;
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(80px);
+  -webkit-backdrop-filter: blur(80px);
+  background: transparent;
+  z-index: 5;
 }
 
-/* 모바일 대응 미디어 쿼리 */
+/* 모바일 대응 미디어 쿼리 (가로폭이 좁은 기기) */
 @media (max-width: 768px) {
   .slider-panel-wrapper {
     left: 15%;
@@ -1313,7 +1319,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   border-radius: 50%;
   background: transparent;
   border: none;
-  box-shadow: none !important;
+  box-shadow: none;
   cursor: grab;
   display: flex;
   justify-content: center;
@@ -1325,7 +1331,6 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 
 .dial-knob:active {
   cursor: grabbing;
-  box-shadow: none !important;
 }
 
 .dial-wheel {
@@ -1333,12 +1338,13 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   inset: 0;
   border-radius: 50%;
   pointer-events: none;
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 /* 다이얼별 그라데이션 테마 */
 #dial-wheel-h {
   background: conic-gradient(
+    from 180deg,
     #ff0000 0%,
     #ffff00 17%,
     #00ff00 33%,
@@ -1351,43 +1357,19 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 
 #dial-wheel-s {
   /* JS에서 현재 Hue값 기준으로 동적 갱신 예정 */
-  background: conic-gradient(#808080, #ff0000);
+  background: conic-gradient(from 180deg, #808080, #ff0000);
 }
 
 #dial-wheel-b {
   /* 명도는 검정 -> 원색 -> 흰색 */
-  background: conic-gradient(#000000, #ff0000, #ffffff, #ff0000, #000000);
-}
-
-.dial-needle {
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 3px;
-  height: clamp(10px, 1.5vw, 16px);
-  background: #ffffff;
-  border-radius: 2px;
-  box-shadow: none !important;
-  z-index: 3;
-}
-
-.dial-label {
-  position: absolute;
-  font-family: 'Paperlogy', sans-serif;
-  font-size: clamp(1.2rem, 2vw, 1.8rem);
-  font-weight: 900;
-  color: #ffffff;
-  text-shadow: none !important;
-  pointer-events: none;
-  z-index: 5;
+  background: conic-gradient(from 180deg, #000000, #ff0000, #ffffff);
 }
 
 .dial-indicator-arrow {
   font-size: clamp(0.7rem, 1.2vw, 0.95rem);
   color: #ffffff;
   margin-top: 0.5rem;
-  text-shadow: none !important;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
@@ -1398,10 +1380,11 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-size: clamp(0.8rem, 1.2vw, 1rem);
   font-weight: 800;
   color: rgba(255, 255, 255, 0.85);
-  margin-top: 0.8rem;
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
+  margin-top: 0.1rem;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  border: none;
   pointer-events: none;
   min-width: 48px;
   text-align: center;
@@ -1415,13 +1398,5 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   .dial-knob {
     width: 76px;
     height: 76px;
-  }
-  .dial-needle {
-    top: 4px;
-    width: 3px;
-    height: 10px;
-  }
-  .dial-label {
-    font-size: 1.1rem;
   }
 }
