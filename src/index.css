@@ -1382,10 +1382,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 .magazine-start-btn {
   font-family: 'Paperlogy', sans-serif !important;
   font-weight: 800 !important;
-  color: #fff !important;
-  background: #000 !important;
-  border: none !important;
-  transition: transform 0.1s, opacity 0.3s, background 0.3s !important;
+  transition: transform 0.1s, opacity 0.3s, background 0.3s, box-shadow 0.3s !important;
   
   /* 폰트 깨짐 및 mix-blend-mode 서브픽셀 아티팩트 방지 */
   -webkit-font-smoothing: antialiased !important;
@@ -1396,17 +1393,20 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 }
 
 .magazine-start-btn:disabled {
-  opacity: 0.35 !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  border: 2px solid transparent !important;
+  opacity: 1 !important;
   cursor: not-allowed !important;
   transform: none !important;
-  background: #000000 !important;
-  color: #ffffff !important;
   mix-blend-mode: normal !important;
 }
 
 .magazine-start-btn:not(:disabled) {
-  background: #ffffff !important;
-  color: #000000 !important;
+  /* 투명 배경에 흰색 텍스트와 흰색 테두리를 렌더링하면 텍스트 안티앨리어싱이 보호되며 완벽한 보색 반전 획득 */
+  background: transparent !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
   mix-blend-mode: difference !important;
   opacity: 1 !important;
   
@@ -1418,7 +1418,8 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 
 .magazine-start-btn:not(:disabled):hover {
   transform: translateY(-4px) translateZ(0) !important;
-  opacity: 0.9 !important;
+  box-shadow: 0 10px 20px rgba(255,255,255,0.15) !important;
+  opacity: 1 !important;
 }
 
 .magazine-start-btn:not(:disabled):active {
