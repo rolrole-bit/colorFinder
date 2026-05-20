@@ -1292,3 +1292,148 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
     width: 80%;
   }
 }
+
+/* === Rotary Dials UI === */
+.dials-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(1.2rem, 4vw, 3rem);
+  z-index: 10;
+  pointer-events: none;
+  padding-bottom: 2rem;
+}
+
+.dial-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.dial-knob {
+  position: relative;
+  width: clamp(90px, 12vw, 130px);
+  height: clamp(90px, 12vw, 130px);
+  border-radius: 50%;
+  background: #18181b;
+  border: 3px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 
+              inset 0 2px 4px rgba(255, 255, 255, 0.08);
+  cursor: grab;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.dial-knob:active {
+  cursor: grabbing;
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 
+              inset 0 2px 4px rgba(255, 255, 255, 0.08);
+}
+
+.dial-wheel {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+}
+
+/* 다이얼별 그라데이션 테마 */
+#dial-wheel-h {
+  background: conic-gradient(
+    #ff0000 0%,
+    #ffff00 17%,
+    #00ff00 33%,
+    #00ffff 50%,
+    #0000ff 67%,
+    #ff00ff 83%,
+    #ff0000 100%
+  );
+}
+
+#dial-wheel-s {
+  /* JS에서 현재 Hue값 기준으로 동적 갱신 예정 */
+  background: conic-gradient(#808080, #ff0000);
+}
+
+#dial-wheel-b {
+  /* 명도는 검정 -> 원색 -> 흰색 */
+  background: conic-gradient(#000000, #ff0000, #ffffff, #ff0000, #000000);
+}
+
+.dial-needle {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: clamp(10px, 1.5vw, 16px);
+  background: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 2px 4px rgba(0, 0, 0, 0.5);
+  z-index: 3;
+}
+
+.dial-label {
+  position: absolute;
+  font-family: 'Paperlogy', sans-serif;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.dial-indicator-arrow {
+  font-size: clamp(0.7rem, 1.2vw, 0.95rem);
+  color: #ffffff;
+  margin-top: 0.5rem;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.dial-value {
+  font-family: 'Paperlogy', sans-serif;
+  font-size: clamp(0.8rem, 1.2vw, 1rem);
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 0.1rem;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+  min-width: 48px;
+  text-align: center;
+}
+
+/* 모바일 세로 좁은 화면 가로 배열 보장 */
+@media (max-width: 480px) {
+  .dials-container {
+    gap: 0.6rem;
+  }
+  .dial-knob {
+    width: 76px;
+    height: 76px;
+  }
+  .dial-needle {
+    top: 4px;
+    width: 3px;
+    height: 10px;
+  }
+  .dial-label {
+    font-size: 1.1rem;
+  }
+}

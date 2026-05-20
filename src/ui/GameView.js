@@ -8,7 +8,7 @@ import { getRandomColor, calculateScore, toRGBString, hslToRgb, rgbToHsl, rgbToH
 import { getState, setTargetColor, setUserColor, setScore, setPhase, getDifficultyTime, addRoundResult } from '../core/GameState.js';
 import { submitRound } from '../core/ServerAPI.js';
 import { CustomVerticalSlider } from './CustomSlider.js';
-import { playGoSound, playSubmitSound } from '../utils/SoundUtils.js';
+import { playGoSound, playSubmitSound, playSliderTickSound } from '../utils/SoundUtils.js';
 import {
   isValidRoundScore,
   resetBehavior,
@@ -137,68 +137,41 @@ export function renderGameView(container, nav) {
       <div id="game-box" class="game-box-container" style="grid-template-columns: 1fr;">
         <div id="guess-bg" class="split-bg" style="background-color: ${initHsl};"></div>
         
-        <!-- 중앙 슬라이더 래퍼 (가로 폭 50%, 모바일 70~80%, 가운데 정렬) -->
+        <!-- 중앙 다이얼 제어 패널 (가로 폭 50%, 모바일 대응) -->
         <div class="slider-panel-wrapper">
           <!-- 블러 오버레이 추가 -->
           <div class="slider-panel-blur"></div>
           
-          <div id="svg-sliders-container" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none;">
-            <svg id="sliders-svg" width="100%" height="100%" style="pointer-events: auto; touch-action: none;">
-              <defs>
-                <filter id="track-blur" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur stdDeviation="80" />
-                </filter>
-                <!-- Top to Bottom Gradients -->
-                <linearGradient id="grad-h" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#ff0000" />
-                  <stop offset="17%" stop-color="#ffff00" />
-                  <stop offset="33%" stop-color="#00ff00" />
-                  <stop offset="50%" stop-color="#00ffff" />
-                  <stop offset="67%" stop-color="#0000ff" />
-                  <stop offset="83%" stop-color="#ff00ff" />
-                  <stop offset="100%" stop-color="#ff0000" />
-                </linearGradient>
-                <linearGradient id="grad-s" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#ff0000" id="sat-stop-0" />
-                  <stop offset="50%" stop-color="#808080" id="sat-stop-1" />
-                  <stop offset="100%" stop-color="#ff0000" id="sat-stop-2" />
-                </linearGradient>
-                <linearGradient id="grad-l" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#ffffff" />
-                  <stop offset="25%" stop-color="#ff0000" id="light-stop-mid1" />
-                  <stop offset="50%" stop-color="#000000" />
-                  <stop offset="75%" stop-color="#ff0000" id="light-stop-mid2" />
-                  <stop offset="100%" stop-color="#ffffff" />
-                </linearGradient>
-              </defs>
-
-              <!-- Scrollable Tapes -->
-              <g id="tapes-group" filter="url(#track-blur)" opacity="0.9">
-                <g id="tape-h">
-                  <rect x="0" y="-1500" width="33.34%" height="1500" fill="url(#grad-h)" />
-                  <rect x="0" y="0" width="33.34%" height="1500" fill="url(#grad-h)" />
-                  <rect x="0" y="1500" width="33.34%" height="1500" fill="url(#grad-h)" />
-                </g>
-                <g id="tape-s">
-                  <rect x="33.33%" y="-1500" width="33.34%" height="1500" fill="url(#grad-s)" />
-                  <rect x="33.33%" y="0" width="33.34%" height="1500" fill="url(#grad-s)" />
-                  <rect x="33.33%" y="1500" width="33.34%" height="1500" fill="url(#grad-s)" />
-                </g>
-                <g id="tape-l">
-                  <rect x="66.66%" y="-1500" width="33.34%" height="1500" fill="url(#grad-l)" />
-                  <rect x="66.66%" y="0" width="33.34%" height="1500" fill="url(#grad-l)" />
-                  <rect x="66.66%" y="1500" width="33.34%" height="1500" fill="url(#grad-l)" />
-                </g>
-              </g>
-
-              <!-- Center Picking Line -->
-              <line id="center-line" x1="0" y1="50%" x2="100%" y2="50%" stroke="#fff" stroke-width="8" style="pointer-events: none;" />
-
-              <!-- Invisible Touch Areas -->
-              <rect id="touch-h" x="0%" y="0" width="33.33%" height="100%" fill="transparent" style="cursor: grab;" />
-              <rect id="touch-s" x="33.33%" y="0" width="33.34%" height="100%" fill="transparent" style="cursor: grab;" />
-              <rect id="touch-l" x="66.66%" y="0" width="33.34%" height="100%" fill="transparent" style="cursor: grab;" />
-            </svg>
+          <div class="dials-container">
+            <!-- H 다이얼 (색상) -->
+            <div class="dial-wrapper" id="dial-h-wrapper">
+              <div class="dial-knob" id="dial-h">
+                <div class="dial-wheel" id="dial-wheel-h"></div>
+                <div class="dial-needle"></div>
+              </div>
+              <div class="dial-indicator-arrow">▲</div>
+              <div class="dial-value" id="dial-h-value">0°</div>
+            </div>
+            
+            <!-- S 다이얼 (채도) -->
+            <div class="dial-wrapper" id="dial-s-wrapper">
+              <div class="dial-knob" id="dial-s">
+                <div class="dial-wheel" id="dial-wheel-s"></div>
+                <div class="dial-needle"></div>
+              </div>
+              <div class="dial-indicator-arrow">▲</div>
+              <div class="dial-value" id="dial-s-value">0%</div>
+            </div>
+            
+            <!-- B 다이얼 (명도) -->
+            <div class="dial-wrapper" id="dial-b-wrapper">
+              <div class="dial-knob" id="dial-b">
+                <div class="dial-wheel" id="dial-wheel-b"></div>
+                <div class="dial-needle"></div>
+              </div>
+              <div class="dial-indicator-arrow">▲</div>
+              <div class="dial-value" id="dial-b-value">0%</div>
+            </div>
           </div>
           
           ${tutorialHTML}
@@ -217,9 +190,6 @@ export function renderGameView(container, nav) {
     const guessBg = document.getElementById('guess-bg');
     const submitBtn = document.getElementById('submit-btn');
     const hexDisplay = document.getElementById('hex-display');
-    
-    // SVG Paths Initialization
-    const svgContainer = document.getElementById('svg-sliders-container');
     
     let currentDisplayedRGB = hslToRgb(currentH, currentS, currentL);
     let hexAnimFrame = null;
@@ -248,53 +218,103 @@ export function renderGameView(container, nav) {
       }
     }
 
-    class TapeSlider {
-      constructor({ min, max, value, tapeGroup, touchArea, onChange }) {
+    // 회전 다이얼 제어 클래스
+    class RotaryDial {
+      constructor({ wrapperEl, min, max, value, type, onChange }) {
+        this.wrapperEl = wrapperEl;
+        this.dialKnob = wrapperEl.querySelector('.dial-knob');
+        this.valueDisplay = wrapperEl.querySelector('.dial-value');
         this.min = min;
         this.max = max;
         this.value = value;
-        this.tapeGroup = tapeGroup;
-        this.touchArea = touchArea;
+        this.type = type;
         this.onChange = onChange;
-        this.trackLen = 1500;
-        this.svgContainer = document.getElementById('svg-sliders-container');
+        
         this.isDragging = false;
-        this.lastY = 0;
+        this.centerX = 0;
+        this.centerY = 0;
+        this.angleOffset = 0;
+        this.lastTickedValue = Math.round(value);
+        
         this.updateTransform();
-        this.touchArea.addEventListener('pointerdown', this.onDown.bind(this));
-        window.addEventListener('pointermove', this.onMove.bind(this), {passive: false});
+        this.dialKnob.addEventListener('pointerdown', this.onDown.bind(this));
+        window.addEventListener('pointermove', this.onMove.bind(this), { passive: false });
         window.addEventListener('pointerup', this.onUp.bind(this));
       }
-      updateTransform() {
-        let v = (this.value - this.min) / (this.max - this.min);
-        const cy = this.svgContainer.clientHeight / 2;
-        const ty = cy - v * this.trackLen;
-        this.tapeGroup.setAttribute('transform', `translate(0, ${ty})`);
+      
+      valueToAngle(val) {
+        const pct = (val - this.min) / (this.max - this.min);
+        return (270 + pct * 360) % 360; // 12시 방향(270도)이 0% 기준
       }
+      
+      angleToValue(angle) {
+        let normAngle = (angle - 270 + 360) % 360;
+        const pct = normAngle / 360;
+        return this.min + pct * (this.max - this.min);
+      }
+      
+      getPointerAngle(clientX, clientY) {
+        const dx = clientX - this.centerX;
+        const dy = clientY - this.centerY;
+        const rad = Math.atan2(dy, dx);
+        const deg = rad * (180 / Math.PI);
+        return (deg % 360 + 360) % 360;
+      }
+      
+      updateTransform() {
+        const angle = this.valueToAngle(this.value);
+        let normAngle = (angle - 270 + 360) % 360;
+        this.dialKnob.style.transform = `rotate(${normAngle}deg)`;
+        
+        const rounded = Math.round(this.value);
+        if (this.type === 'H') {
+          this.valueDisplay.textContent = `${rounded}°`;
+        } else {
+          this.valueDisplay.textContent = `${rounded}%`;
+        }
+      }
+      
       onDown(e) {
         fadeTutorial();
         stopShuffle();
         this.isDragging = true;
-        this.lastY = e.clientY;
-        this.touchArea.setPointerCapture(e.pointerId);
+        this.dialKnob.setPointerCapture(e.pointerId);
+        
+        const rect = this.dialKnob.getBoundingClientRect();
+        this.centerX = rect.left + rect.width / 2;
+        this.centerY = rect.top + rect.height / 2;
+        
+        const pointerAngle = this.getPointerAngle(e.clientX, e.clientY);
+        const currentAngle = this.valueToAngle(this.value);
+        this.angleOffset = pointerAngle - currentAngle;
       }
+      
       onMove(e) {
         if (!this.isDragging) return;
         e.preventDefault();
-        const dy = e.clientY - this.lastY;
-        this.lastY = e.clientY;
-        let dv = dy / this.trackLen;
-        let v = (this.value - this.min) / (this.max - this.min);
-        v -= dv;
-        v = v - Math.floor(v);
-        this.value = this.min + v * (this.max - this.min);
+        
+        const pointerAngle = this.getPointerAngle(e.clientX, e.clientY);
+        let targetAngle = pointerAngle - this.angleOffset;
+        targetAngle = (targetAngle % 360 + 360) % 360;
+        
+        let val = this.angleToValue(targetAngle);
+        val = Math.max(this.min, Math.min(this.max, val));
+        this.value = val;
         this.updateTransform();
-        if (this.onChange) this.onChange(this.value);
+        
+        const roundedVal = Math.round(val);
+        if (roundedVal !== this.lastTickedValue) {
+          playSliderTickSound();
+          this.lastTickedValue = roundedVal;
+        }
+        
+        if (this.onChange) this.onChange(val);
       }
+      
       onUp(e) {
         if (this.isDragging) {
           this.isDragging = false;
-          this.touchArea.releasePointerCapture(e.pointerId);
+          this.dialKnob.releasePointerCapture(e.pointerId);
         }
       }
     }
@@ -306,15 +326,12 @@ export function renderGameView(container, nav) {
       const outerBg = document.querySelector('.animated-gradient-bg');
       if (outerBg) outerBg.style.animation = 'none';
 
-      // 배경 및 그래픽 요소 즉각 업데이트 (딜레이 제거)
+      // 배경 및 그래픽 요소 즉각 업데이트
       const immediateRgbStr = `rgb(${targetRGB.r}, ${targetRGB.g}, ${targetRGB.b})`;
       const immediateContrast = getContrastYIQ(targetRGB.r, targetRGB.g, targetRGB.b);
 
       if (guessBg) guessBg.style.backgroundColor = immediateRgbStr;
       if (outerBg) outerBg.style.background = immediateRgbStr;
-      
-      const centerLine = document.getElementById('center-line');
-      if (centerLine) centerLine.setAttribute('stroke', immediateRgbStr);
       
       const roundText = document.getElementById('round-text');
       if (roundText) roundText.style.color = immediateContrast;
@@ -328,7 +345,7 @@ export function renderGameView(container, nav) {
         hexDisplay.style.color = immediateContrast;
         hexDisplay.style.backgroundColor = immediateRgbStr;
 
-        // 컬러 코드 텍스트 롤링 연출만 비동기 애니메이션 프레임 유지
+        // 컬러 코드 텍스트 롤링 연출
         const startRGB = { ...currentDisplayedRGB };
         const startTime = performance.now();
         const duration = 250;
@@ -351,46 +368,34 @@ export function renderGameView(container, nav) {
         hexAnimFrame = requestAnimationFrame(animate);
       }
       
-      const satStop0 = document.getElementById('sat-stop-0');
-      const satStop1 = document.getElementById('sat-stop-1');
-      const satStop2 = document.getElementById('sat-stop-2');
-      if (satStop0) satStop0.setAttribute('stop-color', `hsl(${currentH}, 100%, 50%)`);
-      if (satStop1) satStop1.setAttribute('stop-color', `hsl(${currentH}, 0%, 50%)`);
-      if (satStop2) satStop2.setAttribute('stop-color', `hsl(${currentH}, 100%, 50%)`);
+      // 채도(S) 및 명도(B) 다이얼의 휠 그라데이션 동적 업데이트
+      const sWheel = document.getElementById('dial-wheel-s');
+      if (sWheel) {
+        sWheel.style.background = `conic-gradient(hsl(${currentH}, 0%, 50%), hsl(${currentH}, 100%, 50%))`;
+      }
 
-      const lightStopMid1 = document.getElementById('light-stop-mid1');
-      const lightStopMid2 = document.getElementById('light-stop-mid2');
-      if (lightStopMid1) lightStopMid1.setAttribute('stop-color', `hsl(${currentH}, ${currentS}%, 50%)`);
-      if (lightStopMid2) lightStopMid2.setAttribute('stop-color', `hsl(${currentH}, ${currentS}%, 50%)`);
+      const bWheel = document.getElementById('dial-wheel-b');
+      if (bWheel) {
+        bWheel.style.background = `conic-gradient(#000000, hsl(${currentH}, ${currentS}%, 50%), #ffffff, hsl(${currentH}, ${currentS}%, 50%), #000000)`;
+      }
     };
 
-    const hueSlider = new TapeSlider({
-      min: 0, max: 360, value: currentH,
-      tapeGroup: document.getElementById('tape-h'),
-      touchArea: document.getElementById('touch-h'),
+    const hueDial = new RotaryDial({
+      wrapperEl: document.getElementById('dial-h-wrapper'),
+      min: 0, max: 360, value: currentH, type: 'H',
       onChange: (val) => { currentH = val; updateColor(); logSliderChange(); }
     });
     
-    const satSlider = new TapeSlider({
-      min: 0, max: 200, value: 100 - currentS,
-      tapeGroup: document.getElementById('tape-s'),
-      touchArea: document.getElementById('touch-s'),
-      onChange: (val) => {
-        currentS = val > 100 ? val - 100 : 100 - val;
-        updateColor();
-        logSliderChange();
-      }
+    const satDial = new RotaryDial({
+      wrapperEl: document.getElementById('dial-s-wrapper'),
+      min: 0, max: 100, value: currentS, type: 'S',
+      onChange: (val) => { currentS = val; updateColor(); logSliderChange(); }
     });
 
-    const lightSlider = new TapeSlider({
-      min: 0, max: 200, value: 100 - currentL,
-      tapeGroup: document.getElementById('tape-l'),
-      touchArea: document.getElementById('touch-l'),
-      onChange: (val) => {
-        currentL = val > 100 ? val - 100 : 100 - val;
-        updateColor();
-        logSliderChange();
-      }
+    const lightDial = new RotaryDial({
+      wrapperEl: document.getElementById('dial-b-wrapper'),
+      min: 0, max: 100, value: currentL, type: 'B',
+      onChange: (val) => { currentL = val; updateColor(); logSliderChange(); }
     });
 
     document.addEventListener('pointermove', logPointerMove);
@@ -404,17 +409,13 @@ export function renderGameView(container, nav) {
       const progress = Math.min(elapsed / shuffleDuration, 1);
 
       if (progress >= 1 || !isMixing) {
-        hueSlider.value = endH;
-        satSlider.value = 100 - endS;
-        lightSlider.value = 100 - endL;
-
         currentH = endH;
         currentS = endS;
         currentL = endL;
 
-        hueSlider.updateTransform();
-        satSlider.updateTransform();
-        lightSlider.updateTransform();
+        hueDial.setValue(endH);
+        satDial.setValue(endS);
+        lightDial.setValue(endL);
         updateColor();
 
         stopShuffle();
@@ -441,13 +442,9 @@ export function renderGameView(container, nav) {
       currentS = Math.round(sVal);
       currentL = Math.round(lVal);
 
-      hueSlider.value = currentH;
-      satSlider.value = 100 - currentS;
-      lightSlider.value = 100 - currentL;
-
-      hueSlider.updateTransform();
-      satSlider.updateTransform();
-      lightSlider.updateTransform();
+      hueDial.setValue(currentH);
+      satDial.setValue(currentS);
+      lightDial.setValue(currentL);
 
       updateColor();
 
@@ -466,7 +463,7 @@ export function renderGameView(container, nav) {
       const behavior = analyzeBehavior();
       
       // 페이드 아웃 즉시 시작
-      const panel = document.querySelector('.vertical-sliders-container');
+      const panel = document.querySelector('.slider-panel-wrapper');
       const btn = document.getElementById('submit-btn');
       if (panel) panel.classList.add('fade-out');
       if (btn) btn.classList.add('fade-out');
