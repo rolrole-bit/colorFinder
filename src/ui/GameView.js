@@ -158,7 +158,7 @@ export function renderGameView(container, nav) {
           </div>
         </div>
         
-        <button id="submit-btn" class="submit-minimal-btn">
+        <button id="submit-btn" class="magazine-start-btn submit-minimal-btn">
           <span class="btn-main-text">DYE IT</span>
           <span class="btn-sub-text" id="submit-btn-sub">#000000</span>
         </button>

@@ -559,26 +559,16 @@ input[type="range"]::-webkit-slider-thumb:active {
   touch-action: none; /* Prevent scrolling on mobile while sliding */
 }
 
+/* submit-minimal-btn: position/shape only. Visual style from magazine-start-btn */
 .submit-minimal-btn {
   position: absolute;
   bottom: clamp(1rem, 5vh, 3rem);
   right: clamp(1rem, 5vw, 3rem);
-  font-family: 'Paperlogy', sans-serif;
-  color: #fff;
-  background: #000; /* Will be overridden dynamically in JS */
-  border: none;
   padding: 0.8rem 3.5rem;
   min-height: 75px;
-  border-radius: 40px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  cursor: pointer;
+  border-radius: 40px !important;
   z-index: 1001;
-  text-transform: uppercase;
-  transition: transform 0.1s, opacity 0.3s, box-shadow 0.3s;
-  display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   gap: 2px;
 }
 
@@ -595,16 +585,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   letter-spacing: 1px;
   line-height: 1;
   opacity: 0.85;
-}
-
-.submit-minimal-btn:hover {
-  transform: translateY(-4px);
-  opacity: 0.9;
-}
-
-.submit-minimal-btn:active {
-  transform: translateY(2px);
-  opacity: 1;
 }
 
 .score-result {
