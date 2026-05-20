@@ -205,6 +205,7 @@ export function renderEntryView(container, nav) {
         
         setTimeout(() => {
           nav.toGameView();
+        }, 2000);
       }, 2000);
     }, 400);
   });
