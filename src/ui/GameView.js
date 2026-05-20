@@ -326,9 +326,19 @@ export function renderGameView(container, nav) {
         if (roundedVal !== this.lastTickedValue) {
           playSliderTickSound();
           this.lastTickedValue = roundedVal;
+          this.triggerPulse();
         }
         
         if (this.onChange) this.onChange(val);
+      }
+      
+      triggerPulse() {
+        if (!this.valueDisplay) return;
+        this.valueDisplay.style.transform = 'scale(1.35)';
+        if (this._pulseTimeout) clearTimeout(this._pulseTimeout);
+        this._pulseTimeout = setTimeout(() => {
+          this.valueDisplay.style.transform = 'scale(1)';
+        }, 80);
       }
       
       onUp(e) {
