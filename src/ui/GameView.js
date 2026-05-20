@@ -327,18 +327,20 @@ export function renderGameView(container, nav) {
         const roundedVal = Math.round(val);
         if (roundedVal !== this.lastTickedValue) {
           if (this.indicator && delta !== 0) {
-            if (this.indicatorAnimation) {
-              this.indicatorAnimation.cancel();
+            // 애니메이션이 이미 실행 중이면 취소하지 않고 무시하여 멈춤 현상(프레임 스킵) 방지
+            const isPlaying = this.indicatorAnimation && 
+                              (this.indicatorAnimation.playState === 'running' || this.indicatorAnimation.playState === 'pending');
+            if (!isPlaying) {
+              const rot = delta > 0 ? -25 : 25;
+              this.indicatorAnimation = this.indicator.animate([
+                { transform: 'rotate(0deg)' },
+                { transform: `rotate(${rot}deg)` },
+                { transform: 'rotate(0deg)' }
+              ], {
+                duration: 120,
+                easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+              });
             }
-            const rot = delta > 0 ? -25 : 25;
-            this.indicatorAnimation = this.indicator.animate([
-              { transform: 'rotate(0deg)' },
-              { transform: `rotate(${rot}deg)` },
-              { transform: 'rotate(0deg)' }
-            ], {
-              duration: 100,
-              easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-            });
           }
           
           playSliderTickSound();
