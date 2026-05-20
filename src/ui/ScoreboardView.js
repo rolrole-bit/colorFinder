@@ -63,7 +63,7 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
       if (myScore >= playerRanks[i].score) { myRank = i + 1; break; }
     }
     const myRankHTML = `
-    <li class="rank-item" style="border-color: currentColor; background: rgba(255,255,255,0.25); backdrop-filter: blur(8px) saturate(120%); -webkit-backdrop-filter: blur(8px) saturate(120%); border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; font-size: 1.1em; font-weight: 800; padding: 0.5rem 0.3rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <li class="rank-item" style="border-color: currentColor; background: rgba(255,255,255,0.35); backdrop-filter: blur(16px) saturate(120%); -webkit-backdrop-filter: blur(16px) saturate(120%); border: 1px solid rgba(255,255,255,0.6); border-radius: 8px; font-size: 1.1em; font-weight: 800; padding: 0.5rem 0.3rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
       <span class="rank-num">${myRank}</span>
       <span class="rank-name">${escapeHTML(myName)} [${escapeHTML(state.originGame)}]</span>
       <span class="rank-score">${myScore.toLocaleString()}</span>

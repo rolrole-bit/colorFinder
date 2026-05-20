@@ -1449,7 +1449,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 /* === SCOREBOARD CONTENT: Enforce Active mix-blend-mode: difference === */
 /* 매거진 컨텐츠 전체에 명조 반전 연산을 적용하여 스코어 화면의 가독성을 극대화 */
 .split-screen-result .magazine-content {
-  mix-blend-mode: difference;
+  mix-blend-mode: normal; /* Restore backdrop-filter functionality */
 }
 
 /* 모든 텍스트와 자식 요소들을 순백색으로 지정하여 배경의 완벽한 보색을 유도 */
