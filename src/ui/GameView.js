@@ -296,8 +296,30 @@ export function renderGameView(container, nav) {
       
       const outerBg = document.querySelector('.animated-gradient-bg');
       if (outerBg) outerBg.style.animation = 'none';
+
+      // 배경 및 그래픽 요소 즉각 업데이트 (딜레이 제거)
+      const immediateRgbStr = `rgb(${targetRGB.r}, ${targetRGB.g}, ${targetRGB.b})`;
+      const immediateContrast = getContrastYIQ(targetRGB.r, targetRGB.g, targetRGB.b);
+
+      if (guessBg) guessBg.style.backgroundColor = immediateRgbStr;
+      if (outerBg) outerBg.style.background = immediateRgbStr;
+      
+      const centerLine = document.getElementById('center-line');
+      if (centerLine) centerLine.setAttribute('stroke', immediateRgbStr);
+      
+      const roundText = document.getElementById('round-text');
+      if (roundText) roundText.style.color = immediateContrast;
+
+      if (submitBtn) {
+        submitBtn.style.color = immediateContrast;
+        submitBtn.style.backgroundColor = immediateRgbStr;
+      }
       
       if (hexDisplay) {
+        hexDisplay.style.color = immediateContrast;
+        hexDisplay.style.backgroundColor = immediateRgbStr;
+
+        // 컬러 코드 텍스트 롤링 연출만 비동기 애니메이션 프레임 유지
         const startRGB = { ...currentDisplayedRGB };
         const startTime = performance.now();
         const duration = 250;
@@ -315,46 +337,9 @@ export function renderGameView(container, nav) {
           
           hexDisplay.textContent = rgbToHex(currentDisplayedRGB.r, currentDisplayedRGB.g, currentDisplayedRGB.b);
           
-          const rgbStr = `rgb(${currentDisplayedRGB.r}, ${currentDisplayedRGB.g}, ${currentDisplayedRGB.b})`;
-          const contrastBg = getContrastYIQ(currentDisplayedRGB.r, currentDisplayedRGB.g, currentDisplayedRGB.b);
-          
-          hexDisplay.style.color = contrastBg;
-          hexDisplay.style.backgroundColor = rgbStr;
-          
-          if (submitBtn) {
-            submitBtn.style.color = contrastBg;
-            submitBtn.style.backgroundColor = rgbStr;
-          }
-          
-          guessBg.style.backgroundColor = rgbStr;
-          if (outerBg) outerBg.style.background = rgbStr;
-          
-          const centerLine = document.getElementById('center-line');
-          if (centerLine) centerLine.setAttribute('stroke', rgbStr);
-          
-          const roundText = document.getElementById('round-text');
-          if (roundText) roundText.style.color = contrastBg;
-          
           if (progress < 1) hexAnimFrame = requestAnimationFrame(animate);
         };
         hexAnimFrame = requestAnimationFrame(animate);
-      } else {
-        const rgbStr = `rgb(${targetRGB.r}, ${targetRGB.g}, ${targetRGB.b})`;
-        const contrastBg = getContrastYIQ(targetRGB.r, targetRGB.g, targetRGB.b);
-        
-        guessBg.style.backgroundColor = rgbStr;
-        if (outerBg) outerBg.style.background = rgbStr;
-        if (hexDisplay) {
-          hexDisplay.style.color = contrastBg;
-          hexDisplay.style.backgroundColor = rgbStr;
-        }
-        if (submitBtn) {
-          submitBtn.style.color = contrastBg;
-          submitBtn.style.backgroundColor = rgbStr;
-        }
-        
-        const centerLine = document.getElementById('center-line');
-        if (centerLine) centerLine.setAttribute('stroke', rgbStr);
       }
       
       const satStop0 = document.getElementById('sat-stop-0');
