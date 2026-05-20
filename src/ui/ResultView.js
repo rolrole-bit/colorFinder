@@ -43,11 +43,11 @@ export function renderInterimResultView(container, nav) {
       <div class="split-screen-half" style="background-color: ${userRGB};"></div>
       
       <!-- 매거진 오버레이 -->
-      <div class="magazine-overlay">
+      <div class="magazine-overlay" style="mix-blend-mode: difference; color: #ffffff;">
         
         <!-- 상단 라운드 표시 -->
         <div style="display: flex; justify-content: flex-start; width: 100%; flex-shrink: 0; margin-bottom: auto; padding-left: 2vw;">
-          <div style="font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: ${leftContrast}; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px;">
+          <div style="font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: #ffffff; padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px;">
             ROUND ${state.currentRound} / ${state.maxRounds}
           </div>
         </div>
@@ -55,10 +55,10 @@ export function renderInterimResultView(container, nav) {
         <!-- 중앙 영역: 헥스코드 + 스코어 -->
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: auto;">
           <div style="display: flex; gap: 4rem; margin-bottom: 1rem;">
-            <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${targetRGB}; background-color: ${leftContrast}; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px;">
+            <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: #ffffff; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px;">
               ${targetHex}
             </div>
-            <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: ${userRGB}; background-color: ${rightContrast}; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px;">
+            <div style="font-size: clamp(1rem, 3vw, 1.5rem); color: #ffffff; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 300; letter-spacing: 3px;">
               ${userHex}
             </div>
           </div>
