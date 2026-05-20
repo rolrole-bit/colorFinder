@@ -101,7 +101,8 @@ body {
   top: -200vh;
   width: 45%;
   height: 500vh;
-  filter: blur(140px);
+  filter: url(#liquid-noise);
+  will-change: transform, filter;
   opacity: 1;
 }
 

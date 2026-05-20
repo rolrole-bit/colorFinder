@@ -20,11 +20,17 @@ import { scrambleTypingEffect } from './AnimationUtils.js';
  * @param {function} nav.setServerSession - 서버 세션 상태 설정
  */
 export function renderEntryView(container, nav) {
-  container.innerHTML = `
     <div class="bg-tapes-container" id="entry-bg">
       <div class="bg-tape bg-tape-1"></div>
       <div class="bg-tape bg-tape-2"></div>
       <div class="bg-tape bg-tape-3"></div>
+      <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute; width:0; height:0; pointer-events:none; visibility:hidden;">
+        <filter id="liquid-noise">
+          <feTurbulence type="fractalNoise" baseFrequency="0.008" numOctaves="3" result="noise" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="220" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+          <feGaussianBlur in="displaced" stdDeviation="120" />
+        </filter>
+      </svg>
     </div>
     <div class="magazine-entry" id="entry-panel">
       <h1 class="magazine-title">DYE<br/>MASTER</h1>
