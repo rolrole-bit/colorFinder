@@ -98,30 +98,30 @@ body {
 .bg-tape {
   position: absolute;
   top: -200vh;
-  width: 60%;
+  width: 33.33%;
   height: 500vh;
   filter: blur(140px);
-  opacity: 0.9;
+  opacity: 0.85;
 }
 
 .bg-tape-1 {
-  left: -10%;
+  left: 0;
   background: linear-gradient(to bottom, #ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000);
-  background-size: 100% 100vh;
+  background-size: 100% 400vh;
   animation: bgTapeInteract1 24s infinite;
 }
 
 .bg-tape-2 {
-  left: 20%;
+  left: 33.33%;
   background: linear-gradient(to bottom, #ff0000, #808080, #ff0000);
-  background-size: 100% 100vh;
+  background-size: 100% 400vh;
   animation: bgTapeInteract2 30s infinite, syncHueRotate 24s infinite;
 }
 
 .bg-tape-3 {
-  left: 50%;
+  left: 66.66%;
   background: linear-gradient(to bottom, #ffffff, #ff0000, #000000, #ffffff);
-  background-size: 100% 100vh;
+  background-size: 100% 400vh;
   animation: bgTapeInteract3 27s infinite, syncHueRotate 24s infinite;
 }
 
