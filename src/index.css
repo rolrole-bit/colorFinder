@@ -567,14 +567,11 @@ input[type="range"]::-webkit-slider-thumb:active {
   bottom: clamp(1rem, 5vh, 3rem);
   right: clamp(1rem, 5vw, 3rem);
   font-family: 'Paperlogy', sans-serif;
-  font-weight: 800;
-  font-size: clamp(1.8rem, 4vh, 2.5rem);
-  letter-spacing: 2px;
   color: #fff;
   background: #000; /* Will be overridden dynamically in JS */
   border: none;
-  padding: 1.2rem 3rem;
-  min-height: 70px;
+  padding: 0.8rem 3.5rem;
+  min-height: 75px;
   border-radius: 40px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   cursor: pointer;
@@ -582,8 +579,25 @@ input[type="range"]::-webkit-slider-thumb:active {
   text-transform: uppercase;
   transition: transform 0.1s, opacity 0.3s, box-shadow 0.3s;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
+}
+
+.submit-minimal-btn .btn-main-text {
+  font-weight: 900;
+  font-size: clamp(1.4rem, 3.2vh, 1.8rem);
+  letter-spacing: 2px;
+  line-height: 1.1;
+}
+
+.submit-minimal-btn .btn-sub-text {
+  font-weight: 600;
+  font-size: clamp(0.8rem, 1.8vh, 1rem);
+  letter-spacing: 1px;
+  line-height: 1;
+  opacity: 0.85;
 }
 
 .submit-minimal-btn:hover {

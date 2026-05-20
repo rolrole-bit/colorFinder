@@ -158,7 +158,10 @@ export function renderGameView(container, nav) {
           </div>
         </div>
         
-        <button id="submit-btn" class="submit-minimal-btn">DONE</button>
+        <button id="submit-btn" class="submit-minimal-btn">
+          <span class="btn-main-text">DYE IT</span>
+          <span class="btn-sub-text" id="submit-btn-sub">#000000</span>
+        </button>
       </div>
     `;
 
@@ -376,7 +379,10 @@ export function renderGameView(container, nav) {
           currentDisplayedRGB.g = Math.round(startRGB.g + (targetRGB.g - startRGB.g) * easeOut);
           currentDisplayedRGB.b = Math.round(startRGB.b + (targetRGB.b - startRGB.b) * easeOut);
           
-          submitBtn.textContent = `DONE ${rgbToHex(currentDisplayedRGB.r, currentDisplayedRGB.g, currentDisplayedRGB.b)}`;
+          const subTextEl = submitBtn.querySelector('#submit-btn-sub');
+          if (subTextEl) {
+            subTextEl.textContent = rgbToHex(currentDisplayedRGB.r, currentDisplayedRGB.g, currentDisplayedRGB.b);
+          }
           
           // 애니메이션 중에도 실시간 콘트라스트 보정 알고리즘 (0.5초 동안 매 프레임 보간된 컬러로 계산)
           const curInvertedR = 255 - currentDisplayedRGB.r;
