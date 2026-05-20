@@ -406,7 +406,7 @@ export function renderGameView(container, nav) {
     const startS = currentS;
     const startL = currentL;
 
-    const shuffleDuration = 600;
+    const shuffleDuration = 1000;
     const shuffleStartTime = performance.now();
 
     function doShuffle(now) {
@@ -431,13 +431,20 @@ export function renderGameView(container, nav) {
         return;
       }
 
-      // 사인 곡선을 활용하여 스르륵 힌트용 부드러운 왕복 모션 적용
-      const ease = Math.sin(progress * Math.PI);
-      const easeDouble = Math.sin(progress * Math.PI * 2);
+      // 힌트용 부드러운 순차 파동 애니메이션
+      const calcWave = (p, start, end) => {
+        if (p < start || p > end) return 0;
+        const normalized = (p - start) / (end - start);
+        return Math.sin(normalized * Math.PI);
+      };
 
-      const hVal = startH + ease * 45;
-      const sVal = startS - ease * 20;
-      const lVal = startL + easeDouble * 15;
+      const easeH = calcWave(progress, 0.0, 0.7);
+      const easeS = calcWave(progress, 0.15, 0.85);
+      const easeL = calcWave(progress, 0.3, 1.0);
+
+      const hVal = startH + easeH * 20;
+      const sVal = startS + easeS * 15;
+      const lVal = startL + easeL * 15;
 
       hueSlider.value = (Math.round(hVal) + 360) % 360;
       satSlider.value = (Math.round(sVal) + 200) % 200;
