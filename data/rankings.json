@@ -462,5 +462,13 @@
     "difficulty": "Hard",
     "session_id": "ea238de5-c2e1-44ea-8fee-bda15d7492e3",
     "created_at": "2026-05-20T04:01:45.072Z"
+  },
+  {
+    "player_name": "키라나",
+    "origin_game": "마비노기 모바일",
+    "score": 1023,
+    "difficulty": "Hard",
+    "session_id": "d574059d-a82d-40a0-9092-9c66e107643a",
+    "created_at": "2026-05-20T05:28:50.199Z"
   }
 ]

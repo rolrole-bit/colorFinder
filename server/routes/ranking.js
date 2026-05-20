@@ -4,19 +4,22 @@
  */
 
 import { Router } from 'express';
-import { getGameRankings, getPlayerRankings, getAllPlayerRankings } from '../db.js';
+import { loadRankings, computeGameRankings, computeAllPlayerRankings } from '../db.js';
 
 const router = Router();
 
 /**
  * 전체 랭킹 조회
  * 게임별 랭킹 + 플레이어별 랭킹을 한번에 반환
+ * [PERFORMANCE] rankings.json 1회만 읽어서 3가지 뷰를 계산
  */
 router.get('/', (req, res) => {
   try {
-    const gameRankings = getGameRankings();
-    const playerRankings = getPlayerRankings();
-    const totalPlayers = getAllPlayerRankings().length;
+    const rawRankings = loadRankings();  // 파일 I/O 1회만
+    const gameRankings = computeGameRankings(rawRankings);
+    const allPlayers = computeAllPlayerRankings(rawRankings);
+    const playerRankings = allPlayers.slice(0, 5);
+    const totalPlayers = allPlayers.length;
 
     res.json({ gameRankings, playerRankings, totalPlayers });
   } catch (err) {

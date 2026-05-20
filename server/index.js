@@ -14,6 +14,7 @@
 
 import 'dotenv/config';
 import express from 'express';
+import compression from 'compression';
 import helmet from 'helmet';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -76,6 +77,19 @@ app.use(helmet({
 }));
 
 // ═══════════════════════════════════════════
+// [PERFORMANCE] Gzip/Brotli 압축 (JS/CSS/JSON ~70% 절약)
+// ═══════════════════════════════════════════
+
+app.use(compression({
+  level: 6,
+  threshold: 1024,
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) return false;
+    return compression.filter(req, res);
+  }
+}));
+
+// ═══════════════════════════════════════════
 // [SECURITY] 3. JSON 바디 크기 제한 (100KB)
 // ═══════════════════════════════════════════
 
@@ -129,9 +143,20 @@ const projectRoot = join(__dirname, '..');
 app.use(express.static(projectRoot, {
   dotfiles: 'deny',
   index: 'index.html',
-  setHeaders: (res, path) => {
-    if (path.toLowerCase().endsWith('.js')) {
+  etag: true,
+  lastModified: true,
+  maxAge: '1d',  // CSS/JS 24시간 캐싱 (외부 접속 성능 핵심)
+  setHeaders: (res, filePath) => {
+    if (filePath.toLowerCase().endsWith('.js')) {
       res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    }
+    // 폰트 파일: 1년 캐싱 (변경 거의 없음)
+    if (/\.(woff2?|ttf|otf)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+    // HTML: 캐싱 없이 항상 최신 (SPA 라우팅 대응)
+    if (filePath.toLowerCase().endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     }
   }
 }));

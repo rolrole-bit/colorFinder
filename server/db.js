@@ -28,7 +28,7 @@ mkdirSync(DATA_DIR, { recursive: true });
 // 파일 I/O 헬퍼
 // ═══════════════════════════════════════════
 
-function loadRankings() {
+export function loadRankings() {
   try {
     if (existsSync(RANKINGS_FILE)) {
       const data = readFileSync(RANKINGS_FILE, 'utf-8');
@@ -216,6 +216,63 @@ export function getPlayerRankings() {
 export function getAllPlayerRankings() {
   const rankings = loadRankings();
   
+  const playerMap = {};
+  rankings.forEach(r => {
+    const key = `${r.player_name}|${r.origin_game}`;
+    if (!playerMap[key] || r.score > playerMap[key].score) {
+      playerMap[key] = {
+        playerName: r.player_name,
+        originGame: r.origin_game,
+        score: r.score,
+        difficulty: r.difficulty
+      };
+    }
+  });
+  
+  return Object.values(playerMap)
+    .sort((a, b) => b.score - a.score);
+}
+
+/**
+ * 사전 로드된 랭킹 데이터로 게임별 랭킹 계산 (파일 I/O 없음)
+ * @param {Array} rankings - loadRankings()로 미리 로드한 데이터
+ */
+export function computeGameRankings(rankings) {
+  const gameMap = {};
+  rankings.forEach(r => {
+    const game = r.origin_game;
+    if (!gameMap[game]) {
+      gameMap[game] = { topScore: 0, playCount: 0, todayTop: 0 };
+    }
+    gameMap[game].playCount++;
+    if (r.score > gameMap[game].topScore) gameMap[game].topScore = r.score;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (new Date(r.created_at) >= today && r.score > gameMap[game].todayTop) {
+      gameMap[game].todayTop = r.score;
+    }
+  });
+  
+  return Object.entries(gameMap)
+    .map(([game, data], i) => ({
+      game,
+      topScore: data.topScore,
+      playCount: data.playCount,
+      todayTopScore: data.todayTop,
+      rank: i + 1,
+      trend: 0,
+      isNew: data.playCount <= 3
+    }))
+    .sort((a, b) => b.topScore - a.topScore)
+    .map((item, i) => ({ ...item, rank: i + 1 }));
+}
+
+/**
+ * 사전 로드된 랭킹 데이터로 전체 플레이어 랭킹 계산 (파일 I/O 없음)
+ * @param {Array} rankings - loadRankings()로 미리 로드한 데이터
+ */
+export function computeAllPlayerRankings(rankings) {
   const playerMap = {};
   rankings.forEach(r => {
     const key = `${r.player_name}|${r.origin_game}`;
