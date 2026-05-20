@@ -136,8 +136,73 @@ export function renderGameView(container, nav) {
       <div class="animated-gradient-bg"></div>
       <div id="game-box" class="game-box-container" style="grid-template-columns: 1fr;">
         <div id="guess-bg" class="split-bg" style="background-color: ${initHsl};"></div>
-        <!-- 블러 오버레이 추가 -->
-        <div style="position: absolute; inset: 0; backdrop-filter: blur(80px); background: rgba(255,255,255,0.05); z-index: 5;"></div>
+        
+        <!-- 중앙 슬라이더 래퍼 (가로 폭 50%, 모바일 70~80%, 가운데 정렬) -->
+        <div class="slider-panel-wrapper">
+          <!-- 블러 오버레이 추가 -->
+          <div class="slider-panel-blur"></div>
+          
+          <div id="svg-sliders-container" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none;">
+            <svg id="sliders-svg" width="100%" height="100%" style="pointer-events: auto; touch-action: none;">
+              <defs>
+                <filter id="track-blur" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="80" />
+                </filter>
+                <!-- Top to Bottom Gradients -->
+                <linearGradient id="grad-h" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#ff0000" />
+                  <stop offset="17%" stop-color="#ffff00" />
+                  <stop offset="33%" stop-color="#00ff00" />
+                  <stop offset="50%" stop-color="#00ffff" />
+                  <stop offset="67%" stop-color="#0000ff" />
+                  <stop offset="83%" stop-color="#ff00ff" />
+                  <stop offset="100%" stop-color="#ff0000" />
+                </linearGradient>
+                <linearGradient id="grad-s" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#ff0000" id="sat-stop-0" />
+                  <stop offset="50%" stop-color="#808080" id="sat-stop-1" />
+                  <stop offset="100%" stop-color="#ff0000" id="sat-stop-2" />
+                </linearGradient>
+                <linearGradient id="grad-l" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#ffffff" />
+                  <stop offset="25%" stop-color="#ff0000" id="light-stop-mid1" />
+                  <stop offset="50%" stop-color="#000000" />
+                  <stop offset="75%" stop-color="#ff0000" id="light-stop-mid2" />
+                  <stop offset="100%" stop-color="#ffffff" />
+                </linearGradient>
+              </defs>
+
+              <!-- Scrollable Tapes -->
+              <g id="tapes-group" filter="url(#track-blur)" opacity="0.9">
+                <g id="tape-h">
+                  <rect x="0" y="-1500" width="33.34%" height="1500" fill="url(#grad-h)" />
+                  <rect x="0" y="0" width="33.34%" height="1500" fill="url(#grad-h)" />
+                  <rect x="0" y="1500" width="33.34%" height="1500" fill="url(#grad-h)" />
+                </g>
+                <g id="tape-s">
+                  <rect x="33.33%" y="-1500" width="33.34%" height="1500" fill="url(#grad-s)" />
+                  <rect x="33.33%" y="0" width="33.34%" height="1500" fill="url(#grad-s)" />
+                  <rect x="33.33%" y="1500" width="33.34%" height="1500" fill="url(#grad-s)" />
+                </g>
+                <g id="tape-l">
+                  <rect x="66.66%" y="-1500" width="33.34%" height="1500" fill="url(#grad-l)" />
+                  <rect x="66.66%" y="0" width="33.34%" height="1500" fill="url(#grad-l)" />
+                  <rect x="66.66%" y="1500" width="33.34%" height="1500" fill="url(#grad-l)" />
+                </g>
+              </g>
+
+              <!-- Center Picking Line -->
+              <line id="center-line" x1="0" y1="50%" x2="100%" y2="50%" stroke="#fff" stroke-width="8" style="pointer-events: none;" />
+
+              <!-- Invisible Touch Areas -->
+              <rect id="touch-h" x="0%" y="0" width="33.33%" height="100%" fill="transparent" style="cursor: grab;" />
+              <rect id="touch-s" x="33.33%" y="0" width="33.34%" height="100%" fill="transparent" style="cursor: grab;" />
+              <rect id="touch-l" x="66.66%" y="0" width="33.34%" height="100%" fill="transparent" style="cursor: grab;" />
+            </svg>
+          </div>
+          
+          ${tutorialHTML}
+        </div>
         
         <div style="position: absolute; top: 2rem; right: 2rem; display: flex; gap: 1rem; z-index: 20;">
           <div id="hex-display" style="font-family: 'Paperlogy', sans-serif; font-size: 2rem; font-weight: 300; letter-spacing: 3px; padding: 0.5rem 1rem; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
@@ -145,66 +210,6 @@ export function renderGameView(container, nav) {
           </div>
         </div>
         
-        <div id="svg-sliders-container" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none;">
-          <svg id="sliders-svg" width="100%" height="100%" style="pointer-events: auto; touch-action: none;">
-            <defs>
-              <filter id="track-blur" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="80" />
-              </filter>
-              <!-- Top to Bottom Gradients -->
-              <linearGradient id="grad-h" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#ff0000" />
-                <stop offset="17%" stop-color="#ffff00" />
-                <stop offset="33%" stop-color="#00ff00" />
-                <stop offset="50%" stop-color="#00ffff" />
-                <stop offset="67%" stop-color="#0000ff" />
-                <stop offset="83%" stop-color="#ff00ff" />
-                <stop offset="100%" stop-color="#ff0000" />
-              </linearGradient>
-              <linearGradient id="grad-s" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#ff0000" id="sat-stop-0" />
-                <stop offset="50%" stop-color="#808080" id="sat-stop-1" />
-                <stop offset="100%" stop-color="#ff0000" id="sat-stop-2" />
-              </linearGradient>
-              <linearGradient id="grad-l" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#ffffff" />
-                <stop offset="25%" stop-color="#ff0000" id="light-stop-mid1" />
-                <stop offset="50%" stop-color="#000000" />
-                <stop offset="75%" stop-color="#ff0000" id="light-stop-mid2" />
-                <stop offset="100%" stop-color="#ffffff" />
-              </linearGradient>
-            </defs>
-
-            <!-- Scrollable Tapes -->
-            <g id="tapes-group" filter="url(#track-blur)" opacity="0.9">
-              <g id="tape-h">
-                <rect x="0" y="-1500" width="33.34%" height="1500" fill="url(#grad-h)" />
-                <rect x="0" y="0" width="33.34%" height="1500" fill="url(#grad-h)" />
-                <rect x="0" y="1500" width="33.34%" height="1500" fill="url(#grad-h)" />
-              </g>
-              <g id="tape-s">
-                <rect x="33.33%" y="-1500" width="33.34%" height="1500" fill="url(#grad-s)" />
-                <rect x="33.33%" y="0" width="33.34%" height="1500" fill="url(#grad-s)" />
-                <rect x="33.33%" y="1500" width="33.34%" height="1500" fill="url(#grad-s)" />
-              </g>
-              <g id="tape-l">
-                <rect x="66.66%" y="-1500" width="33.34%" height="1500" fill="url(#grad-l)" />
-                <rect x="66.66%" y="0" width="33.34%" height="1500" fill="url(#grad-l)" />
-                <rect x="66.66%" y="1500" width="33.34%" height="1500" fill="url(#grad-l)" />
-              </g>
-            </g>
-
-            <!-- Center Picking Line -->
-            <line id="center-line" x1="0" y1="50%" x2="100%" y2="50%" stroke="#fff" stroke-width="8" style="pointer-events: none;" />
-
-            <!-- Invisible Touch Areas -->
-            <rect id="touch-h" x="0%" y="0" width="33.33%" height="100%" fill="transparent" style="cursor: grab;" />
-            <rect id="touch-s" x="33.33%" y="0" width="33.34%" height="100%" fill="transparent" style="cursor: grab;" />
-            <rect id="touch-l" x="66.66%" y="0" width="33.34%" height="100%" fill="transparent" style="cursor: grab;" />
-          </svg>
-        </div>
-        
-        ${tutorialHTML}
         <button id="submit-btn" class="submit-minimal-btn">DONE</button>
       </div>
     `;

@@ -1049,6 +1049,201 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
+  animation: gradientPlaceholder 3s ease infinite;
+  transition: opacity 0.3s ease;
+}
+
+@keyframes gradientPlaceholder {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.blink-cursor {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  margin-left: 4px;
+  -webkit-text-fill-color: rgba(255,255,255,0.8);
+  animation: blinkCursor 1s step-end infinite;
+}
+
+@keyframes blinkCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+input.minimal-input:focus + .custom-placeholder,
+input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
+  opacity: 0;
+}
+
+.difficulty-group {
+  margin-bottom: max(2vh, 1.5rem);
+}
+
+.diff-label {
+  display: block;
+  font-family: 'Paperlogy', sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.9rem, 2vh, 1.2rem);
+  color: #000;
+  margin-bottom: max(1vh, 0.5rem);
+}
+
+.radio-group.clean {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
+}
+
+.radio-group.clean label {
+  font-family: 'Paperlogy', sans-serif;
+  font-weight: 400;
+  font-size: clamp(0.9rem, 2.5vh, 1.2rem);
+  color: #000;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.radio-group.clean input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #000;
+  border-radius: 50%;
+  outline: none;
+  transition: all 0.2s;
+  position: relative;
+  cursor: pointer;
+  margin: 0;
+}
+
+.radio-group.clean input[type="radio"]:checked {
+  border-color: #000;
+}
+
+.radio-group.clean input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: #000;
+  border-radius: 50%;
+}
+
+.magazine-start-btn {
+  font-family: 'Paperlogy', sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.1rem, 2.5vh, 1.4rem);
+  color: #fff;
+  background: #000;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.3s;
+  text-transform: uppercase;
+  margin-top: max(1vh, 0.5rem);
+  letter-spacing: 3px;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.magazine-start-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.magazine-start-btn:not(:disabled):hover {
+  transform: translateY(-4px);
+  opacity: 0.9;
+}
+
+.magazine-start-btn:not(:disabled):active {
+  transform: translateY(2px);
+  opacity: 1;
+}
+
+/* === Responsive Adjustments === */
+@media (max-width: 768px) {
+  .magazine-entry {
+    padding: 8vw;
+    padding-top: 8vh;
+    padding-bottom: 8vh;
+  }
+  
+  .magazine-title {
+    font-size: 16vw;
+    margin-bottom: 2rem;
+  }
+  
+  input[type="text"].minimal-input {
+    font-size: 1.2rem;
+    padding: 0.8rem 0;
+    margin-bottom: 2rem;
+  }
+  
+  .diff-label {
+    font-size: 1rem;
+  }
+  
+  .radio-group.clean label {
+    font-size: 1rem;
+  }
+  
+  .magazine-start-btn {
+    font-size: 1.1rem;
+    width: 100%;
+    padding: 1rem 2rem;
+    min-height: 56px;
+  }
+  
+  /* 모바일 세로 화면에서는 슬라이더들이 너무 많은 자리를 차지하지 않도록 폭만 줄여줍니다 (세로 UI 유지) */
+  .custom-v-slider-wrapper {
+    width: clamp(20px, 8vw, 40px);
+  }
+}
+
+@keyframes double-bounce {
+  0% { transform: scale(0.5); opacity: 0; }
+  30% { transform: scale(1.3); opacity: 1; }
+  60% { transform: scale(0.9); }
+  80% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.anim-double-bounce {
+  animation: double-bounce 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes score-impact {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.2); text-shadow: 0 0 20px rgba(255,255,255,0.8); }
+  60% { transform: scale(0.95); }
+  100% { transform: scale(1); text-shadow: none; }
+}
+
+.anim-score-impact {
+  display: inline-block;
+  animation: score-impact 0.5s ease-out forwards;
+}
+
+/* 공유 카드 미리보기 모달 애니메이션 */
+@keyframes shareCardPop {
+  0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 #copy-url-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(118,75,162,0.5);
@@ -1057,4 +1252,43 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 #share-close-btn:hover {
   background: rgba(255,255,255,0.15);
   color: rgba(255,255,255,0.9);
+}
+
+/* 중앙 슬라이더 래퍼 및 블러 영역 */
+.slider-panel-wrapper {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 25%;
+  width: 50%;
+  z-index: 10;
+  pointer-events: none;
+  overflow: hidden;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
+}
+
+.slider-panel-blur {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(80px);
+  -webkit-backdrop-filter: blur(80px);
+  background: rgba(255, 255, 255, 0.04);
+  z-index: 5;
+}
+
+/* 모바일 대응 미디어 쿼리 (가로폭이 좁은 기기) */
+@media (max-width: 768px) {
+  .slider-panel-wrapper {
+    left: 15%;
+    width: 70%;
+  }
+}
+
+@media (max-width: 480px) {
+  .slider-panel-wrapper {
+    left: 10%;
+    width: 80%;
+  }
 }
