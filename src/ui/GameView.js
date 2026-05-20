@@ -253,6 +253,7 @@ export function renderGameView(container, nav) {
         
         this.rotation = - ((value - min) / (max - min) * 360);
         this.lastTickedValue = Math.round(value);
+        this._pulseToggle = false;
         
         this.updateTransform();
         this.dialKnob.addEventListener('pointerdown', this.onDown.bind(this));
@@ -334,7 +335,12 @@ export function renderGameView(container, nav) {
       
       triggerPulse() {
         if (!this.valueDisplay) return;
-        this.valueDisplay.style.transform = 'scale(1.35)';
+        
+        // 지그재그 토글 값 생성 (연속 회전 시 커진 상태에 머무는 현상 방지)
+        this._pulseToggle = !this._pulseToggle;
+        const scaleVal = this._pulseToggle ? 1.35 : 1.15;
+        this.valueDisplay.style.transform = `scale(${scaleVal})`;
+        
         if (this._pulseTimeout) clearTimeout(this._pulseTimeout);
         this._pulseTimeout = setTimeout(() => {
           this.valueDisplay.style.transform = 'scale(1)';
