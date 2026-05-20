@@ -286,5 +286,141 @@
     "difficulty": "Hard",
     "session_id": "12693cb1-5d73-4676-9fa1-60d163e87e49",
     "created_at": "2026-05-19T08:02:49.520Z"
+  },
+  {
+    "player_name": "삼성",
+    "origin_game": "마비노기 모바일",
+    "score": 2086,
+    "difficulty": "Hard",
+    "session_id": "8facca1b-9b63-4e65-930a-c42dad0fd28f",
+    "created_at": "2026-05-19T08:20:01.867Z"
+  },
+  {
+    "player_name": "현대",
+    "origin_game": "마비노기 모바일",
+    "score": 129,
+    "difficulty": "Normal",
+    "session_id": "c75eef2d-1ece-4702-b366-7b64e94bac5a",
+    "created_at": "2026-05-19T08:25:18.609Z"
+  },
+  {
+    "player_name": "원희",
+    "origin_game": "마비노기 모바일",
+    "score": 1791,
+    "difficulty": "Hard",
+    "session_id": "525e7ce1-4de4-4923-bdf6-fc62de01640a",
+    "created_at": "2026-05-19T08:33:46.352Z"
+  },
+  {
+    "player_name": "소주과일석류과일",
+    "origin_game": "마비노기 모바일",
+    "score": 2083,
+    "difficulty": "Hard",
+    "session_id": "08895400-7ceb-43b6-be60-1d523a7f41ca",
+    "created_at": "2026-05-19T08:35:31.039Z"
+  },
+  {
+    "player_name": "잇지",
+    "origin_game": "마비노기 모바일",
+    "score": 1123,
+    "difficulty": "Hard",
+    "session_id": "a9fa082c-f825-45e0-a2ac-3687d691deb1",
+    "created_at": "2026-05-19T08:49:24.026Z"
+  },
+  {
+    "player_name": "신류진",
+    "origin_game": "마비노기 모바일",
+    "score": 1537,
+    "difficulty": "Hard",
+    "session_id": "d0af4fd7-b5f3-46b5-a3c7-a14d6814a71b",
+    "created_at": "2026-05-19T08:51:48.209Z"
+  },
+  {
+    "player_name": "유나",
+    "origin_game": "마비노기 모바일",
+    "score": 121,
+    "difficulty": "Hard",
+    "session_id": "4eb72177-a8ea-4c7f-a0db-7c0eb8009b6c",
+    "created_at": "2026-05-19T09:02:44.585Z"
+  },
+  {
+    "player_name": "테스터",
+    "origin_game": "마비노기 모바일",
+    "score": 322,
+    "difficulty": "Normal",
+    "session_id": "1a4585c8-c4a6-4bab-8495-e41db157bc63",
+    "created_at": "2026-05-19T09:05:59.401Z"
+  },
+  {
+    "player_name": "54",
+    "origin_game": "마비노기 모바일",
+    "score": 1570,
+    "difficulty": "Hard",
+    "session_id": "b02a2a8d-6932-47c1-b374-28f7f1aa0842",
+    "created_at": "2026-05-19T09:23:42.077Z"
+  },
+  {
+    "player_name": "76",
+    "origin_game": "마비노기 모바일",
+    "score": 1444,
+    "difficulty": "Hard",
+    "session_id": "d9650f7d-520f-41e2-8226-42cffbfe0b0d",
+    "created_at": "2026-05-19T09:25:12.772Z"
+  },
+  {
+    "player_name": "88",
+    "origin_game": "마비노기 모바일",
+    "score": 1618,
+    "difficulty": "Hard",
+    "session_id": "fbbe62cd-a43b-4eae-9cac-7994f7348eaf",
+    "created_at": "2026-05-19T09:30:14.804Z"
+  },
+  {
+    "player_name": "류진",
+    "origin_game": "마비노기 모바일",
+    "score": 1854,
+    "difficulty": "Hard",
+    "session_id": "e4f7bbfd-fc1f-4c78-a746-b6cc044017c7",
+    "created_at": "2026-05-19T09:42:04.146Z"
+  },
+  {
+    "player_name": "원히",
+    "origin_game": "마비노기 모바일",
+    "score": 1303,
+    "difficulty": "Hard",
+    "session_id": "7f13a4d8-6f29-4582-b68f-58913829d45d",
+    "created_at": "2026-05-19T09:44:44.501Z"
+  },
+  {
+    "player_name": "카리나도마",
+    "origin_game": "마비노기 모바일",
+    "score": 1545,
+    "difficulty": "Hard",
+    "session_id": "17b14e8d-c456-48f8-9b24-98c4c98fb7b8",
+    "created_at": "2026-05-19T09:47:15.458Z"
+  },
+  {
+    "player_name": "명도반",
+    "origin_game": "마비노기 모바일",
+    "score": 697,
+    "difficulty": "Hard",
+    "session_id": "6eebb6eb-af8a-49f5-adf8-541e801774a9",
+    "created_at": "2026-05-19T09:48:37.212Z"
+  },
+  {
+    "player_name": "범인",
+    "origin_game": "마비노기 모바일",
+    "score": 1597,
+    "difficulty": "Hard",
+    "session_id": "bba21ded-8081-4096-89be-ff0888cf590b",
+    "created_at": "2026-05-19T09:49:31.618Z"
+  },
+  {
+    "player_name": "비전84",
+    "origin_game": "마비노기 모바일",
+    "score": 1418,
+    "difficulty": "Hard",
+    "session_id": "6f5057c2-c247-4cdf-90f3-ad4e9a892002",
+    "created_at": "2026-05-19T09:51:19.584Z"
   }
 ]

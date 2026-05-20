@@ -348,19 +348,46 @@ export function renderGameView(container, nav) {
     document.addEventListener('pointermove', logPointerMove);
     updateColor();
 
-    const shuffleDuration = 500;
+    const startH = currentH;
+    const startS = currentS;
+    const startL = currentL;
+
+    const shuffleDuration = 600;
     const shuffleStartTime = performance.now();
 
     function doShuffle(now) {
       const elapsed = now - shuffleStartTime;
-      if (elapsed >= shuffleDuration || !isMixing) {
+      const progress = Math.min(elapsed / shuffleDuration, 1);
+
+      if (progress >= 1 || !isMixing) {
+        hueSlider.value = startH;
+        satSlider.value = startS;
+        lightSlider.value = startL;
+
+        currentH = startH;
+        currentS = startS;
+        currentL = startL;
+
+        hueSlider.updateTransform();
+        satSlider.updateTransform();
+        lightSlider.updateTransform();
+        updateColor();
+
         stopShuffle();
         return;
       }
 
-      hueSlider.value = Math.floor(Math.random() * 360);
-      satSlider.value = Math.floor(Math.random() * 100);
-      lightSlider.value = Math.floor(Math.random() * 100);
+      // 사인 곡선을 활용하여 스르륵 힌트용 부드러운 왕복 모션 적용
+      const ease = Math.sin(progress * Math.PI);
+      const easeDouble = Math.sin(progress * Math.PI * 2);
+
+      const hVal = startH + ease * 45;
+      const sVal = startS - ease * 20;
+      const lVal = startL + easeDouble * 15;
+
+      hueSlider.value = (Math.round(hVal) + 360) % 360;
+      satSlider.value = Math.max(0, Math.min(100, Math.round(sVal)));
+      lightSlider.value = Math.max(0, Math.min(100, Math.round(lVal)));
 
       currentH = hueSlider.value;
       currentS = satSlider.value;
