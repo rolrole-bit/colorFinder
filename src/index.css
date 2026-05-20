@@ -663,7 +663,6 @@ input[type="range"]::-webkit-slider-thumb:active {
   padding: clamp(1.5rem, 4vh, 3rem);
   padding-bottom: 6rem;
   box-sizing: border-box;
-  z-index: 1;
 }
 
 .magazine-content {
@@ -1477,6 +1476,12 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   border-color: rgba(255, 255, 255, 0.4) !important;
   isolation: isolate;
   mix-blend-mode: normal;
+}
+
+/* rank-item 내부의 텍스트에 다시 명도 반전을 주어 가독성 확보 */
+.split-screen-result .magazine-content .rank-item * {
+  mix-blend-mode: difference;
+  color: #ffffff !important;
 }
 
 /* 보너스 텍스트 및 한줄평 인라인 스타일 오버라이드 */
