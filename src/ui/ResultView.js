@@ -43,7 +43,7 @@ export function renderInterimResultView(container, nav) {
       <div class="split-screen-half" style="background-color: ${userRGB};"></div>
       
       <!-- 매거진 오버레이 -->
-      <div class="magazine-overlay" style="mix-blend-mode: difference; color: #ffffff; filter: contrast(200%) brightness(120%);">
+      <div class="magazine-overlay" style="mix-blend-mode: difference; color: #ffffff; filter: contrast(500%) brightness(150%);">
         
         <!-- 상단 라운드 표시 -->
         <div style="display: flex; justify-content: flex-start; width: 100%; flex-shrink: 0; margin-bottom: auto; padding-left: 2vw;">

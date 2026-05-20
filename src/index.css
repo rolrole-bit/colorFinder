@@ -1353,7 +1353,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   transform-origin: bottom center;
   transition: transform 0.05s ease-out;
   mix-blend-mode: difference;
-  filter: contrast(200%) brightness(120%);
+  filter: contrast(500%) brightness(150%);
 }
 
 
@@ -1456,7 +1456,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 /* 매거진 컨텐츠 전체에 명도 반전 연산을 적용하여 스코어 화면의 가독성을 극대화 */
 .split-screen-result .magazine-content {
   mix-blend-mode: difference;
-  filter: contrast(200%) brightness(120%);
+  filter: contrast(500%) brightness(150%);
 }
 
 /* 모든 텍스트와 자식 요소들을 순백색으로 지정하여 배경의 완벽한 보색을 유도 */
