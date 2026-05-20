@@ -129,7 +129,7 @@ export function renderGameView(container, nav) {
                 ${getTutSvg(0)}
               </div>
               <div class="dial-indicator-arrow">▲</div>
-              <div class="dial-value" id="dial-h-value">0°</div>
+              <div class="dial-value" id="dial-h-value"></div>
             </div>
             
             <!-- S 다이얼 (채도) -->
@@ -141,7 +141,7 @@ export function renderGameView(container, nav) {
                 ${getTutSvg(1)}
               </div>
               <div class="dial-indicator-arrow">▲</div>
-              <div class="dial-value" id="dial-s-value">0%</div>
+              <div class="dial-value" id="dial-s-value"></div>
             </div>
             
             <!-- B 다이얼 (명도) -->
@@ -153,7 +153,7 @@ export function renderGameView(container, nav) {
                 ${getTutSvg(2)}
               </div>
               <div class="dial-indicator-arrow">▲</div>
-              <div class="dial-value" id="dial-b-value">0%</div>
+              <div class="dial-value" id="dial-b-value"></div>
             </div>
           </div>
         </div>
@@ -277,11 +277,7 @@ export function renderGameView(container, nav) {
         let val = this.min + pct * (this.max - this.min);
         
         const rounded = Math.round(val);
-        if (this.type === 'H') {
-          this.valueDisplay.textContent = `${rounded}°`;
-        } else {
-          this.valueDisplay.textContent = `${rounded}%`;
-        }
+        // 텍스트 대신 동그란 색상으로 표시하기 위해 텍스트 업데이트 로직 제거
       }
       
       onDown(e) {
@@ -400,6 +396,16 @@ export function renderGameView(container, nav) {
       if (bWheel) {
         bWheel.style.background = `conic-gradient(from 180deg, #000000 0%, hsl(${currentH}, ${currentS}%, 50%) 50%, #ffffff 100%)`;
       }
+
+      // 하단 다이얼 수치 뱃지를 컬러 서클로 표현
+      const hVal = document.getElementById('dial-h-value');
+      if (hVal) hVal.style.backgroundColor = `hsl(${currentH}, 100%, 50%)`;
+
+      const sVal = document.getElementById('dial-s-value');
+      if (sVal) sVal.style.backgroundColor = `hsl(${currentH}, ${currentS}%, 50%)`;
+
+      const bVal = document.getElementById('dial-b-value');
+      if (bVal) bVal.style.backgroundColor = `hsl(${currentH}, ${currentS}%, ${currentL}%)`;
     };
 
     const hueDial = new RotaryDial({

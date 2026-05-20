@@ -86,43 +86,43 @@ body {
 }
 
 /* Animated Tapes Background for Entry View */
-.bg-tapes-container {
+.entry-bg {
   position: fixed;
   top: 0; left: 0;
   width: 100vw; height: 100vh;
   z-index: -2;
   overflow: hidden;
-  background: #0f1115;
+  background: #fdfdff;
 }
 
 .bg-tape {
   position: absolute;
   top: -200vh;
-  width: 33.33%;
+  width: 45%;
   height: 500vh;
   filter: blur(140px);
-  opacity: 0.85;
+  opacity: 1;
 }
 
 .bg-tape-1 {
-  left: 0;
-  background: linear-gradient(to bottom, #ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000);
+  left: -5%;
+  background: linear-gradient(to bottom, #a8c0ff, #c2d5ff, #a8c0ff);
   background-size: 100% 400vh;
   animation: bgTapeInteract1 24s infinite;
 }
 
 .bg-tape-2 {
-  left: 33.33%;
-  background: linear-gradient(to bottom, #ff0000, #808080, #ff0000);
+  left: 30%;
+  background: linear-gradient(to bottom, #c2d5ff, #e2c2ff, #c2d5ff);
   background-size: 100% 400vh;
-  animation: bgTapeInteract2 30s infinite, syncHueRotate 24s infinite;
+  animation: bgTapeInteract2 30s infinite;
 }
 
 .bg-tape-3 {
-  left: 66.66%;
-  background: linear-gradient(to bottom, #ffffff, #ff0000, #000000, #ffffff);
+  left: 65%;
+  background: linear-gradient(to bottom, #e2c2ff, #ffc2db, #e2c2ff);
   background-size: 100% 400vh;
-  animation: bgTapeInteract3 27s infinite, syncHueRotate 24s infinite;
+  animation: bgTapeInteract3 27s infinite;
 }
 
 @keyframes bgTapeInteract1 {
@@ -1376,18 +1376,17 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 }
 
 .dial-value {
-  font-family: 'Paperlogy', sans-serif;
-  font-size: clamp(0.8rem, 1.2vw, 1rem);
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.85);
-  margin-top: 0.1rem;
-  background: rgba(0, 0, 0, 0.25);
-  padding: 0.2rem 0.6rem;
-  border-radius: 6px;
-  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  margin-top: 0.2rem;
+  background: transparent;
   pointer-events: none;
-  min-width: 48px;
-  text-align: center;
+  font-size: 0;
+  color: transparent;
+  flex-shrink: 0;
 }
 
 /* 모바일 세로 좁은 화면 가로 배열 보장 */
