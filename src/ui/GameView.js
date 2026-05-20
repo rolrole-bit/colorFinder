@@ -79,29 +79,39 @@ export function renderGameView(container, nav) {
     if (isFirstRound) {
       tutorialHTML = `
         <div id="tutorial-overlay" style="position: absolute; inset: 0; pointer-events: none; z-index: 15; transition: opacity 0.8s ease; opacity: 0.85;">
-          <!-- 1번째 H 화살표 -->
-          <div class="tutorial-arrow-item" style="position: absolute; left: 16.66%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center;">
-             <svg width="40" height="240" viewBox="0 0 40 240" fill="none">
-                <path d="M20 20 L20 220" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 6"/>
-                <path d="M10 30 L20 20 L30 30" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M10 210 L20 220 L30 210" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-             </svg>
-          </div>
-          <!-- 2번째 S 화살표 -->
-          <div class="tutorial-arrow-item" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center;">
-             <svg width="40" height="240" viewBox="0 0 40 240" fill="none">
-                <path d="M20 20 L20 220" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 6"/>
-                <path d="M10 30 L20 20 L30 30" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M10 210 L20 220 L30 210" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-             </svg>
-          </div>
-          <!-- 3번째 L 화살표 -->
-          <div class="tutorial-arrow-item" style="position: absolute; left: 83.33%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center;">
-             <svg width="40" height="240" viewBox="0 0 40 240" fill="none">
-                <path d="M20 20 L20 220" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 6"/>
-                <path d="M10 30 L20 20 L30 30" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M10 210 L20 220 L30 210" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-             </svg>
+          <style>
+            @keyframes hintSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            .tutorial-svg { position: absolute; width: 140%; height: 140%; animation: hintSpin 8s linear infinite; filter: drop-shadow(0 0 4px rgba(0,0,0,0.5)); }
+            .tutorial-dial-spacer { width: clamp(90px, 12vw, 130px); height: clamp(90px, 12vw, 130px); position: relative; display: flex; justify-content: center; align-items: center; }
+          </style>
+          <div style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; gap: clamp(1.2rem, 4vw, 3rem); padding-bottom: 2rem;">
+            <!-- H -->
+            <div class="tutorial-dial-spacer">
+              <svg class="tutorial-svg" viewBox="0 0 160 160" fill="none">
+                <path d="M 80 15 A 65 65 0 0 1 145 80" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
+                <path d="M 132 70 L 145 80 L 158 70" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M 80 145 A 65 65 0 0 1 15 80" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
+                <path d="M 2 90 L 15 80 L 28 90" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <!-- S -->
+            <div class="tutorial-dial-spacer">
+              <svg class="tutorial-svg" viewBox="0 0 160 160" fill="none">
+                <path d="M 80 15 A 65 65 0 0 1 145 80" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
+                <path d="M 132 70 L 145 80 L 158 70" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M 80 145 A 65 65 0 0 1 15 80" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
+                <path d="M 2 90 L 15 80 L 28 90" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <!-- B -->
+            <div class="tutorial-dial-spacer">
+              <svg class="tutorial-svg" viewBox="0 0 160 160" fill="none">
+                <path d="M 80 15 A 65 65 0 0 1 145 80" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
+                <path d="M 132 70 L 145 80 L 158 70" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M 80 145 A 65 65 0 0 1 15 80" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
+                <path d="M 2 90 L 15 80 L 28 90" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
           </div>
         </div>
       `;
