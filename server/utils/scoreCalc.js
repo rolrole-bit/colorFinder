@@ -133,13 +133,13 @@ function hslToRgb(h, s, l) {
 }
 
 /**
- * 랜덤 파스텔톤 컬러 생성
- * 너무 어두운 색상 대신, 밝고 예쁜 파스텔톤 위주로 생성
+ * 랜덤 RGB 색상 생성 (전체 컬러 범위 무작위)
  * @returns {{r: number, g: number, b: number}}
  */
 export function getRandomColor() {
-  const h = Math.random();           // 모든 색상 (0~1)
-  const s = 0.6 + Math.random() * 0.4; // 채도: 60% ~ 100% (선명하게)
-  const l = 0.7 + Math.random() * 0.2; // 명도: 70% ~ 90% (밝게, 파스텔톤)
-  return hslToRgb(h, s, l);
+  return {
+    r: Math.floor(Math.random() * 256),
+    g: Math.floor(Math.random() * 256),
+    b: Math.floor(Math.random() * 256)
+  };
 }
