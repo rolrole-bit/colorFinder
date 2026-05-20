@@ -51,11 +51,12 @@ body {
   font-family: 'Paperlogy', 'Inter', sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  min-height: 100vh;
+  height: 100vh;
+  margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 @keyframes rotateAurora {

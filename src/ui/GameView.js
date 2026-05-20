@@ -397,15 +397,15 @@ export function renderGameView(container, nav) {
         bWheel.style.background = `conic-gradient(from 180deg, #000000 0%, hsl(${currentH}, ${currentS}%, 50%) 50%, #ffffff 100%)`;
       }
 
-      // 하단 다이얼 수치 뱃지를 컬러 서클로 표현
+      // 하단 다이얼 수치 뱃지를 컬러 서클로 표현 (소수점으로 인한 CSS 파싱 오류 방지를 위해 반올림)
       const hVal = document.getElementById('dial-h-value');
-      if (hVal) hVal.style.backgroundColor = `hsl(${currentH}, 100%, 50%)`;
+      if (hVal) hVal.style.background = `hsl(${Math.round(currentH)}, 100%, 50%)`;
 
       const sVal = document.getElementById('dial-s-value');
-      if (sVal) sVal.style.backgroundColor = `hsl(${currentH}, ${currentS}%, 50%)`;
+      if (sVal) sVal.style.background = `hsl(${Math.round(currentH)}, ${Math.round(currentS)}%, 50%)`;
 
       const bVal = document.getElementById('dial-b-value');
-      if (bVal) bVal.style.backgroundColor = `hsl(${currentH}, ${currentS}%, ${currentL}%)`;
+      if (bVal) bVal.style.background = `hsl(${Math.round(currentH)}, ${Math.round(currentS)}%, ${Math.round(currentL)}%)`;
     };
 
     const hueDial = new RotaryDial({
