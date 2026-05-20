@@ -582,5 +582,13 @@
     "difficulty": "Normal",
     "session_id": "444783ea-0047-4863-b8cf-7a29713d9906",
     "created_at": "2026-05-20T10:24:56.623Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 1387,
+    "difficulty": "Normal",
+    "session_id": "c0d1603f-b619-462d-add7-7d2d2cd43ed7",
+    "created_at": "2026-05-20T13:20:11.042Z"
   }
 ]

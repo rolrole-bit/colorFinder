@@ -158,7 +158,7 @@ export function renderGameView(container, nav) {
           </div>
         </div>
         
-        <button id="submit-btn" class="magazine-start-btn submit-minimal-btn">
+        <button id="submit-btn" class="submit-minimal-btn">
           <span class="btn-main-text">DYE IT</span>
           <span class="btn-sub-text" id="submit-btn-sub">#000000</span>
         </button>
@@ -272,7 +272,12 @@ export function renderGameView(container, nav) {
       updateTransform() {
         this.dialKnob.style.transform = `rotate(${this.rotation}deg)`;
         
-        let pct = ((-this.rotation % 360) + 360) % 360 / 360;
+        let pct;
+        if (this.type !== 'H') {
+          pct = -this.rotation / 360;
+        } else {
+          pct = ((-this.rotation % 360) + 360) % 360 / 360;
+        }
         let val = this.min + pct * (this.max - this.min);
         
         const rounded = Math.round(val);
@@ -302,9 +307,18 @@ export function renderGameView(container, nav) {
         if (delta < -180) delta += 360;
         
         this.rotation += delta;
+        if (this.type !== 'H') {
+          if (this.rotation > 0) this.rotation = 0;
+          if (this.rotation < -360) this.rotation = -360;
+        }
         this.lastPointerAngle = pointerAngle;
         
-        let pct = ((-this.rotation % 360) + 360) % 360 / 360;
+        let pct;
+        if (this.type !== 'H') {
+          pct = -this.rotation / 360;
+        } else {
+          pct = ((-this.rotation % 360) + 360) % 360 / 360;
+        }
         let val = this.min + pct * (this.max - this.min);
         
         this.updateTransform();
