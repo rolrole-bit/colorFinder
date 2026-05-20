@@ -1353,6 +1353,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   transform-origin: bottom center;
   transition: transform 0.05s ease-out;
   mix-blend-mode: difference;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.7));
 }
 
 
