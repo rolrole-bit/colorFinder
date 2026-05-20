@@ -125,11 +125,11 @@ export function renderGameView(container, nav) {
               <div style="position: relative; width: 100%; display: flex; justify-content: center;">
                 <div class="dial-knob" id="dial-h">
                   <div class="dial-wheel" id="dial-wheel-h"></div>
+                  <div class="dial-value" id="dial-h-value"></div>
                 </div>
                 ${getTutSvg(0)}
               </div>
-              <div class="dial-indicator-arrow">▲</div>
-              <div class="dial-value" id="dial-h-value"></div>
+              <div class="dial-indicator-arrow" id="dial-h-arrow">▲</div>
             </div>
             
             <!-- S 다이얼 (채도) -->
@@ -137,11 +137,11 @@ export function renderGameView(container, nav) {
               <div style="position: relative; width: 100%; display: flex; justify-content: center;">
                 <div class="dial-knob" id="dial-s">
                   <div class="dial-wheel" id="dial-wheel-s"></div>
+                  <div class="dial-value" id="dial-s-value"></div>
                 </div>
                 ${getTutSvg(1)}
               </div>
-              <div class="dial-indicator-arrow">▲</div>
-              <div class="dial-value" id="dial-s-value"></div>
+              <div class="dial-indicator-arrow" id="dial-s-arrow">▲</div>
             </div>
             
             <!-- B 다이얼 (명도) -->
@@ -149,11 +149,11 @@ export function renderGameView(container, nav) {
               <div style="position: relative; width: 100%; display: flex; justify-content: center;">
                 <div class="dial-knob" id="dial-b">
                   <div class="dial-wheel" id="dial-wheel-b"></div>
+                  <div class="dial-value" id="dial-b-value"></div>
                 </div>
                 ${getTutSvg(2)}
               </div>
-              <div class="dial-indicator-arrow">▲</div>
-              <div class="dial-value" id="dial-b-value"></div>
+              <div class="dial-indicator-arrow" id="dial-b-arrow">▲</div>
             </div>
           </div>
         </div>
@@ -241,6 +241,7 @@ export function renderGameView(container, nav) {
         this.wrapperEl = wrapperEl;
         this.dialKnob = wrapperEl.querySelector('.dial-knob');
         this.valueDisplay = wrapperEl.querySelector('.dial-value');
+        this.indicator = wrapperEl.querySelector('.dial-indicator-arrow');
         this.min = min;
         this.max = max;
         this.type = type;
@@ -325,6 +326,12 @@ export function renderGameView(container, nav) {
         
         const roundedVal = Math.round(val);
         if (roundedVal !== this.lastTickedValue) {
+          if (this.indicator && delta !== 0) {
+            this.indicator.classList.remove('tick-left', 'tick-right');
+            void this.indicator.offsetWidth; // force reflow
+            this.indicator.classList.add(delta > 0 ? 'tick-right' : 'tick-left');
+          }
+          
           playSliderTickSound();
           this.lastTickedValue = roundedVal;
           this.triggerPulse();
