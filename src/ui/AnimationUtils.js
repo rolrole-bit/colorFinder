@@ -72,12 +72,24 @@ export const animateValue = (element, start, end, duration, isInteger = false, p
   return new Promise(resolve => {
     let startTimestamp = null;
     let lastTick = 0;
+    const maxBlur = 5; // 최대 5px 블러 적용
+    
     const step = (timestamp) => {
       if (!startTimestamp) startTimestamp = timestamp;
       const progress = Math.min((timestamp - startTimestamp) / duration, 1);
       const easeProgress = progress * (2 - progress); // ease-out quad
       const current = start + (end - start) * easeProgress;
       element.innerHTML = isInteger ? Math.floor(current).toLocaleString() : current.toFixed(1);
+      
+      // 모션 블러 효과 적용 (진행도가 낮을수록 속도가 빠르므로 더 강한 블러)
+      const currentBlur = (1 - progress) * maxBlur;
+      if (element) {
+        if (progress < 1 && currentBlur > 0.2) {
+          element.style.filter = `blur(${currentBlur.toFixed(2)}px)`;
+        } else {
+          element.style.filter = 'none';
+        }
+      }
       
       if (playSound && timestamp - lastTick > 40) {
         playScoreTickSound(progress);
@@ -88,6 +100,7 @@ export const animateValue = (element, start, end, duration, isInteger = false, p
         window.requestAnimationFrame(step);
       } else {
         element.innerHTML = isInteger ? Math.floor(end).toLocaleString() : end.toFixed(1);
+        if (element) element.style.filter = 'none';
         resolve();
       }
     };
