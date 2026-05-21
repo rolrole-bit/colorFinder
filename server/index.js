@@ -140,15 +140,28 @@ app.use('/share', shareRoutes);
 // ═══════════════════════════════════════════
 
 const projectRoot = join(__dirname, '..');
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ⛔ 정적 파일 캐시 정책 — 수정 시 주의 (HARNESS LOCK)
+ * ═══════════════════════════════════════════════════════════════════════════
+ * maxAge 를 0 이상으로 올리면 JS/CSS 변경이 브라우저에 반영되지 않음.
+ * 배포 환경에서만 maxAge 를 올릴 것. 이때 반드시 index.html 의
+ * ?v= 쿼리를 함께 업데이트해야 캐시 무효화됨.
+ * ═══════════════════════════════════════════════════════════════════════════ */
 app.use(express.static(projectRoot, {
   dotfiles: 'deny',
   index: 'index.html',
   etag: true,
   lastModified: true,
-  maxAge: 0,  // 개발 중 캐싱 비활성화 (배포 시 '1d'로 변경)
+  maxAge: 0,  // ⛔ 개발 중 0 유지 — 배포 시에만 변경
   setHeaders: (res, filePath) => {
     if (filePath.toLowerCase().endsWith('.js')) {
       res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    }
+    // JS/CSS: 캐싱 없이 항상 최신 (개발 중 필수)
+    if (/\.(js|css)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
     }
     // 폰트 파일: 1년 캐싱 (변경 거의 없음)
     if (/\.(woff2?|ttf|otf)$/i.test(filePath)) {

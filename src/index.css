@@ -728,6 +728,32 @@ input[type="range"]::-webkit-slider-thumb:active {
 
 
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ⛔ .magazine-title — 절대 수정 금지 (HARNESS LOCK)
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * 이 규칙의 동작 원리:
+ *   1. 글로벌 h1 규칙(line 174)이 -webkit-text-fill-color: transparent 를 적용함
+ *   2. -webkit-text-fill-color: transparent 는 어떤 color 속성보다 우선함
+ *   3. 따라서 color: #000 등으로 바꿔도 텍스트는 투명한 채로 유지됨
+ *   4. mix-blend-mode: difference + color: #fff 조합이 투명 텍스트를
+ *      배경과 블렌딩하여 시각적으로 보이게 만듦
+ *   5. filter: contrast + saturate + brightness 가 블렌딩 결과를 선명하게 증폭
+ *
+ * ⚠️ 수정 시 반드시 확인할 것:
+ *   - mix-blend-mode 를 제거하면 텍스트가 완전히 사라짐
+ *   - filter 를 제거하면 텍스트 대비가 매우 약해짐
+ *   - color 를 #fff 이외로 변경하면 블렌딩 결과가 예측 불가능해짐
+ *   - -webkit-text-fill-color: initial 은 일부 브라우저에서 transparent 로 해석됨
+ *     하지만 mix-blend-mode: difference 와 함께 사용하면 정상 작동
+ *
+ * ⚠️ 서버 캐시 주의:
+ *   - server/index.js 의 maxAge 설정으로 인해 CSS/JS 변경이 즉시 반영되지 않을 수 있음
+ *   - 변경 후 반드시 서버 재시작 + Ctrl+Shift+R 강력 새로고침 필요
+ *   - index.html 의 ?v= 쿼리 파라미터를 업데이트해야 캐시 무효화됨
+ *
+ * 마지막 검증: 2026-05-21 (commit 28f6f2c)
+ * ═══════════════════════════════════════════════════════════════════════════ */
 .magazine-title {
   font-family: 'Paperlogy', sans-serif;
   font-weight: 800;
@@ -737,10 +763,12 @@ input[type="range"]::-webkit-slider-thumb:active {
   margin-bottom: max(2vh, 1rem);
   text-align: left;
   
+  /* ⛔ 아래 3줄은 반드시 세트로 유지 — 하나라도 제거하면 타이틀 사라짐 */
   color: #fff !important;
   mix-blend-mode: difference;
   filter: contrast(1000%) saturate(300%) brightness(150%);
   
+  /* 글로벌 h1 그라디언트 배경 무력화 */
   background: none;
   -webkit-background-clip: unset;
   -webkit-text-fill-color: initial;
