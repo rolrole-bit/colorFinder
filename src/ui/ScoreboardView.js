@@ -7,10 +7,10 @@
 
 import { getState, resetGame, setDifficulty, getDifficultyName, getDifficultyMultiplier } from '../core/GameState.js';
 import { getGameRankings, getPlayerRankings, getTotalPlayers } from '../core/Ranking.js';
-import { toRGBString, rgbToHex } from '../utils/ColorUtils.js';
+import { toRGBString, rgbToHex, getHSLContrastColor } from '../utils/ColorUtils.js';
 import { escapeHTML, clearSession } from '../utils/AntiCheat.js';
 import { playBonusBounceSound, playScoreImpactSound } from '../utils/SoundUtils.js';
-import { getContrastYIQ, animateValue } from './AnimationUtils.js';
+import { animateValue } from './AnimationUtils.js';
 import { getScoreComment } from '../utils/ScoreComment.js';
 import { bindShareEvents } from './ShareManager.js';
 import { fireCenterConfetti } from '../utils/ConfettiUtils.js';
@@ -78,8 +78,8 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
   const targetRGB = toRGBString(state.targetColor);
   const userRGB = toRGBString(state.userColor);
   
-  const leftContrast = getContrastYIQ(state.targetColor.r, state.targetColor.g, state.targetColor.b);
-  const rightContrast = getContrastYIQ(state.userColor.r, state.userColor.g, state.userColor.b);
+  const leftContrast = getHSLContrastColor(state.targetColor.r, state.targetColor.g, state.targetColor.b);
+  const rightContrast = getHSLContrastColor(state.userColor.r, state.userColor.g, state.userColor.b);
 
   let targetGradient = targetRGB;
   let userGradient = userRGB;

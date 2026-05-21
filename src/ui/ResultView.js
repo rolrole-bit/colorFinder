@@ -5,11 +5,11 @@
  */
 
 import { getState, setScore, nextRound, getDifficultyMultiplier } from '../core/GameState.js';
-import { toRGBString, rgbToHex, rgbToHsl } from '../utils/ColorUtils.js';
+import { toRGBString, rgbToHex, rgbToHsl, getHSLContrastColor } from '../utils/ColorUtils.js';
 import { fireSideConfetti } from '../utils/ConfettiUtils.js';
 import { saveRecord } from '../core/Ranking.js';
 import { isSessionValid, clampScore } from '../utils/AntiCheat.js';
-import { getContrastYIQ, animateValue } from './AnimationUtils.js';
+import { animateValue } from './AnimationUtils.js';
 
 /**
  * 중간 결과 화면 렌더링
@@ -25,8 +25,8 @@ export function renderInterimResultView(container, nav) {
   const targetHex = rgbToHex(state.targetColor.r, state.targetColor.g, state.targetColor.b);
   const userHex = rgbToHex(state.userColor.r, state.userColor.g, state.userColor.b);
   
-  const leftContrast = getContrastYIQ(state.targetColor.r, state.targetColor.g, state.targetColor.b);
-  const rightContrast = getContrastYIQ(state.userColor.r, state.userColor.g, state.userColor.b);
+  const leftContrast = getHSLContrastColor(state.targetColor.r, state.targetColor.g, state.targetColor.b);
+  const rightContrast = getHSLContrastColor(state.userColor.r, state.userColor.g, state.userColor.b);
 
   const targetHsl = rgbToHsl(state.targetColor.r, state.targetColor.g, state.targetColor.b);
   const userHsl = rgbToHsl(state.userColor.r, state.userColor.g, state.userColor.b);

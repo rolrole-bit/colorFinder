@@ -4,7 +4,7 @@
  * 담당: 타겟 색상 기억 → HSL 슬라이더 조작 → 서버 점수 제출
  */
 
-import { getRandomColor, calculateScore, toRGBString, hslToRgb, rgbToHsl, rgbToHex } from '../utils/ColorUtils.js';
+import { getRandomColor, calculateScore, toRGBString, hslToRgb, rgbToHsl, rgbToHex, getHSLContrastColor } from '../utils/ColorUtils.js';
 import { getState, setTargetColor, setUserColor, setScore, setPhase, getDifficultyTime, addRoundResult } from '../core/GameState.js';
 import { submitRound } from '../core/ServerAPI.js';
 import { CustomVerticalSlider } from './CustomSlider.js';
@@ -16,7 +16,6 @@ import {
   logSliderChange,
   analyzeBehavior
 } from '../utils/AntiCheat.js';
-import { getContrastYIQ } from './AnimationUtils.js';
 
 /**
  * 게임 플레이 화면 렌더링
@@ -35,7 +34,7 @@ export function renderGameView(container, nav) {
   
   setPhase("MEMORIZE");
   const rgbString = toRGBString(targetColor);
-  const contrastYIQ = getContrastYIQ(targetColor.r, targetColor.g, targetColor.b);
+  const contrastYIQ = getHSLContrastColor(targetColor.r, targetColor.g, targetColor.b);
   const state = getState();
   
   container.innerHTML = `
@@ -388,7 +387,7 @@ export function renderGameView(container, nav) {
 
       // 배경 및 그래픽 요소 즉각 업데이트
       const immediateRgbStr = `rgb(${targetRGB.r}, ${targetRGB.g}, ${targetRGB.b})`;
-      const immediateContrast = getContrastYIQ(targetRGB.r, targetRGB.g, targetRGB.b);
+      const immediateContrast = getHSLContrastColor(targetRGB.r, targetRGB.g, targetRGB.b);
 
       if (guessBg) guessBg.style.backgroundColor = immediateRgbStr;
       if (outerBg) outerBg.style.background = immediateRgbStr;

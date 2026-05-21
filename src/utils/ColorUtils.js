@@ -74,6 +74,51 @@ export function getContrastColor(r, g, b) {
 }
 
 /**
+ * RGB 색상의 대비가 높은 HSL 보색을 계산하여 CSS HSL 문자열로 반환합니다.
+ * H(Hue)는 180도 회전(보색), S(Saturation)는 반전합니다.
+ * L(Lightness)은 기본 반전하되, 중간 영역(30% ~ 70%)에 속하면 밖으로 밀어냅니다.
+ * 
+ * @param {number} r - Red (0-255)
+ * @param {number} g - Green (0-255)
+ * @param {number} b - Blue (0-255)
+ * @returns {string} css hsl() color string
+ */
+export function getHSLContrastColor(r, g, b) {
+  if (r === undefined || g === undefined || b === undefined) {
+    return '#ffffff';
+  }
+
+  const hsl = rgbToHsl(r, g, b);
+  
+  // Hue 반전 (180도 보색)
+  const hContrast = (hsl.h + 180) % 360;
+  
+  // Saturation 반전 (가독성 최소 채도 30% 보정)
+  let sContrast = 100 - hsl.s;
+  if (sContrast < 30) {
+    sContrast = 30;
+  }
+  
+  // Lightness 반전
+  let lContrast = 100 - hsl.l;
+  
+  // 중간 명도 붉은 영역 (30% ~ 70%)인 경우 밀어내기 처리
+  const redZoneStart = 30;
+  const redZoneEnd = 70;
+  
+  if (lContrast >= redZoneStart && lContrast <= redZoneEnd) {
+    if (lContrast <= 50) {
+      lContrast = 15; // 어두운 영역으로 밀어내기
+    } else {
+      lContrast = 85; // 밝은 영역으로 밀어내기
+    }
+  }
+  
+  return `hsl(${hContrast}, ${sContrast}%, ${lContrast}%)`;
+}
+
+
+/**
  * RGB 객체를 CSS rgb() 문자열로 변환합니다.
  * @param {{r: number, g: number, b: number}} color 
  * @returns {string} css color string
