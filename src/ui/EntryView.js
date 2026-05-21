@@ -36,7 +36,7 @@ export function renderEntryView(container, nav) {
       </svg>
     </div>
     <div class="magazine-entry" id="entry-panel">
-      <h1 class="magazine-title">DYE<br/>MASTER</h1>
+      <div style="font-family:'Paperlogy',sans-serif; font-weight:800; font-size:clamp(3rem,10vh,10vw); line-height:0.9; letter-spacing:-0.02em; margin-bottom:max(2vh,1rem); text-align:left; color:#1a3a1a; -webkit-text-fill-color:#1a3a1a;">DYE<br/>MASTER</div>
       
       <div class="entry-form">
         <div class="form-group dropdown-container" style="position: relative;">
