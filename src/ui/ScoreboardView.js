@@ -113,7 +113,7 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
         <div class="magazine-content">
 
           <!-- 중앙 영역: 2컬럼 레이아웃 (좌측: 이름+점수 / 우측: 라운드별 점수 + 코멘트) -->
-          <div style="display: flex; flex-direction: row; flex-wrap: wrap; align-items: flex-end; justify-content: flex-start; gap: clamp(2rem, 5vw, 6rem); margin-bottom: 4rem; margin-top: 2rem; width: 100%; box-sizing: border-box; text-align: left;">
+          <div class="scoreboard-grid" style="align-items: flex-end; margin-bottom: 4rem; margin-top: 2rem; width: 100%; box-sizing: border-box; text-align: left;">
 
             <!-- 좌측 컬럼 -->
             <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start;">
