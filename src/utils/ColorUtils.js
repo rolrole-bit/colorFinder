@@ -41,28 +41,28 @@ export function rgbToLab(r, g, b) {
 }
 
 /**
- * 두 RGB 색상 간의 정확도를 CIE76 ΔE* 기반으로 점수를 계산합니다.
- * 인간의 시각적 인지와 일치하는 색차 공식을 사용합니다.
+ * 두 RGB 색상 간의 정확도를 RGB 유클리드 거리 기반으로 점수를 계산합니다.
+ * 
+ * 공식: score = round(1000 × (1 - diff / maxDiff))
+ *   - diff    = √((tR-uR)² + (tG-uG)² + (tB-uB)²)
+ *   - maxDiff = √(255²+255²+255²) ≈ 441.67
+ *   - 완전 일치 → 1000점, 최대 차이(흑↔백) → 0점
  * 
  * @param {{r: number, g: number, b: number}} target - 목표 색상
  * @param {{r: number, g: number, b: number}} user - 유저가 선택한 색상
  * @returns {number} 0 ~ 1000 (정수)
  */
 export function calculateScore(target, user) {
-  const lab1 = rgbToLab(target.r, target.g, target.b);
-  const lab2 = rgbToLab(user.r, user.g, user.b);
+  const MAX_DIFF = Math.sqrt(255 * 255 + 255 * 255 + 255 * 255); // ≈ 441.67
 
-  const deltaE = Math.sqrt(
-    Math.pow(lab1.L - lab2.L, 2) +
-    Math.pow(lab1.a - lab2.a, 2) +
-    Math.pow(lab1.b - lab2.b, 2)
+  const diff = Math.sqrt(
+    Math.pow(target.r - user.r, 2) +
+    Math.pow(target.g - user.g, 2) +
+    Math.pow(target.b - user.b, 2)
   );
 
-  const maxDelta = 100;
-  const accuracy = Math.max(0, (maxDelta - deltaE) / maxDelta);
-  const baseScore = Math.pow(accuracy, 2.5) * 1000;
-
-  return Math.floor(Math.max(0, Math.min(1000, baseScore)));
+  const score = Math.round(1000 * (1 - diff / MAX_DIFF));
+  return Math.max(0, Math.min(1000, score));
 }
 
 /**
