@@ -1390,6 +1390,9 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 .magazine-start-btn {
   font-family: 'Paperlogy', sans-serif !important;
   font-weight: 800 !important;
+  font-size: 1.1rem !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
   transition: transform 0.1s, opacity 0.3s, background 0.3s, box-shadow 0.3s !important;
   
   /* 버튼 형태(레이아웃) 붕괴 방지용 필수 속성 강제 복구 */
@@ -1398,7 +1401,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   justify-content: center !important;
   width: 100% !important;
   min-height: 56px !important;
-  padding: 1rem 2rem !important;
+  padding: 0.8rem 2.5rem !important;
   margin-top: 1.5rem !important;
   box-sizing: border-box !important;
   
@@ -1414,13 +1417,13 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   backdrop-filter: blur(20px) saturate(130%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
   color: rgba(255, 255, 255, 0.4) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
   box-shadow: none !important;
   opacity: 1 !important;
   cursor: not-allowed !important;
   transform: none !important;
   mix-blend-mode: normal !important;
-  border-radius: 12px !important;
+  border-radius: 9999px !important;
 }
 
 .magazine-start-btn:not(:disabled) {
@@ -1429,11 +1432,11 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   backdrop-filter: blur(20px) saturate(130%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
   color: #ffffff !important;
-  border: 1px solid #ffffff !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.7) !important;
   box-shadow: none !important;
   mix-blend-mode: normal !important;
   opacity: 1 !important;
-  border-radius: 12px !important;
+  border-radius: 9999px !important;
   
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
