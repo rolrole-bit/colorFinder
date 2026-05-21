@@ -190,15 +190,12 @@ export function renderEntryView(container, nav) {
     panel.classList.add('fade-out');
     
     setTimeout(() => {
-      container.innerHTML = `
-        <div class="bg-tapes-container">
-          <div class="bg-tape bg-tape-1"></div>
-          <div class="bg-tape bg-tape-2"></div>
-          <div class="bg-tape bg-tape-3"></div>
-        </div>
-        <div id="intro-text" style="width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; color: #000; font-family: 'Paperlogy', sans-serif; font-weight: 800; font-size: clamp(3rem, 10vh, 10vw); line-height: 0.9; letter-spacing: -0.02em; text-align: center; margin-top: -10vh;">
-        </div>
-      `;
+      panel.style.display = 'none';
+      
+      const introOverlay = document.createElement('div');
+      introOverlay.id = 'intro-text';
+      introOverlay.style.cssText = "position: absolute; top: 0; left: 0; z-index: 50; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; color: #fff; mix-blend-mode: difference; font-family: 'Paperlogy', sans-serif; font-weight: 800; font-size: clamp(3rem, 10vh, 10vw); line-height: 0.9; letter-spacing: -0.02em; text-align: center; margin-top: -10vh;";
+      container.appendChild(introOverlay);
       
       const introText = document.getElementById('intro-text');
       if (introText) {
