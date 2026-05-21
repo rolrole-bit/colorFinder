@@ -53,7 +53,8 @@ const copyTargets = [
   'index.html',
   'package.json',
   'package-lock.json',
-  'start.bat'
+  'start.bat',
+  'INSTALL_GUIDE.md'
 ];
 
 for (const target of copyTargets) {
