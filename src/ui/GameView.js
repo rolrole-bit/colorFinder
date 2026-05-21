@@ -106,7 +106,7 @@ export function renderGameView(container, nav) {
     const initHsl = `hsl(${currentH}, ${currentS}%, ${currentL}%)`;
     
     container.innerHTML = `
-      <div id="round-text" style="position: absolute; top: 1.2vh; left: 5vw; font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: #fff; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px; z-index: 100;">
+      <div id="round-text" style="position: absolute; top: 1.2vh; left: 5vw; font-family: 'Paperlogy', sans-serif; font-size: 0.85rem; color: ${getHSLContrastColor(hslToRgb(currentH, currentS, currentL).r, hslToRgb(currentH, currentS, currentL).g, hslToRgb(currentH, currentS, currentL).b)}; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 800; letter-spacing: 1px; z-index: 100;">
         ROUND ${state.currentRound} / ${state.maxRounds}
       </div>
       <div class="animated-gradient-bg"></div>
@@ -417,25 +417,10 @@ export function renderGameView(container, nav) {
             subTextEl.textContent = rgbToHex(currentDisplayedRGB.r, currentDisplayedRGB.g, currentDisplayedRGB.b);
           }
           
-          // 애니메이션 중에도 실시간 콘트라스트 보정 알고리즘 (0.5초 동안 매 프레임 보간된 컬러로 계산)
-          const curInvertedR = 255 - currentDisplayedRGB.r;
-          const curInvertedG = 255 - currentDisplayedRGB.g;
-          const curInvertedB = 255 - currentDisplayedRGB.b;
+          // 애니메이션 중에도 실시간 HSL 콘트라스트 보정 알고리즘
+          const curContrast = getHSLContrastColor(currentDisplayedRGB.r, currentDisplayedRGB.g, currentDisplayedRGB.b);
           
-          const curTextYiq = ((currentDisplayedRGB.r * 299) + (currentDisplayedRGB.g * 587) + (currentDisplayedRGB.b * 114)) / 1000;
-          let curBgR, curBgG, curBgB;
-          if (curTextYiq >= 128) {
-            const factor = 0.35;
-            curBgR = Math.round(curInvertedR * factor);
-            curBgG = Math.round(curInvertedG * factor);
-            curBgB = Math.round(curInvertedB * factor);
-          } else {
-            curBgR = Math.round(curInvertedR + (255 - curInvertedR) * 0.65);
-            curBgG = Math.round(curInvertedG + (255 - curInvertedG) * 0.65);
-            curBgB = Math.round(curInvertedB + (255 - curInvertedB) * 0.65);
-          }
-          
-          submitBtn.style.backgroundColor = `rgb(${curBgR}, ${curBgG}, ${curBgB})`;
+          submitBtn.style.backgroundColor = curContrast;
           submitBtn.style.color = `rgb(${currentDisplayedRGB.r}, ${currentDisplayedRGB.g}, ${currentDisplayedRGB.b})`;
           
           if (progress < 1) hexAnimFrame = requestAnimationFrame(animate);

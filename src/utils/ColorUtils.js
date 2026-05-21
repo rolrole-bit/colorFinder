@@ -89,23 +89,23 @@ export function getHSLContrastColor(r, g, b) {
   }
 
   const hsl = rgbToHsl(r, g, b);
-  
+
   // Hue 반전 (180도 보색)
   const hContrast = (hsl.h + 180) % 360;
-  
+
   // Saturation 반전 (가독성 최소 채도 30% 보정)
   let sContrast = 100 - hsl.s;
   if (sContrast < 30) {
     sContrast = 30;
   }
-  
+
   // Lightness 반전
   let lContrast = 100 - hsl.l;
-  
+
   // 중간 명도 붉은 영역 (30% ~ 70%)인 경우 밀어내기 처리
-  const redZoneStart = 30;
-  const redZoneEnd = 70;
-  
+  const redZoneStart = 10;
+  const redZoneEnd = 90;
+
   if (lContrast >= redZoneStart && lContrast <= redZoneEnd) {
     if (lContrast <= 50) {
       lContrast = 15; // 어두운 영역으로 밀어내기
@@ -113,7 +113,7 @@ export function getHSLContrastColor(r, g, b) {
       lContrast = 85; // 밝은 영역으로 밀어내기
     }
   }
-  
+
   return `hsl(${hContrast}, ${sContrast}%, ${lContrast}%)`;
 }
 
