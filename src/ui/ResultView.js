@@ -6,7 +6,7 @@
 
 import { getState, setScore, nextRound, getDifficultyMultiplier } from '../core/GameState.js';
 import { toRGBString, rgbToHex, rgbToHsl, getAverageColor, getButtonContrastStyle } from '../utils/ColorUtils.js';
-import { fireSideConfetti, fireCenterConfetti } from '../utils/ConfettiUtils.js';
+
 import { saveRecord } from '../core/Ranking.js';
 import { isSessionValid, clampScore } from '../utils/AntiCheat.js';
 import { getContrastYIQ, animateValue } from './AnimationUtils.js';
@@ -91,25 +91,7 @@ export function renderInterimResultView(container, nav) {
     const target = parseInt(animatedScore.getAttribute('data-target'));
     const duration = 1200;
     
-    // 점수가 800 이상이면 올라가는 동안 사이드 폭죽 터뜨리기
-    let sideConfettiInterval = null;
-    if (target >= 800) {
-      sideConfettiInterval = setInterval(() => {
-        fireSideConfetti();
-      }, 300);
-    }
-    
-    animateValue(animatedScore, 0, target, duration, true).then(() => {
-      // 카운팅이 끝나면 사이드 폭죽 중지
-      if (sideConfettiInterval) {
-        clearInterval(sideConfettiInterval);
-      }
-      
-      // 스코어 카운팅이 완전히 끝난 후 가운데서 팍 터짐
-      if (target >= 800) {
-        fireCenterConfetti();
-      }
-    });
+    animateValue(animatedScore, 0, target, duration, true);
   }
 
   document.getElementById('next-round-btn').addEventListener('click', () => {

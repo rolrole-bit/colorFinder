@@ -13,7 +13,7 @@ import { playBonusBounceSound, playScoreImpactSound } from '../utils/SoundUtils.
 import { getContrastYIQ, animateValue } from './AnimationUtils.js';
 import { getScoreComment } from '../utils/ScoreComment.js';
 import { bindShareEvents } from './ShareManager.js';
-import { fireCenterConfetti, fireSideConfetti } from '../utils/ConfettiUtils.js';
+
 
 /**
  * 최종 스코어보드 화면 렌더링
@@ -254,14 +254,6 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
     const finalTarget = parseInt(animatedScoreFinal.getAttribute('data-target'));
     const baseTotal = state.roundResults.reduce((acc, r) => acc + r.score, 0);
     
-    // 점수가 2000 이상이면 올라가는 동안 사이드 폭죽 터뜨리기
-    let sideConfettiInterval = null;
-    if (finalTarget >= 2000) {
-      sideConfettiInterval = setInterval(() => {
-        fireSideConfetti();
-      }, 300);
-    }
-
     if (appliedMultiplier > 1.0) {
       animateValue(animatedScoreFinal, 0, baseTotal, 1200, true, true).then(() => {
         const bonusText = document.getElementById('bonus-text');
@@ -272,19 +264,11 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
         setTimeout(() => {
           animatedScoreFinal.parentElement.classList.add('anim-score-impact');
           playScoreImpactSound();
-          animateValue(animatedScoreFinal, baseTotal, finalTarget, 1000, true, true).then(() => {
-            // 최종 애니메이션 완료 후
-            if (sideConfettiInterval) clearInterval(sideConfettiInterval);
-            if (finalTarget >= 2000) fireCenterConfetti();
-          });
+          animateValue(animatedScoreFinal, baseTotal, finalTarget, 1000, true, true);
         }, 800);
       });
     } else {
-      animateValue(animatedScoreFinal, 0, finalTarget, 1200, true, true).then(() => {
-        // 최종 애니메이션 완료 후
-        if (sideConfettiInterval) clearInterval(sideConfettiInterval);
-        if (finalTarget >= 2000) fireCenterConfetti();
-      });
+      animateValue(animatedScoreFinal, 0, finalTarget, 1200, true, true);
     }
   }
 
