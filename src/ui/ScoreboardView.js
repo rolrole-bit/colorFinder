@@ -78,11 +78,48 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
   const targetRGB = toRGBString(state.targetColor);
   const userRGB = toRGBString(state.userColor);
   
-  const leftContrast = getContrastYIQ(state.targetColor.r, state.targetColor.g, state.targetColor.b);
-  const rightContrast = getContrastYIQ(state.userColor.r, state.userColor.g, state.userColor.b);
+  // ═══ 라운드별 색상 배열 준비 (그라디언트 보간용) ═══
+  const leftColors = (state.roundResults && state.roundResults.length > 0)
+    ? state.roundResults.map(r => r.targetColor || state.targetColor)
+    : [state.targetColor];
+  const rightColors = (state.roundResults && state.roundResults.length > 0)
+    ? state.roundResults.map(r => r.userColor || state.userColor)
+    : [state.userColor];
 
-  // 버튼 배경 대비색 (좌우 평균)
-  const avgBg = getAverageColor(state.targetColor, state.userColor);
+  /**
+   * 스크롤 비율(0~1)에 따라 그라디언트 상의 보간된 색상을 반환
+   * @param {Array<{r,g,b}>} colors - 라운드별 색상 배열
+   * @param {number} t - 스크롤 비율 (0=상단, 1=하단)
+   * @returns {{r:number, g:number, b:number}}
+   */
+  function interpolateGradient(colors, t) {
+    if (colors.length === 1) return colors[0];
+    const pos = t * (colors.length - 1);
+    const idx = Math.floor(pos);
+    const frac = pos - idx;
+    const c1 = colors[Math.min(idx, colors.length - 1)];
+    const c2 = colors[Math.min(idx + 1, colors.length - 1)];
+    return {
+      r: Math.round(c1.r + (c2.r - c1.r) * frac),
+      g: Math.round(c1.g + (c2.g - c1.g) * frac),
+      b: Math.round(c1.b + (c2.b - c1.b) * frac)
+    };
+  }
+
+  // 초기 대비색 (상단 기준 = t:0)
+  const initLeftColor = interpolateGradient(leftColors, 0);
+  const initRightColor = interpolateGradient(rightColors, 0);
+  const leftContrast = getContrastYIQ(initLeftColor.r, initLeftColor.g, initLeftColor.b);
+  const rightContrast = getContrastYIQ(initRightColor.r, initRightColor.g, initRightColor.b);
+
+  // 버튼 배경 대비색 (좌우 전체 라운드 평균)
+  const allLeftAvg = leftColors.reduce((acc, c) => ({ r: acc.r + c.r, g: acc.g + c.g, b: acc.b + c.b }), { r: 0, g: 0, b: 0 });
+  const allRightAvg = rightColors.reduce((acc, c) => ({ r: acc.r + c.r, g: acc.g + c.g, b: acc.b + c.b }), { r: 0, g: 0, b: 0 });
+  const avgBg = {
+    r: Math.round((allLeftAvg.r / leftColors.length + allRightAvg.r / rightColors.length) / 2),
+    g: Math.round((allLeftAvg.g / leftColors.length + allRightAvg.g / rightColors.length) / 2),
+    b: Math.round((allLeftAvg.b / leftColors.length + allRightAvg.b / rightColors.length) / 2)
+  };
   const btnStyle = getButtonContrastStyle(avgBg);
 
   let targetGradient = targetRGB;
@@ -97,7 +134,7 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
   let breakdownHTML = '';
   if (state.roundResults && state.roundResults.length > 0) {
     breakdownHTML = `
-      <div style="display: flex; flex-direction: column; gap: 0.2rem; font-size: 1.1rem; font-weight: 400; letter-spacing: -0.5px; color: ${rightContrast}; text-align: left; line-height: 1.4;">
+      <div data-contrast-side="right" style="display: flex; flex-direction: column; gap: 0.2rem; font-size: 1.1rem; font-weight: 400; letter-spacing: -0.5px; color: ${rightContrast}; text-align: left; line-height: 1.4;">
         ${state.roundResults.map((r, i) => `<div>ROUND ${i + 1} : <span style="font-weight:800;">${r.score.toLocaleString()}</span>${i < state.roundResults.length - 1 ? ',' : ''}</div>`).join('')}
       </div>
     `;
@@ -121,12 +158,12 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
 
             <!-- 좌측 컬럼 -->
             <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start;">
-              <div style="font-size: clamp(1rem, 3vw, 1.4rem); font-weight: 300; color: ${leftContrast}; letter-spacing: -0.5px; margin-bottom: 0.5rem; text-align: left;">
+              <div data-contrast-side="left" style="font-size: clamp(1rem, 3vw, 1.4rem); font-weight: 300; color: ${leftContrast}; letter-spacing: -0.5px; margin-bottom: 0.5rem; text-align: left;">
                 <span style="font-weight: 700; border-bottom: 2px dotted currentColor; padding-bottom: 2px;">${playerNameSafe}</span> 님의 점수는
               </div>
               
               <div class="magazine-score" style="margin-top: 0; font-size: clamp(5rem, 18vw, 10rem); text-align: left; letter-spacing: -0.04em;">
-                <div style="line-height: 1; color: ${leftContrast};">
+                <div data-contrast-side="left" style="line-height: 1; color: ${leftContrast};">
                   <span class="animated-score" data-target="${state.score}">0</span>
                 </div>
               </div>
@@ -136,12 +173,12 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
             <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-bottom: 1.5rem;">
               ${breakdownHTML}
               
-              <div id="bonus-text" style="font-size: 1rem; font-weight: 700; opacity: 0; letter-spacing: -0.5px; white-space: nowrap; display: block; margin-top: 1rem; color: ${rightContrast}; transition: opacity 0.8s ease; text-align: left;">
+              <div id="bonus-text" data-contrast-side="right" style="font-size: 1rem; font-weight: 700; opacity: 0; letter-spacing: -0.5px; white-space: nowrap; display: block; margin-top: 1rem; color: ${rightContrast}; transition: opacity 0.8s ease; text-align: left;">
                 ${getDifficultyName(state.difficulty)} BONUS X ${Number(appliedMultiplier.toFixed(2))}
               </div>
               
               <!-- 한줄평 -->
-              <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.9rem, 2vw, 1.1rem); font-weight: 400; color: ${rightContrast}; letter-spacing: -0.5px; text-align: left; max-width: 400px; line-height: 1.6; word-break: keep-all; opacity: 0; transition: opacity 1s ease 0.5s;">
+              <div id="score-comment" data-contrast-side="right" style="margin-top: 1.5rem; font-size: clamp(0.9rem, 2vw, 1.1rem); font-weight: 400; color: ${rightContrast}; letter-spacing: -0.5px; text-align: left; max-width: 400px; line-height: 1.6; word-break: keep-all; opacity: 0; transition: opacity 1s ease 0.5s;">
                 "${comment}"
               </div>
             </div>
@@ -150,14 +187,14 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
           
           <div class="magazine-scoreboard">
             <div class="scoreboard-grid" style="margin-top: 0; padding-bottom: 5rem;">
-              <div class="score-card" style="background: none; border: none; border-top: 1px solid currentColor; padding: 1.5rem 0 0 0; color: ${leftContrast};">
+              <div class="score-card" data-contrast-side="left" style="background: none; border: none; border-top: 1px solid currentColor; padding: 1.5rem 0 0 0; color: ${leftContrast};">
                 <h3 style="color: inherit;">플레이어 랭킹</h3>
                 <ul class="rank-list" style="color: inherit;">
                   ${playerRanksHTML}
                 </ul>
               </div>
               
-              <div class="score-card" style="background: none; border: none; border-top: 1px solid currentColor; padding: 1.5rem 0 0 0; color: ${rightContrast};">
+              <div class="score-card" data-contrast-side="right" style="background: none; border: none; border-top: 1px solid currentColor; padding: 1.5rem 0 0 0; color: ${rightContrast};">
                 <h3 style="color: inherit;">게임별 랭킹</h3>
                 <ul class="rank-list" style="color: inherit;">
                   ${gameRanksHTML}
@@ -214,6 +251,39 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
     const commentEl = document.getElementById('score-comment');
     if (commentEl) commentEl.style.opacity = '1';
   });
+
+  // ═══ 스크롤 기반 실시간 대비색 업데이트 ═══
+  const overlay = container.querySelector('.magazine-overlay');
+  if (overlay) {
+    let rafId = null;
+    const updateContrastColors = () => {
+      const scrollTop = overlay.scrollTop;
+      const scrollHeight = overlay.scrollHeight - overlay.clientHeight;
+      const t = scrollHeight > 0 ? Math.min(1, Math.max(0, scrollTop / scrollHeight)) : 0;
+
+      // 현재 스크롤 위치의 보간된 배경색 계산
+      const currentLeft = interpolateGradient(leftColors, t);
+      const currentRight = interpolateGradient(rightColors, t);
+      const newLeftContrast = getContrastYIQ(currentLeft.r, currentLeft.g, currentLeft.b);
+      const newRightContrast = getContrastYIQ(currentRight.r, currentRight.g, currentRight.b);
+
+      // data-contrast-side 속성으로 마킹된 모든 요소의 색상 업데이트
+      container.querySelectorAll('[data-contrast-side="left"]').forEach(el => {
+        el.style.color = newLeftContrast;
+      });
+      container.querySelectorAll('[data-contrast-side="right"]').forEach(el => {
+        el.style.color = newRightContrast;
+      });
+    };
+
+    overlay.addEventListener('scroll', () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updateContrastColors);
+    }, { passive: true });
+
+    // 초기 1회 실행 (렌더링 직후)
+    requestAnimationFrame(updateContrastColors);
+  }
 
   // 점수 애니메이션
   const animatedScoreFinal = container.querySelector('.animated-score');
