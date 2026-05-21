@@ -193,12 +193,14 @@ app.use('/api/round', rateLimit(rlRound, 60 * 1000, 'round'), roundRoutes);
 app.use('/api/rankings', rateLimit(rlRanking, 60 * 1000, 'ranking'), rankingRoutes);
 
 app.get('/api/health', (req, res) => {
-  res.json({ 
+  const info = { 
     status: 'ok', 
     version: '3.0',
-    env: NODE_ENV,
     timestamp: new Date().toISOString()
-  });
+  };
+  // [SECURITY] production에서는 환경 정보 숨김
+  if (NODE_ENV !== 'production') info.env = NODE_ENV;
+  res.json(info);
 });
 
 // ═══════════════════════════════════════════

@@ -65,15 +65,15 @@ setInterval(() => {
 // ═══════════════════════════════════════════
 
 export function blockServerDirectory(req, res, next) {
-  const blocked = ['/server/', '/data/', '/node_modules/', '/.git/', '/.env'];
+  const blocked = ['/server/', '/data/', '/node_modules/', '/.git/', '/.env', '/tools/', '/docs/'];
   const url = req.url.toLowerCase();
   
   if (blocked.some(path => url.startsWith(path))) {
     return res.status(403).json({ error: 'Forbidden' });
   }
   
-  // package.json, .gitignore 등 루트 설정 파일 차단
-  const blockedFiles = ['/package.json', '/package-lock.json', '/.gitignore', '/.env'];
+  // 루트 설정/스크립트 파일 차단
+  const blockedFiles = ['/package.json', '/package-lock.json', '/.gitignore', '/.env', '/start.bat', '/start.sh'];
   if (blockedFiles.includes(url)) {
     return res.status(403).json({ error: 'Forbidden' });
   }
