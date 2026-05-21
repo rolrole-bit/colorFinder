@@ -128,7 +128,8 @@ export function renderInterimResultView(container, nav) {
         
         setScore(finalScore);
         
-        if (finalScore >= 2500) {
+        // 3000점 이상 → 다음 판에만 Hell 해금 (1회성)
+        if (finalScore >= 3000) {
           localStorage.setItem('hell_unlocked', 'true');
         }
         

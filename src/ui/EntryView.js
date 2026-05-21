@@ -173,6 +173,10 @@ export function renderEntryView(container, nav) {
     const selectedDifficulty = document.querySelector('input[name="difficulty"]:checked').value;
     setPlayerInfo(playerNameInput.value.trim(), originGameInput.value.trim());
     setDifficulty(selectedDifficulty);
+    
+    // [Hell 1회성] 게임 시작 시 해금 플래그 즉시 소모
+    localStorage.removeItem('hell_unlocked');
+    
     initAudio();
     startSession();
     startDevToolsDetection();
