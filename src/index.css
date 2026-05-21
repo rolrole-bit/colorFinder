@@ -737,12 +737,11 @@ input[type="range"]::-webkit-slider-thumb:active {
   margin-bottom: max(2vh, 1rem);
   text-align: left;
   
-  /* ═══ JS 기반 대비색 — mix-blend-mode: difference 사용 금지 (filter와 결합시 무효) ═══ */
   color: rgba(0, 0, 0, 0.85) !important;
-  
-  background: none;
-  -webkit-background-clip: unset;
-  -webkit-text-fill-color: initial;
+  -webkit-text-fill-color: rgba(0, 0, 0, 0.85) !important;
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
 }
 
 @keyframes gradientText {
