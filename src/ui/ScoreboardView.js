@@ -93,8 +93,8 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
   let breakdownHTML = '';
   if (state.roundResults && state.roundResults.length > 0) {
     breakdownHTML = `
-      <div style="display: flex; flex-direction: row; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-start; font-size: 1.1rem; font-weight: 400; letter-spacing: -0.5px; margin-top: 1rem; color: ${leftContrast}; text-align: left;">
-        ${state.roundResults.map((r, i) => `<div>ROUND ${i + 1} : <span style="font-weight:800; font-size: 1.2em; display: inline-block;">${r.score.toLocaleString()}</span>${i < state.roundResults.length - 1 ? ',' : ''}</div>`).join('')}
+      <div style="display: flex; flex-direction: column; gap: 0.2rem; font-size: 1.1rem; font-weight: 400; letter-spacing: -0.5px; color: ${leftContrast}; text-align: left; line-height: 1.4;">
+        ${state.roundResults.map((r, i) => `<div>ROUND ${i + 1} : <span style="font-weight:800;">${r.score.toLocaleString()}</span>${i < state.roundResults.length - 1 ? ',' : ''}</div>`).join('')}
       </div>
     `;
   }
@@ -112,33 +112,36 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
       <div class="magazine-overlay">
         <div class="magazine-content">
 
-          <!-- 중앙 영역: 플레이어 이름 + 최종 스코어 + 한줄평 -->
-          <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; margin-bottom: 4rem; margin-top: 2rem; width: 100%; box-sizing: border-box; text-align: left;">
+          <!-- 중앙 영역: 2컬럼 레이아웃 (좌측: 이름+점수 / 우측: 라운드별 점수 + 코멘트) -->
+          <div style="display: flex; flex-direction: row; flex-wrap: wrap; align-items: flex-end; justify-content: flex-start; gap: clamp(2rem, 5vw, 6rem); margin-bottom: 4rem; margin-top: 2rem; width: 100%; box-sizing: border-box; text-align: left;">
 
-            <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; width: 100%;">
-              <!-- 플레이어 이름 -->
+            <!-- 좌측 컬럼 -->
+            <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start;">
               <div style="font-size: clamp(1rem, 3vw, 1.4rem); font-weight: 300; color: ${leftContrast}; letter-spacing: -0.5px; margin-bottom: 0.5rem; text-align: left;">
-                <span style="font-weight: 700;">${playerNameSafe}</span>님의 점수는
+                <span style="font-weight: 700; border-bottom: 2px dotted ${leftContrast}; padding-bottom: 2px;">${playerNameSafe}</span> 님의 점수는
               </div>
               
-              <div style="display: flex; flex-direction: column; text-align: left; align-items: flex-start;">
-                <div class="magazine-score" style="margin-top: 0; font-size: clamp(5rem, 18vw, 10rem); text-align: left; letter-spacing: -0.04em;">
-                  <div style="line-height: 1; color: ${leftContrast};">
-                    <span class="animated-score" data-target="${state.score}">0</span>
-                  </div>
+              <div class="magazine-score" style="margin-top: 0; font-size: clamp(5rem, 18vw, 10rem); text-align: left; letter-spacing: -0.04em;">
+                <div style="line-height: 1; color: ${leftContrast};">
+                  <span class="animated-score" data-target="${state.score}">0</span>
                 </div>
               </div>
+            </div>
+
+            <!-- 우측 컬럼 -->
+            <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-bottom: 1.5rem;">
               ${breakdownHTML}
               
-              <div id="bonus-text" style="font-size: 1.4rem; font-weight: 700; opacity: 0; letter-spacing: -0.5px; white-space: nowrap; display: block; margin-top: 1rem; color: ${leftContrast}; transition: opacity 0.8s ease; text-align: left;">
+              <div id="bonus-text" style="font-size: 1rem; font-weight: 700; opacity: 0; letter-spacing: -0.5px; white-space: nowrap; display: block; margin-top: 1rem; color: ${leftContrast}; transition: opacity 0.8s ease; text-align: left;">
                 ${getDifficultyName(state.difficulty)} BONUS X ${Number(appliedMultiplier.toFixed(2))}
               </div>
               
               <!-- 한줄평 -->
-              <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.85rem, 2.5vw, 1.1rem); font-weight: 400; color: ${leftContrast}; letter-spacing: -0.5px; text-align: left; max-width: 500px; line-height: 1.6; word-break: keep-all; opacity: 0; transition: opacity 1s ease 0.5s; font-style: italic;">
-                ${comment}
+              <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.9rem, 2vw, 1.1rem); font-weight: 400; color: ${leftContrast}; letter-spacing: -0.5px; text-align: left; max-width: 400px; line-height: 1.6; word-break: keep-all; opacity: 0; transition: opacity 1s ease 0.5s;">
+                "${comment}"
               </div>
             </div>
+            
           </div>
           
           <div class="magazine-scoreboard">
