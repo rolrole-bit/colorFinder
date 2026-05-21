@@ -739,7 +739,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   
   color: #fff !important;
   mix-blend-mode: difference;
-  filter: contrast(500%) brightness(150%);
+  filter: contrast(1000%) saturate(300%) brightness(150%);
   
   background: none;
   -webkit-background-clip: unset;
@@ -791,7 +791,7 @@ input[type="text"].minimal-input {
   transition: border-color 0.3s;
   border-radius: 0 !important;
   mix-blend-mode: difference;
-  filter: contrast(500%) brightness(150%);
+  filter: contrast(1000%) saturate(300%) brightness(150%);
 }
 
 input[type="text"].minimal-input::placeholder {
@@ -855,7 +855,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-size: clamp(0.9rem, 2vh, 1.2rem);
   color: #fff !important;
   mix-blend-mode: difference;
-  filter: contrast(500%) brightness(150%);
+  filter: contrast(1000%) saturate(300%) brightness(150%);
   margin-bottom: max(1vh, 0.5rem);
 }
 
@@ -871,7 +871,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-size: clamp(0.9rem, 2.5vh, 1.2rem);
   color: #fff !important;
   mix-blend-mode: difference;
-  filter: contrast(500%) brightness(150%);
+  filter: contrast(1000%) saturate(300%) brightness(150%);
   cursor: pointer;
   display: flex;
   align-items: center;
