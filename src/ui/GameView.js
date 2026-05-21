@@ -286,6 +286,7 @@ export function renderGameView(container, nav) {
       }
       
       onDown(e) {
+        e.preventDefault(); // 브라우저 네이티브 드래그/텍스트 선택 차단
         fadeTutorial();
         stopShuffle();
         this.isDragging = true;
