@@ -1455,6 +1455,32 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   opacity: 1 !important;
 }
 
+/* 버튼 내부 텍스트·아이콘: difference 블렌딩 (유리 배경과 자동 대비) */
+.magazine-start-btn span,
+.magazine-start-btn svg {
+  mix-blend-mode: difference !important;
+  color: #fff !important;
+  position: relative;
+  z-index: 2;
+}
+
+/* 버튼 테두리 링: difference 블렌딩 (배경에 따라 밝음/어두움 반전) */
+.magazine-start-btn {
+  position: relative !important;
+  border: none !important;  /* 원본 border 제거 — ::before가 대체 */
+}
+
+.magazine-start-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1.5px solid #fff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* === SCOREBOARD CONTENT: JS 기반 대비색(getContrastYIQ) 사용 === */
 /* mix-blend-mode: difference 제거 — JS에서 배경 명도를 계산하여 */
 /* 텍스트에 직접 #000 또는 #fff를 지정하므로 CSS 블렌딩 불필요 */

@@ -95,10 +95,10 @@ export function calculateScore(target, user) {
  */
 export function getContrastBlendColor(r, g, b) {
   // ═══ ★ 여기서 수치를 직접 조절하세요 ★ ═══
-  const DEAD_ZONE_LOW  = 25;   // L 데드존 하한 (0~50 사이)
-  const DEAD_ZONE_HIGH = 75;   // L 데드존 상한 (50~100 사이)
-  const PUSH_MARGIN    = 10;   // 데드존 밖으로 밀어내는 여유값
-  const MIN_SATURATION = 20;   // 결과 색상의 최소 채도 (0~100)
+  const DEAD_ZONE_LOW = 10;   // L 데드존 하한 (0~50 사이)
+  const DEAD_ZONE_HIGH = 80;   // L 데드존 상한 (50~100 사이)
+  const PUSH_MARGIN = 10;   // 데드존 밖으로 밀어내는 여유값
+  const MIN_SATURATION = 0;   // 결과 색상의 최소 채도 (0~100)
   // ═══════════════════════════════════════════
 
   const bg = rgbToHsl(r, g, b);
