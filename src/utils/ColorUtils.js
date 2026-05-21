@@ -108,14 +108,16 @@ export function getContrastBlendColor(r, g, b) {
   // S: 반전 + 최소 채도 보장
   const newS = Math.max(MIN_SATURATION, 100 - bg.s);
 
+  // 배경의 실제 시각적 밝기(Perceived Luminance) 계산
+  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+  const isDark = yiq < 140;
+
   // L: 배경 밝기에 따라 강제 방향 결정
-  //    밝은 배경(L>50) → 반드시 어두운 텍스트
-  //    어두운 배경(L≤50) → 반드시 밝은 텍스트
   let newL;
-  if (bg.l > 50) {
-    newL = LIGHT_THRESHOLD;  // 밝은 배경 → 어두운 글자
+  if (isDark) {
+    newL = DARK_THRESHOLD;   // 어두운 배경 → 밝은 글자 (반전)
   } else {
-    newL = DARK_THRESHOLD;   // 어두운 배경 → 밝은 글자
+    newL = LIGHT_THRESHOLD;  // 밝은 배경 → 어두운 글자 (반전)
   }
 
   // 최종 클램프 (0~100)
