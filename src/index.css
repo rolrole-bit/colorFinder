@@ -766,7 +766,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   /* ⛔ 아래 3줄은 반드시 세트로 유지 — 하나라도 제거하면 타이틀 사라짐 */
   color: #fff !important;
   mix-blend-mode: difference;
-  filter: contrast(1000%) saturate(300%) brightness(150%);
+  filter: contrast(200%) saturate(120%) brightness(150%);
   
   /* 글로벌 h1 그라디언트 배경 무력화 */
   background: none;
