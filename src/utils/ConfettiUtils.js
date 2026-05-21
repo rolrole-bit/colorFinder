@@ -113,15 +113,12 @@ export function fireSideConfetti() {
   let wave = 0;
 
   function burst() {
-    if (wave >= waves) return;
     for (let i = 0; i < 25; i++) {
       // 왼쪽에서
       particles.push(createParticle(0, 0.5 + (Math.random() - 0.5) * 0.4, -60 + Math.random() * 30, 8 + Math.random() * 6));
       // 오른쪽에서
       particles.push(createParticle(1, 0.5 + (Math.random() - 0.5) * 0.4, 210 + Math.random() * 30, 8 + Math.random() * 6));
     }
-    wave++;
-    if (wave < waves) setTimeout(burst, 300);
   }
 
   burst();

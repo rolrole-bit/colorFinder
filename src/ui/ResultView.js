@@ -47,8 +47,11 @@ export function renderInterimResultView(container, nav) {
       <div class="split-screen-half" style="background-color: ${targetRGB};"></div>
       <div class="split-screen-half" style="background-color: ${userRGB};"></div>
       
+      <!-- 통합 블러 덮개 (경계선 문제 해결용) -->
+      <div style="position: absolute; inset: -10%; backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); pointer-events: none; z-index: 1;"></div>
+      
       <!-- 매거진 오버레이 (blend mode 제거, JS 기반 대비색 사용) -->
-      <div class="magazine-overlay">
+      <div class="magazine-overlay" style="z-index: 2;">
         
         <!-- 상단 라운드 표시 -->
         <div style="display: flex; justify-content: flex-start; width: 100%; flex-shrink: 0; margin-bottom: auto; padding-left: 2vw;">
@@ -86,12 +89,27 @@ export function renderInterimResultView(container, nav) {
   const animatedScore = container.querySelector('.animated-score');
   if (animatedScore) {
     const target = parseInt(animatedScore.getAttribute('data-target'));
-    animateValue(animatedScore, 0, target, 1200, true);
+    const duration = 1200;
+    
+    // 점수가 800 이상이면 올라가는 동안 사이드 폭죽 터뜨리기
+    let sideConfettiInterval = null;
     if (target >= 800) {
-      setTimeout(() => {
+      sideConfettiInterval = setInterval(() => {
         fireSideConfetti();
-      }, 600); // 점수가 어느 정도 올라갔을 때 터지도록 약간의 지연
+      }, 300);
     }
+    
+    animateValue(animatedScore, 0, target, duration, true).then(() => {
+      // 카운팅이 끝나면 사이드 폭죽 중지
+      if (sideConfettiInterval) {
+        clearInterval(sideConfettiInterval);
+      }
+      
+      // 스코어 카운팅이 완전히 끝난 후 가운데서 팍 터짐
+      if (target >= 800) {
+        fireCenterConfetti();
+      }
+    });
   }
 
   document.getElementById('next-round-btn').addEventListener('click', () => {

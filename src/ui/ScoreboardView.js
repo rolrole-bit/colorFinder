@@ -145,12 +145,15 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
 
   container.innerHTML = `
     <div class="split-screen-result" id="score-panel">
-      <!-- 50:50 분할 배경 (블러 처리) -->
-      <div class="split-screen-half" style="background: ${targetGradient}; filter: blur(40px); transform: scale(1.2);"></div>
-      <div class="split-screen-half" style="background: ${userGradient}; filter: blur(40px); transform: scale(1.2);"></div>
+      <!-- 50:50 분할 배경 -->
+      <div class="split-screen-half" style="background: ${targetGradient};"></div>
+      <div class="split-screen-half" style="background: ${userGradient};"></div>
+      
+      <!-- 통합 블러 덮개 (경계선 문제 해결용) -->
+      <div style="position: absolute; inset: -10%; backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); pointer-events: none; z-index: 1;"></div>
       
       <!-- 매거진 오버레이 -->
-      <div class="magazine-overlay">
+      <div class="magazine-overlay" style="z-index: 2;">
         <div class="magazine-content">
 
           <!-- 중앙 영역: 2컬럼 레이아웃 (좌측: 이름+점수 / 우측: 라운드별 점수 + 코멘트) -->
@@ -291,10 +294,12 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
     const finalTarget = parseInt(animatedScoreFinal.getAttribute('data-target'));
     const baseTotal = state.roundResults.reduce((acc, r) => acc + r.score, 0);
     
+    // 점수가 2000 이상이면 올라가는 동안 사이드 폭죽 터뜨리기
+    let sideConfettiInterval = null;
     if (finalTarget >= 2000) {
-      setTimeout(() => {
-        fireCenterConfetti();
-      }, 600); // 카운트업 도중 화려하게 터지도록
+      sideConfettiInterval = setInterval(() => {
+        fireSideConfetti();
+      }, 300);
     }
 
     if (appliedMultiplier > 1.0) {
@@ -307,11 +312,19 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
         setTimeout(() => {
           animatedScoreFinal.parentElement.classList.add('anim-score-impact');
           playScoreImpactSound();
-          animateValue(animatedScoreFinal, baseTotal, finalTarget, 1000, true, true);
+          animateValue(animatedScoreFinal, baseTotal, finalTarget, 1000, true, true).then(() => {
+            // 최종 애니메이션 완료 후
+            if (sideConfettiInterval) clearInterval(sideConfettiInterval);
+            if (finalTarget >= 2000) fireCenterConfetti();
+          });
         }, 800);
       });
     } else {
-      animateValue(animatedScoreFinal, 0, finalTarget, 1200, true, true);
+      animateValue(animatedScoreFinal, 0, finalTarget, 1200, true, true).then(() => {
+        // 최종 애니메이션 완료 후
+        if (sideConfettiInterval) clearInterval(sideConfettiInterval);
+        if (finalTarget >= 2000) fireCenterConfetti();
+      });
     }
   }
 
