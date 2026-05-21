@@ -1441,11 +1441,11 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 .magazine-start-btn:not(:disabled) {
   /* ═══ 활성화 유리 — 절대 변경 금지 ═══ */
   /* ⚠️ mix-blend-mode: difference 사용 금지! backdrop-filter와 충돌 */
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: var(--btn-bg, rgba(255, 255, 255, 0.2)) !important;
   backdrop-filter: blur(20px) saturate(130%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
-  color: #ffffff !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+  color: var(--btn-color, #ffffff) !important;
+  border: 1.5px solid var(--btn-border, rgba(255, 255, 255, 0.7)) !important;
   box-shadow: none !important;
   mix-blend-mode: normal !important;  /* ← difference 절대 금지 */
   isolation: isolate !important;
@@ -1458,7 +1458,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 }
 
 .magazine-start-btn:not(:disabled):hover {
-  background: rgba(255, 255, 255, 0.3) !important;
+  background: var(--btn-hover-bg, rgba(255, 255, 255, 0.3)) !important;
   transform: translateY(-3px) !important;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.15) !important;
 }

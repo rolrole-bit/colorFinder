@@ -158,12 +158,13 @@ export function getAverageColor(c1, c2) {
  */
 export function getButtonContrastStyle(bgColor) {
   const yiq = ((bgColor.r * 299) + (bgColor.g * 587) + (bgColor.b * 114)) / 1000;
-  const isDark = yiq < 128;
+  const isDark = yiq < 140;
 
   return {
     textColor: isDark ? '#ffffff' : '#000000',
     borderColor: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.35)',
-    glassBg: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)'
+    glassBg: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)',
+    hoverBg: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'
   };
 }
 

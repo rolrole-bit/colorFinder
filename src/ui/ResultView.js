@@ -72,7 +72,7 @@ export function renderInterimResultView(container, nav) {
           </div>
           
           <div class="magazine-score">
-            <div style="line-height: 1; color: ${btnStyle.textColor};">
+            <div style="line-height: 1; color: var(--btn-color, #fff);">
               <span class="animated-score" data-target="${state.score}">0</span>
             </div>
           </div>
@@ -81,7 +81,7 @@ export function renderInterimResultView(container, nav) {
       </div>
       
       <div style="position: fixed; bottom: 3rem; left: 0; right: 0; margin: 0 auto; text-align: center; width: calc(100% - 3rem); max-width: 400px; z-index: 3000; pointer-events: auto;">
-        <button class="magazine-start-btn" id="next-round-btn" style="width: 100%; color: ${btnStyle.textColor}; border-color: ${btnStyle.borderColor}; background: ${btnStyle.glassBg};">${state.currentRound < state.maxRounds ? 'NEXT ROUND' : 'FINAL RESULT'}</button>
+        <button class="magazine-start-btn" id="next-round-btn" style="width: 100%; --btn-color: ${btnStyle.textColor}; --btn-border: ${btnStyle.borderColor}; --btn-bg: ${btnStyle.glassBg}; --btn-hover-bg: ${btnStyle.hoverBg};">${state.currentRound < state.maxRounds ? 'NEXT ROUND' : 'FINAL RESULT'}</button>
       </div>
     </div>
   `;
