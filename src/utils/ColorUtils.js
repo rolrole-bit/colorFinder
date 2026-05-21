@@ -141,6 +141,39 @@ export function getContrastColor(r, g, b) {
 }
 
 /**
+ * 두 RGB 색상의 평균색을 구합니다.
+ * @param {{r,g,b}} c1
+ * @param {{r,g,b}} c2
+ * @returns {{r: number, g: number, b: number}}
+ */
+export function getAverageColor(c1, c2) {
+  return {
+    r: Math.round((c1.r + c2.r) / 2),
+    g: Math.round((c1.g + c2.g) / 2),
+    b: Math.round((c1.b + c2.b) / 2)
+  };
+}
+
+/**
+ * 배경 RGB에 따른 버튼 스타일 반환 (텍스트, 테두리, 유리 배경)
+ * backdrop-filter 위에서는 mix-blend-mode가 작동하지 않으므로
+ * JS에서 직접 계산하여 인라인 스타일로 적용
+ * 
+ * @param {{r,g,b}} bgColor - 버튼 뒤쪽의 평균 배경색
+ * @returns {{textColor: string, borderColor: string, glassBg: string}}
+ */
+export function getButtonContrastStyle(bgColor) {
+  const yiq = ((bgColor.r * 299) + (bgColor.g * 587) + (bgColor.b * 114)) / 1000;
+  const isDark = yiq < 128;
+
+  return {
+    textColor: isDark ? '#ffffff' : '#000000',
+    borderColor: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.35)',
+    glassBg: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)'
+  };
+}
+
+/**
  * RGB 객체를 CSS rgb() 문자열로 변환합니다.
  * @param {{r: number, g: number, b: number}} color 
  * @returns {string} css color string

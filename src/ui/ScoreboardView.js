@@ -7,7 +7,7 @@
 
 import { getState, resetGame, setDifficulty, getDifficultyName, getDifficultyMultiplier } from '../core/GameState.js';
 import { getGameRankings, getPlayerRankings, getTotalPlayers } from '../core/Ranking.js';
-import { toRGBString, rgbToHex } from '../utils/ColorUtils.js';
+import { toRGBString, rgbToHex, getAverageColor, getButtonContrastStyle } from '../utils/ColorUtils.js';
 import { escapeHTML, clearSession } from '../utils/AntiCheat.js';
 import { playBonusBounceSound, playScoreImpactSound } from '../utils/SoundUtils.js';
 import { getContrastYIQ, animateValue } from './AnimationUtils.js';
@@ -80,6 +80,10 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
   
   const leftContrast = getContrastYIQ(state.targetColor.r, state.targetColor.g, state.targetColor.b);
   const rightContrast = getContrastYIQ(state.userColor.r, state.userColor.g, state.userColor.b);
+
+  // 버튼 배경 대비색 (좌우 평균)
+  const avgBg = getAverageColor(state.targetColor, state.userColor);
+  const btnStyle = getButtonContrastStyle(avgBg);
 
   let targetGradient = targetRGB;
   let userGradient = userRGB;
@@ -165,13 +169,13 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
       </div>
       
       <div style="position: fixed; bottom: 2rem; left: 0; right: 0; margin: 0 auto; width: calc(100% - 4rem); max-width: 800px; z-index: 3000; text-align: center; display: flex; gap: 1rem;">
-        <button class="magazine-start-btn" id="retry-btn" style="flex: 1; display:flex; align-items:center; justify-content:center;">
-          <span style="display:flex; align-items:center; gap:0.5rem; color: #ffffff;">
+        <button class="magazine-start-btn" id="retry-btn" style="flex: 1; display:flex; align-items:center; justify-content:center; color: ${btnStyle.textColor}; border-color: ${btnStyle.borderColor}; background: ${btnStyle.glassBg};">
+          <span style="display:flex; align-items:center; gap:0.5rem; color: inherit;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>다시 하기
           </span>
         </button>
-        <button class="magazine-start-btn" id="share-btn" style="flex: 1; display:flex; align-items:center; justify-content:center;">
-          <span style="display:flex; align-items:center; gap:0.5rem; color: #ffffff;">
+        <button class="magazine-start-btn" id="share-btn" style="flex: 1; display:flex; align-items:center; justify-content:center; color: ${btnStyle.textColor}; border-color: ${btnStyle.borderColor}; background: ${btnStyle.glassBg};">
+          <span style="display:flex; align-items:center; gap:0.5rem; color: inherit;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>공유하기
           </span>
         </button>

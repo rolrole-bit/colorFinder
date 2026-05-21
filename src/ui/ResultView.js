@@ -5,7 +5,7 @@
  */
 
 import { getState, setScore, nextRound, getDifficultyMultiplier } from '../core/GameState.js';
-import { toRGBString, rgbToHex, rgbToHsl } from '../utils/ColorUtils.js';
+import { toRGBString, rgbToHex, rgbToHsl, getAverageColor, getButtonContrastStyle } from '../utils/ColorUtils.js';
 import { fireSideConfetti } from '../utils/ConfettiUtils.js';
 import { saveRecord } from '../core/Ranking.js';
 import { isSessionValid, clampScore } from '../utils/AntiCheat.js';
@@ -27,6 +27,10 @@ export function renderInterimResultView(container, nav) {
   
   const leftContrast = getContrastYIQ(state.targetColor.r, state.targetColor.g, state.targetColor.b);
   const rightContrast = getContrastYIQ(state.userColor.r, state.userColor.g, state.userColor.b);
+
+  // 버튼 배경 대비색 (좌우 평균)
+  const avgBg = getAverageColor(state.targetColor, state.userColor);
+  const btnStyle = getButtonContrastStyle(avgBg);
 
   const targetHsl = rgbToHsl(state.targetColor.r, state.targetColor.g, state.targetColor.b);
   const userHsl = rgbToHsl(state.userColor.r, state.userColor.g, state.userColor.b);
@@ -74,7 +78,7 @@ export function renderInterimResultView(container, nav) {
       </div>
       
       <div style="position: fixed; bottom: 3rem; left: 0; right: 0; margin: 0 auto; text-align: center; width: calc(100% - 3rem); max-width: 400px; z-index: 3000; pointer-events: auto;">
-        <button class="magazine-start-btn" id="next-round-btn" style="width: 100%;">${state.currentRound < state.maxRounds ? 'NEXT ROUND' : 'FINAL RESULT'}</button>
+        <button class="magazine-start-btn" id="next-round-btn" style="width: 100%; color: ${btnStyle.textColor}; border-color: ${btnStyle.borderColor}; background: ${btnStyle.glassBg};">${state.currentRound < state.maxRounds ? 'NEXT ROUND' : 'FINAL RESULT'}</button>
       </div>
     </div>
   `;
