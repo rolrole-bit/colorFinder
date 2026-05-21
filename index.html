@@ -6,6 +6,28 @@
   <meta name="description" content="DYE MASTER - 당신의 색감을 증명하세요. 게임별 색감 정확도 랭킹.">
   <title>DYE MASTER</title>
   <link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin>
+  <!-- 핵심 JS 모듈 병렬 프리로드 (직렬 체인 18개 → 병렬 변환) -->
+  <link rel="modulepreload" href="./src/main.js?v=20260521h">
+  <link rel="modulepreload" href="./src/ui/UIManager.js?v=20260521h">
+  <link rel="modulepreload" href="./src/ui/EntryView.js?v=20260521h">
+  <link rel="modulepreload" href="./src/ui/GameView.js?v=20260521h">
+  <link rel="modulepreload" href="./src/ui/ResultView.js?v=20260521h">
+  <link rel="modulepreload" href="./src/ui/ScoreboardView.js?v=20260521h">
+  <link rel="modulepreload" href="./src/ui/AnimationUtils.js?v=20260521h">
+  <link rel="modulepreload" href="./src/ui/CustomSlider.js?v=20260521h">
+  <link rel="modulepreload" href="./src/core/GameState.js?v=20260521h">
+  <link rel="modulepreload" href="./src/core/Ranking.js?v=20260521h">
+  <link rel="modulepreload" href="./src/core/ServerAPI.js?v=20260521h">
+  <link rel="modulepreload" href="./src/utils/ColorUtils.js?v=20260521h">
+  <link rel="modulepreload" href="./src/utils/AntiCheat.js?v=20260521h">
+  <link rel="modulepreload" href="./src/utils/SoundUtils.js?v=20260521h">
+  <link rel="modulepreload" href="./src/utils/ConfettiUtils.js?v=20260521h">
+  <link rel="modulepreload" href="./src/utils/Constants.js?v=20260521h">
+  <link rel="modulepreload" href="./src/utils/ScoreComment.js?v=20260521h">
+  <link rel="modulepreload" href="./src/ui/ShareManager.js?v=20260521h">
+  <!-- CDN 폰트 프리로드 (가장 자주 사용되는 Bold/ExtraBold 우선) -->
+  <link rel="preload" href="https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-8ExtraBold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-7Bold.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./src/index.css?v=20260521h" />
 </head>
 <body>
