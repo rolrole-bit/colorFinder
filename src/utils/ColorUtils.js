@@ -99,19 +99,13 @@ export function getHSLContrastColor(r, g, b) {
     sContrast = 30;
   }
 
-  // Lightness 반전
-  let lContrast = 100 - hsl.l;
-
-  // 중간 명도 붉은 영역 (30% ~ 70%)인 경우 밀어내기 처리
-  const redZoneStart = 10;
-  const redZoneEnd = 90;
-
-  if (lContrast >= redZoneStart && lContrast <= redZoneEnd) {
-    if (lContrast <= 50) {
-      lContrast = 15; // 어두운 영역으로 밀어내기
-    } else {
-      lContrast = 85; // 밝은 영역으로 밀어내기
-    }
+  // Lightness: 원본 배경 명도 기준으로 방향 결정
+  // 배경이 어두우면 → 밝은 텍스트, 배경이 밝으면 → 어두운 텍스트
+  let lContrast;
+  if (hsl.l < 50) {
+    lContrast = 85; // 어두운 배경 → 밝은 텍스트
+  } else {
+    lContrast = 15; // 밝은 배경 → 어두운 텍스트
   }
 
   return `hsl(${hContrast}, ${sContrast}%, ${lContrast}%)`;
