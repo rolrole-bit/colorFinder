@@ -1,30 +1,28 @@
 # 작업 목적
-최종 점수 화면(ScoreboardView)의 텍스트 시인성 문제 해결. 가독성을 위해 동적 대비색 로직을 제거하고, 라운딩된 반투명 배경 패널 위에 밝은 텍스트를 배치하는 디자인으로 변경.
+게임 진입 불가 버그(Syntax Error) 수정
 
 # 핵심 기능
-- `ScoreboardView.js` 내 동적 대비색 계산 및 스크롤 이벤트 리스너 제거
-- 텍스트 색상을 흰색(밝은 색)계열로 고정
-- 상단 점수 영역과 하단 랭킹 영역을 각각 라운딩 처리된 반투명 박스(glassmorphism 느낌)로 묶음
+- `ScoreboardView.js` 내 중복 선언된 `btnLeftColor`, `btnRightColor` 변수 제거
 
 # 입력과 출력
-입력: 가독성이 떨어지던 기존 텍스트
-출력: 어두운 배경 박스 위에서 명확하게 보이는 밝은 텍스트
+입력: 중복 선언으로 인해 모듈 로딩 시 런타임 에러 발생하여 게임 렌더링 불가
+출력: 구문 오류(Syntax Error)가 해결되어 정상적으로 게임 엔트리 화면 진입
 
 # 파일 구조
 - `src/ui/ScoreboardView.js` 수정
 
 # 핵심 모듈
-- `ScoreboardView.js` 렌더링 함수 내 HTML/스타일 구조
+- `ScoreboardView.js` 내부 `renderScoreBoardView`
 
 # 실행 흐름
-- 기존 `updateContrastColors` 타이머 및 이벤트 리스너 제거. 
-- HTML 마크업에 `background: rgba(0,0,0,0.3); border-radius: 24px; backdrop-filter: blur(10px)` 등의 스타일 추가.
+- 모듈 로딩 시 에러 없이 파일이 파싱되어 정상적으로 초기화 로직이 동작함
 
 # 에러 처리
 - N/A
 
 # 테스트 전략
-- 브라우저 상에서 점수 렌더링 시 흰색 글씨가 라운드 박스 안에서 잘 보이는지, 랭킹 및 상단 점수 영역이 분리되어 렌더링되는지 확인.
+- 수정 후 브라우저 개발자 도구(Console)에서 Syntax Error가 사라졌는지 확인
+- 초기 구동 시 "DYE MASTER" 로딩 후 게임 진입 화면이 나오는지 확인
 
 # 완료 기준
-- 글씨가 어두운 배경 상자 안에서 항상 밝게 유지되며, 기존 동적 색상 업데이트 로직이 완전히 제거됨.
+- 중복 선언 변수 제거로 구문 에러 해결

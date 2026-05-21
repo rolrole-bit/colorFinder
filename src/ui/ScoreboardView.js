@@ -109,8 +109,6 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
   // 버튼 위치(화면 하단 약 95% 지점)의 실제 보간된 색상을 사용해 버튼 대비색 지정
   const btnLeftColor = interpolateGradient(leftColors, 0.95);
   const btnRightColor = interpolateGradient(rightColors, 0.95);
-  const btnLeftColor = interpolateGradient(leftColors, 0.95);
-  const btnRightColor = interpolateGradient(rightColors, 0.95);
   const avgBg = getAverageColor(btnLeftColor, btnRightColor);
   const btnStyle = getButtonContrastStyle(avgBg);
 
