@@ -11,6 +11,98 @@ import { startSession as startServerSession } from '../core/ServerAPI.js';
 import { initAudio, playReadySound } from '../utils/SoundUtils.js';
 import { startSession, startDevToolsDetection } from '../utils/AntiCheat.js';
 import { scrambleTypingEffect } from './AnimationUtils.js';
+import { getHSLContrastColor } from '../utils/ColorUtils.js';
+
+/**
+ * 배경 메시의 중앙 영역 색상을 Canvas로 샘플링하여 HSL 대비색을 반환합니다.
+ * @param {HTMLElement} meshEl - 배경 메시 요소
+ * @returns {string} HSL 대비색 문자열
+ */
+function sampleBgAndGetContrast(meshEl) {
+  if (!meshEl) return '#ffffff';
+  
+  // 메시 요소의 computedStyle에서 background 분석
+  const style = getComputedStyle(meshEl);
+  const bgColor = style.backgroundColor;
+  
+  // computedStyle에서 rgb 추출
+  const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+  if (match) {
+    return getHSLContrastColor(+match[1], +match[2], +match[3]);
+  }
+  
+  // 메시는 gradient라서 computedStyle로 안 잡히면
+  // 화면 중앙 지점의 색상을 Canvas 캡처 없이 배경 그라디언트의 평균색으로 추정
+  // 배경 그라디언트의 주요 색상: #ff7eb9(핑크), #2bf0cc(민트), #ffc837(노랑), #a18cd1(보라)
+  // 평균: R≈(255+43+255+161)/4≈178, G≈(126+240+200+141)/4≈177, B≈(185+204+55+209)/4≈163
+  return getHSLContrastColor(178, 177, 163);
+}
+
+/**
+ * EntryView 내 모든 텍스트 요소에 HSL 대비색을 적용합니다.
+ * @param {HTMLElement} container
+ */
+function applyContrastToEntryTexts(container) {
+  const meshEl = container.querySelector('.entry-bg-mesh');
+  const contrastColor = sampleBgAndGetContrast(meshEl);
+  
+  // 타이틀
+  const title = container.querySelector('.magazine-title');
+  if (title) {
+    title.style.color = contrastColor;
+    title.style.webkitTextFillColor = contrastColor;
+    title.style.mixBlendMode = 'normal';
+    title.style.filter = 'none';
+    title.style.background = 'none';
+  }
+  
+  // 라벨들
+  container.querySelectorAll('.diff-label').forEach(el => {
+    el.style.color = contrastColor;
+    el.style.mixBlendMode = 'normal';
+    el.style.filter = 'none';
+  });
+  
+  // 라디오 라벨
+  container.querySelectorAll('.radio-group.clean label').forEach(el => {
+    el.style.color = contrastColor;
+    el.style.mixBlendMode = 'normal';
+    el.style.filter = 'none';
+  });
+  
+  // 라디오 버튼 테두리/도트
+  container.querySelectorAll('.radio-group.clean input[type="radio"]').forEach(el => {
+    el.style.borderColor = contrastColor;
+    el.style.mixBlendMode = 'normal';
+    el.style.filter = 'none';
+  });
+  container.querySelectorAll('.radio-group.clean input[type="radio"]:checked').forEach(el => {
+    el.style.borderColor = contrastColor;
+  });
+  
+  // 인풋
+  container.querySelectorAll('.minimal-input').forEach(el => {
+    el.style.color = contrastColor;
+    el.style.borderBottomColor = contrastColor;
+    el.style.mixBlendMode = 'normal';
+    el.style.filter = 'none';
+  });
+  
+  // 커스텀 플레이스홀더
+  container.querySelectorAll('.custom-placeholder').forEach(el => {
+    el.style.color = contrastColor;
+    el.style.webkitTextFillColor = contrastColor;
+    el.style.background = 'none';
+    el.style.opacity = el.style.opacity || '0.5';
+  });
+  
+  // 드롭다운
+  container.querySelectorAll('.dropdown-item').forEach(el => {
+    el.style.color = contrastColor;
+    el.style.mixBlendMode = 'normal';
+    el.style.filter = 'none';
+  });
+}
 
 /**
  * 엔트리 화면 렌더링
@@ -71,6 +163,16 @@ export function renderEntryView(container, nav) {
       </div>
     </div>
   `;
+
+  // 첫 적용 + 2초마다 배경 변화 추적하여 텍스트 색상 갱신
+  requestAnimationFrame(() => applyContrastToEntryTexts(container));
+  const contrastInterval = setInterval(() => {
+    if (!document.getElementById('entry-panel')) {
+      clearInterval(contrastInterval);
+      return;
+    }
+    applyContrastToEntryTexts(container);
+  }, 2000);
 
   const playerNameInput = document.getElementById('player-name');
   const originGameInput = document.getElementById('origin-game');
