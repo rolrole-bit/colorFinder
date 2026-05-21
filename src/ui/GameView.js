@@ -566,8 +566,8 @@ export function renderGameView(container, nav) {
             roundScore = result.score;
             if (result.nextTargetColor) nav.setServerNextTargetColor(result.nextTargetColor);
             if (result.isLastRound) {
-              state._serverFinalScore = result.finalScore;
-              state._serverMultiplier = result.multiplier;
+              nav._serverFinalScore = result.finalScore;
+              nav._serverMultiplier = result.multiplier;
             }
           } catch (err) {
             console.error('[Server] 라운드 제출 실패:', err);

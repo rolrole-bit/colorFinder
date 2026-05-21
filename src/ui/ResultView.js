@@ -6,7 +6,7 @@
 
 import { getState, setScore, nextRound, getDifficultyMultiplier } from '../core/GameState.js';
 import { toRGBString, rgbToHex, rgbToHsl, getAverageColor, getButtonContrastStyle } from '../utils/ColorUtils.js';
-import { fireSideConfetti } from '../utils/ConfettiUtils.js';
+import { fireSideConfetti, fireCenterConfetti } from '../utils/ConfettiUtils.js';
 import { saveRecord } from '../core/Ranking.js';
 import { isSessionValid, clampScore } from '../utils/AntiCheat.js';
 import { getContrastYIQ, animateValue } from './AnimationUtils.js';
@@ -125,9 +125,11 @@ export function renderInterimResultView(container, nav) {
         let finalScore;
         let multiplier;
         
-        if (state._serverFinalScore != null) {
-          finalScore = state._serverFinalScore;
-          multiplier = state._serverMultiplier || 1.0;
+        if (nav._serverFinalScore != null) {
+          finalScore = nav._serverFinalScore;
+          multiplier = nav._serverMultiplier || 1.0;
+          nav._serverFinalScore = null;
+          nav._serverMultiplier = null;
         } else {
           let baseTotalScore = 0;
           state.roundResults.forEach(r => {

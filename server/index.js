@@ -133,7 +133,7 @@ app.use((req, res, next) => {
 });
 
 // OG 공유 페이지 (server/routes/share.js로 분리)
-app.use('/share', shareRoutes);
+app.use('/share', rateLimit(60, 60 * 1000, 'share'), shareRoutes);
 
 // ═══════════════════════════════════════════
 // 정적 파일
@@ -157,11 +157,17 @@ app.use(express.static(projectRoot, {
     if (filePath.toLowerCase().endsWith('.js')) {
       res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
     }
-    // JS/CSS: 캐싱 없이 항상 최신 (개발 중 필수)
+    // JS/CSS: 환경에 따른 캐시 정책
     if (/\.(js|css)$/i.test(filePath)) {
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
+      if (NODE_ENV === 'production') {
+        // 배포: 캐시버스터(?v=YYYYMMDD) 적용 전제하에 long-term 캐싱
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      } else {
+        // 개발: 항상 최신 파일 제공
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      }
     }
     // 폰트 파일: 1년 캐싱 (변경 거의 없음)
     if (/\.(woff2?|ttf|otf)$/i.test(filePath)) {

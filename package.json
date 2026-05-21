@@ -12,7 +12,6 @@
     "lint:css": "node src/test/css-harness.js"
   },
   "dependencies": {
-    "canvas-confetti": "^1.9.4",
     "compression": "^1.8.1",
     "dotenv": "^17.4.2",
     "express": "^4.21.0",

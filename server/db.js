@@ -7,7 +7,8 @@
  * - 파일 쓰기 에러 핸들링
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { readFileSync, existsSync, mkdirSync } from 'fs';
+import { writeFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import crypto from 'crypto';
@@ -25,10 +26,11 @@ const MAX_RANKINGS = 1000;    // 랭킹 레코드 상한
 mkdirSync(DATA_DIR, { recursive: true });
 
 // ═══════════════════════════════════════════
-// 파일 I/O 헬퍼
+// 파일 I/O 헬퍼 (메모리 캐시 + 비동기 영속화)
 // ═══════════════════════════════════════════
 
-export function loadRankings() {
+/** 디스크에서 rankings.json을 동기 읽기 (서버 시작 시 1회만 호출) */
+function _loadFromDisk() {
   try {
     if (existsSync(RANKINGS_FILE)) {
       const data = readFileSync(RANKINGS_FILE, 'utf-8');
@@ -47,11 +49,31 @@ export function loadRankings() {
   return [];
 }
 
-function persistRankings(rankings) {
+/** 메모리 캐시 (서버 시작 시 1회 로드, 이후 I/O 없이 즉시 반환) */
+let _rankingsCache = _loadFromDisk();
+let _persistPending = false;
+
+/**
+ * 랭킹 데이터 조회 (메모리 캐시에서 즉시 반환, 디스크 I/O 없음)
+ * @returns {Array} 랭킹 배열
+ */
+export function loadRankings() {
+  return _rankingsCache;
+}
+
+/**
+ * 랭킹 데이터 비동기 영속화 (이벤트 루프 블로킹 없음)
+ * 연속 호출 시 중복 쓰기를 방지하는 debounce 잠금 적용
+ */
+async function persistRankings() {
+  if (_persistPending) return;
+  _persistPending = true;
   try {
-    writeFileSync(RANKINGS_FILE, JSON.stringify(rankings, null, 2), 'utf-8');
+    await writeFile(RANKINGS_FILE, JSON.stringify(_rankingsCache, null, 2), 'utf-8');
   } catch (e) {
     console.error('[DB] rankings.json 저장 실패:', e.message);
+  } finally {
+    _persistPending = false;
   }
 }
 
@@ -164,7 +186,7 @@ export function saveRanking(playerName, originGame, score, difficulty, sessionId
     created_at: new Date().toISOString()
   });
   
-  persistRankings(rankings);
+  persistRankings();  // 비동기 fire-and-forget
 }
 
 /**
