@@ -93,7 +93,7 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
   let breakdownHTML = '';
   if (state.roundResults && state.roundResults.length > 0) {
     breakdownHTML = `
-      <div style="display: flex; flex-direction: column; gap: 0.2rem; font-size: 1.1rem; font-weight: 400; letter-spacing: -0.5px; color: ${leftContrast}; text-align: left; line-height: 1.4;">
+      <div style="display: flex; flex-direction: column; gap: 0.2rem; font-size: 1.1rem; font-weight: 400; letter-spacing: -0.5px; color: ${rightContrast}; text-align: left; line-height: 1.4;">
         ${state.roundResults.map((r, i) => `<div>ROUND ${i + 1} : <span style="font-weight:800;">${r.score.toLocaleString()}</span>${i < state.roundResults.length - 1 ? ',' : ''}</div>`).join('')}
       </div>
     `;
@@ -132,12 +132,12 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
             <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-bottom: 1.5rem;">
               ${breakdownHTML}
               
-              <div id="bonus-text" style="font-size: 1rem; font-weight: 700; opacity: 0; letter-spacing: -0.5px; white-space: nowrap; display: block; margin-top: 1rem; color: ${leftContrast}; transition: opacity 0.8s ease; text-align: left;">
+              <div id="bonus-text" style="font-size: 1rem; font-weight: 700; opacity: 0; letter-spacing: -0.5px; white-space: nowrap; display: block; margin-top: 1rem; color: ${rightContrast}; transition: opacity 0.8s ease; text-align: left;">
                 ${getDifficultyName(state.difficulty)} BONUS X ${Number(appliedMultiplier.toFixed(2))}
               </div>
               
               <!-- 한줄평 -->
-              <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.9rem, 2vw, 1.1rem); font-weight: 400; color: ${leftContrast}; letter-spacing: -0.5px; text-align: left; max-width: 400px; line-height: 1.6; word-break: keep-all; opacity: 0; transition: opacity 1s ease 0.5s;">
+              <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.9rem, 2vw, 1.1rem); font-weight: 400; color: ${rightContrast}; letter-spacing: -0.5px; text-align: left; max-width: 400px; line-height: 1.6; word-break: keep-all; opacity: 0; transition: opacity 1s ease 0.5s;">
                 "${comment}"
               </div>
             </div>
