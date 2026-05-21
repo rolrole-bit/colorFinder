@@ -637,8 +637,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   height: 100vh;
   display: flex;
   z-index: 2000;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .split-screen-half {
