@@ -36,7 +36,7 @@ export function renderEntryView(container, nav) {
       </svg>
     </div>
     <div class="magazine-entry" id="entry-panel">
-      <h1 class="magazine-title" style="color: rgba(0,0,0,0.85); -webkit-text-fill-color: rgba(0,0,0,0.85); background: none;">DYE<br/>MASTER</h1>
+      <h1 class="magazine-title">DYE<br/>MASTER</h1>
       
       <div class="entry-form">
         <div class="form-group dropdown-container" style="position: relative;">
