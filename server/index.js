@@ -145,7 +145,7 @@ app.use(express.static(projectRoot, {
   index: 'index.html',
   etag: true,
   lastModified: true,
-  maxAge: '1d',  // CSS/JS 24시간 캐싱 (외부 접속 성능 핵심)
+  maxAge: 0,  // 개발 중 캐싱 비활성화 (배포 시 '1d'로 변경)
   setHeaders: (res, filePath) => {
     if (filePath.toLowerCase().endsWith('.js')) {
       res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
