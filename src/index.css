@@ -637,7 +637,8 @@ input[type="range"]::-webkit-slider-thumb:active {
   height: 100vh;
   display: flex;
   z-index: 2000;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .split-screen-half {
@@ -672,7 +673,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .magazine-score {
@@ -683,6 +684,7 @@ input[type="range"]::-webkit-slider-thumb:active {
   text-align: center;
   flex-shrink: 0;
   margin: 3vh 0;
+  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
 }
 
 .magazine-scoreboard {

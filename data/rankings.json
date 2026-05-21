@@ -878,5 +878,157 @@
     "difficulty": "Normal",
     "session_id": "31f90a84-4405-45da-b9d6-c3f61db09815",
     "created_at": "2026-05-21T03:34:55.942Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 1445,
+    "difficulty": "Normal",
+    "session_id": "c1bc99a5-3266-4952-8889-d4377adda73d",
+    "created_at": "2026-05-21T05:05:53.549Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 1188,
+    "difficulty": "Normal",
+    "session_id": "0d3003bd-1a32-4cbe-a3fc-b15ec6f25b1e",
+    "created_at": "2026-05-21T05:12:44.188Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 851,
+    "difficulty": "Normal",
+    "session_id": "046503c2-89ee-4a9f-b7a7-62ef65b154e2",
+    "created_at": "2026-05-21T05:18:46.805Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 762,
+    "difficulty": "Normal",
+    "session_id": "8cf0404c-6417-49de-bc51-7ac0556b212e",
+    "created_at": "2026-05-21T05:20:23.215Z"
+  },
+  {
+    "player_name": "546",
+    "origin_game": "마비노기 모바일",
+    "score": 1774,
+    "difficulty": "Hard",
+    "session_id": "0f0a8f0f-3c32-43c8-82bb-7dbf4e896d1a",
+    "created_at": "2026-05-21T05:21:16.894Z"
+  },
+  {
+    "player_name": "645",
+    "origin_game": "마비노기 모바일",
+    "score": 1310,
+    "difficulty": "Hard",
+    "session_id": "49eeba16-e3aa-4081-9e4d-fbccea9e4cbb",
+    "created_at": "2026-05-21T05:24:21.313Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 1344,
+    "difficulty": "Normal",
+    "session_id": "1757cd0a-9640-42f8-b54e-1d621cdadadc",
+    "created_at": "2026-05-21T05:32:03.616Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 1916,
+    "difficulty": "Normal",
+    "session_id": "3bc3a697-1efd-46fe-9e7a-a8a59c55a5e1",
+    "created_at": "2026-05-21T05:32:54.587Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 1298,
+    "difficulty": "Normal",
+    "session_id": "4085eb19-c733-4233-a76f-1cf4b3e4bcc6",
+    "created_at": "2026-05-21T05:37:36.011Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 1163,
+    "difficulty": "Normal",
+    "session_id": "eddc7900-c79c-44e9-bd53-d524c61a5820",
+    "created_at": "2026-05-21T05:54:03.612Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 687,
+    "difficulty": "Normal",
+    "session_id": "621e3fc5-9c3c-43ca-97d6-cd59125e7968",
+    "created_at": "2026-05-21T06:03:58.235Z"
+  },
+  {
+    "player_name": "1312",
+    "origin_game": "마비노기 모바일",
+    "score": 1768,
+    "difficulty": "Hard",
+    "session_id": "57265873-2520-430b-83a2-09e62ba77391",
+    "created_at": "2026-05-21T06:05:57.702Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 579,
+    "difficulty": "Normal",
+    "session_id": "11fb9e70-b4af-4291-8361-073c424eec36",
+    "created_at": "2026-05-21T07:02:18.034Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 1795,
+    "difficulty": "Normal",
+    "session_id": "80f75147-e798-4caf-ba50-4a957d1d76c5",
+    "created_at": "2026-05-21T07:05:55.478Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 735,
+    "difficulty": "Normal",
+    "session_id": "12d9221a-ae0c-41f5-be61-272d7e93c056",
+    "created_at": "2026-05-21T07:07:21.390Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 1782,
+    "difficulty": "Normal",
+    "session_id": "30190e4d-87c3-4dee-b37a-3850c27e3723",
+    "created_at": "2026-05-21T07:16:52.246Z"
+  },
+  {
+    "player_name": "21",
+    "origin_game": "마비노기 모바일",
+    "score": 271,
+    "difficulty": "Hard",
+    "session_id": "f08fbccb-6f49-4a6e-8cc1-1523525fc08c",
+    "created_at": "2026-05-21T07:21:06.643Z"
+  },
+  {
+    "player_name": "546",
+    "origin_game": "마비노기 모바일",
+    "score": 451,
+    "difficulty": "Hard",
+    "session_id": "428a4c01-902c-4a0c-bdad-e62a427cf3f3",
+    "created_at": "2026-05-21T07:22:31.892Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 1115,
+    "difficulty": "Normal",
+    "session_id": "4df7137d-3f09-44da-ba6c-082e284d8347",
+    "created_at": "2026-05-21T07:25:13.831Z"
   }
 ]

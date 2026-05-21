@@ -72,6 +72,7 @@ export const animateValue = (element, start, end, duration, isInteger = false, p
   return new Promise(resolve => {
     let startTimestamp = null;
     let lastTick = 0;
+    let lastText = '';
     
     // 모션 블러를 위한 필터 적용
     element.style.transition = 'filter 0.1s ease';
@@ -82,7 +83,19 @@ export const animateValue = (element, start, end, duration, isInteger = false, p
       const progress = Math.min((timestamp - startTimestamp) / duration, 1);
       const easeProgress = progress * (2 - progress); // ease-out quad
       const current = start + (end - start) * easeProgress;
-      element.innerHTML = isInteger ? Math.floor(current).toLocaleString() : current.toFixed(1);
+      
+      const currentText = isInteger ? Math.floor(current).toLocaleString() : current.toFixed(1);
+      
+      if (currentText !== lastText) {
+        element.innerHTML = currentText;
+        lastText = currentText;
+        // 속도(progress 변화율)에 따라 블러 강도 조절
+        const speed = (1 - progress) * 5; 
+        element.style.filter = `blur(${speed}px)`;
+      } else {
+        // 숫자가 바뀌지 않은 프레임에서는 블러 제거 (transition 덕분에 부드럽게 감소)
+        element.style.filter = 'blur(0px)';
+      }
       
       if (playSound && timestamp - lastTick > 40) {
         playScoreTickSound(progress);
@@ -90,9 +103,6 @@ export const animateValue = (element, start, end, duration, isInteger = false, p
       }
       
       if (progress < 1) {
-        // 속도(progress 변화율)에 따라 블러 강도 조절
-        const speed = (1 - progress) * 5; 
-        element.style.filter = `blur(${speed}px)`;
         window.requestAnimationFrame(step);
       } else {
         element.innerHTML = isInteger ? Math.floor(end).toLocaleString() : end.toFixed(1);

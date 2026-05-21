@@ -23,9 +23,10 @@ import { getButtonContrastStyle } from '../utils/ColorUtils.js';
 export function renderEntryView(container, nav) {
   // 엔트리 배경은 항상 밝은 톤(mesh gradient)이므로 밝은 기준의 평균색을 사용
   const btnStyle = getButtonContrastStyle({ r: 245, g: 240, b: 245 });
+  const randomDelay = -(Math.random() * 25).toFixed(2);
   container.innerHTML = `
     <div class="bg-tapes-container" id="entry-bg">
-      <div class="entry-bg-mesh"></div>
+      <div class="entry-bg-mesh" style="animation-delay: ${randomDelay}s;"></div>
       <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute; width:0; height:0; pointer-events:none; visibility:hidden;">
         <filter id="liquid-noise">
           <feTurbulence type="fractalNoise" baseFrequency="0.005 0.005" numOctaves="3" result="noise">
