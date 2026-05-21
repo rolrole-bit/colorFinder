@@ -737,7 +737,12 @@ input[type="range"]::-webkit-slider-thumb:active {
   margin-bottom: max(2vh, 1rem);
   text-align: left;
   
+  /* 글로벌 h1 규칙(line 174)의 -webkit-text-fill-color:transparent 를 덮어씀 */
   color: rgba(0, 0, 0, 0.85) !important;
+  -webkit-text-fill-color: rgba(0, 0, 0, 0.85) !important;
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
 }
 
 @keyframes gradientText {
