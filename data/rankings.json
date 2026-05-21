@@ -814,5 +814,21 @@
     "difficulty": "Normal",
     "session_id": "a8766726-26b6-4349-b5fe-bc1f57497920",
     "created_at": "2026-05-21T02:23:35.047Z"
+  },
+  {
+    "player_name": "64",
+    "origin_game": "마비노기 모바일",
+    "score": 680,
+    "difficulty": "Normal",
+    "session_id": "d00925b2-24d0-4dc6-9c27-eb9ef20864a0",
+    "created_at": "2026-05-21T02:28:37.326Z"
+  },
+  {
+    "player_name": "DevTester",
+    "origin_game": "DevMode",
+    "score": 636,
+    "difficulty": "Normal",
+    "session_id": "74b35701-8a78-4e9c-a2bc-57514425da22",
+    "created_at": "2026-05-21T02:29:37.321Z"
   }
 ]

@@ -1410,28 +1410,28 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 
 .magazine-start-btn:disabled {
   /* 비활성화: 반투명 유리(Frosted Glass) — 배경 블러 + 낮은 콘트라스트 */
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
   backdrop-filter: blur(20px) saturate(130%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
-  color: rgba(255, 255, 255, 0.4) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
   border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
   box-shadow: none !important;
   opacity: 1 !important;
   cursor: not-allowed !important;
   transform: none !important;
-  mix-blend-mode: normal !important;
+  mix-blend-mode: difference !important;
   border-radius: 9999px !important;
 }
 
 .magazine-start-btn:not(:disabled) {
-  /* 활성화: disabled와 같은 유리 스타일이지만 더 진하고 또렷하게 */
-  background: rgba(255, 255, 255, 0.2) !important;
+  /* 활성화: 유리 스타일 + difference 블렌딩으로 배경에 따라 자동 반전 */
+  background: rgba(255, 255, 255, 0.25) !important;
   backdrop-filter: blur(20px) saturate(130%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
   color: #ffffff !important;
   border: 1.5px solid rgba(255, 255, 255, 0.7) !important;
   box-shadow: none !important;
-  mix-blend-mode: normal !important;
+  mix-blend-mode: difference !important;
   opacity: 1 !important;
   border-radius: 9999px !important;
   

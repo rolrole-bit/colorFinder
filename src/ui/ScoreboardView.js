@@ -93,7 +93,7 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
   let breakdownHTML = '';
   if (state.roundResults && state.roundResults.length > 0) {
     breakdownHTML = `
-      <div style="display: flex; flex-direction: column; gap: 0.2rem; font-size: 1.1rem; font-weight: 400; letter-spacing: -0.5px; color: ${rightContrast}; text-align: left; line-height: 1.4;">
+      <div style="display: flex; flex-direction: column; gap: 0.2rem; font-size: 1.1rem; font-weight: 400; letter-spacing: -0.5px; color: #fff; mix-blend-mode: difference; filter: contrast(1000%) saturate(300%) brightness(150%); text-align: left; line-height: 1.4;">
         ${state.roundResults.map((r, i) => `<div>ROUND ${i + 1} : <span style="font-weight:800;">${r.score.toLocaleString()}</span>${i < state.roundResults.length - 1 ? ',' : ''}</div>`).join('')}
       </div>
     `;
@@ -117,12 +117,12 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
 
             <!-- 좌측 컬럼 -->
             <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start;">
-              <div style="font-size: clamp(1rem, 3vw, 1.4rem); font-weight: 300; color: ${leftContrast}; letter-spacing: -0.5px; margin-bottom: 0.5rem; text-align: left;">
-                <span style="font-weight: 700; border-bottom: 2px dotted ${leftContrast}; padding-bottom: 2px;">${playerNameSafe}</span> 님의 점수는
+              <div style="font-size: clamp(1rem, 3vw, 1.4rem); font-weight: 300; color: #fff; mix-blend-mode: difference; filter: contrast(1000%) saturate(300%) brightness(150%); letter-spacing: -0.5px; margin-bottom: 0.5rem; text-align: left;">
+                <span style="font-weight: 700; border-bottom: 2px dotted currentColor; padding-bottom: 2px;">${playerNameSafe}</span> 님의 점수는
               </div>
               
               <div class="magazine-score" style="margin-top: 0; font-size: clamp(5rem, 18vw, 10rem); text-align: left; letter-spacing: -0.04em;">
-                <div style="line-height: 1; color: ${leftContrast};">
+                <div style="line-height: 1; color: #fff; mix-blend-mode: difference; filter: contrast(1000%) saturate(300%) brightness(150%);">
                   <span class="animated-score" data-target="${state.score}">0</span>
                 </div>
               </div>
@@ -132,12 +132,12 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
             <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-bottom: 1.5rem;">
               ${breakdownHTML}
               
-              <div id="bonus-text" style="font-size: 1rem; font-weight: 700; opacity: 0; letter-spacing: -0.5px; white-space: nowrap; display: block; margin-top: 1rem; color: ${rightContrast}; transition: opacity 0.8s ease; text-align: left;">
+              <div id="bonus-text" style="font-size: 1rem; font-weight: 700; opacity: 0; letter-spacing: -0.5px; white-space: nowrap; display: block; margin-top: 1rem; color: #fff; mix-blend-mode: difference; filter: contrast(1000%) saturate(300%) brightness(150%); transition: opacity 0.8s ease; text-align: left;">
                 ${getDifficultyName(state.difficulty)} BONUS X ${Number(appliedMultiplier.toFixed(2))}
               </div>
               
               <!-- 한줄평 -->
-              <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.9rem, 2vw, 1.1rem); font-weight: 400; color: ${rightContrast}; letter-spacing: -0.5px; text-align: left; max-width: 400px; line-height: 1.6; word-break: keep-all; opacity: 0; transition: opacity 1s ease 0.5s;">
+              <div id="score-comment" style="margin-top: 1.5rem; font-size: clamp(0.9rem, 2vw, 1.1rem); font-weight: 400; color: #fff; mix-blend-mode: difference; filter: contrast(1000%) saturate(300%) brightness(150%); letter-spacing: -0.5px; text-align: left; max-width: 400px; line-height: 1.6; word-break: keep-all; opacity: 0; transition: opacity 1s ease 0.5s;">
                 "${comment}"
               </div>
             </div>
@@ -146,14 +146,14 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
           
           <div class="magazine-scoreboard">
             <div class="scoreboard-grid" style="margin-top: 0; padding-bottom: 5rem;">
-              <div class="score-card" style="background: none; border: none; border-top: 1px solid currentColor; padding: 1.5rem 0 0 0; color: ${leftContrast};">
+              <div class="score-card" style="background: none; border: none; border-top: 1px solid currentColor; padding: 1.5rem 0 0 0; color: #fff; mix-blend-mode: difference; filter: contrast(1000%) saturate(300%) brightness(150%);">
                 <h3 style="color: inherit;">플레이어 랭킹</h3>
                 <ul class="rank-list" style="color: inherit;">
                   ${playerRanksHTML}
                 </ul>
               </div>
               
-              <div class="score-card" style="background: none; border: none; border-top: 1px solid currentColor; padding: 1.5rem 0 0 0; color: ${rightContrast};">
+              <div class="score-card" style="background: none; border: none; border-top: 1px solid currentColor; padding: 1.5rem 0 0 0; color: #fff; mix-blend-mode: difference; filter: contrast(1000%) saturate(300%) brightness(150%);">
                 <h3 style="color: inherit;">게임별 랭킹</h3>
                 <ul class="rank-list" style="color: inherit;">
                   ${gameRanksHTML}
