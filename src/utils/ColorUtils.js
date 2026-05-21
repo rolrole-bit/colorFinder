@@ -66,51 +66,79 @@ export function calculateScore(target, user) {
 }
 
 /**
+ * ═══════════════════════════════════════════════════════════════
+ *  HSL 기반 명도반전 컨트라스트 블렌딩 (Contrast Blend Color)
+ * ═══════════════════════════════════════════════════════════════
+ * 
+ *  배경색 RGB → HSL 변환 후:
+ *    H (색상) : +180° 보색 반전
+ *    S (채도) : 100 - S 반전
+ *    L (명도) : 100 - L 반전, 단 데드존(붉은 영역)에 진입하면
+ *               가장 가까운 바깥으로 밀어냄
+ * 
+ *  ┌─────────────────────── L 축 (0~100) ───────────────────────┐
+ *  │  ██████████  ░░░░░░░░░░░░░░░░░░░░░░░░░░░  ██████████████  │
+ *  │  안전(어둡)   ▲ DEAD_ZONE_LOW  DEAD_ZONE_HIGH ▲  안전(밝음)  │
+ *  │              └── 이 구간에 L이 들어오면 밖으로 밀어냄 ──┘       │
+ *  └────────────────────────────────────────────────────────────┘
+ * 
+ * ★ 튜닝 가이드 (직접 수정할 수 있는 파라미터들):
+ *   - DEAD_ZONE_LOW  : 데드존 하한 (기본 25). 높이면 더 많은 중간톤을 밀어냄
+ *   - DEAD_ZONE_HIGH : 데드존 상한 (기본 75). 낮추면 더 많은 중간톤을 밀어냄
+ *   - PUSH_MARGIN    : 데드존 바깥으로 밀어내는 추가 여유값 (기본 10)
+ *   - MIN_SATURATION : 결과 채도 최소값 (기본 20). 높이면 더 선명한 색상
+ * 
+ * @param {number} r - 배경 Red (0-255)
+ * @param {number} g - 배경 Green (0-255)
+ * @param {number} b - 배경 Blue (0-255)
+ * @returns {string} CSS hex color string (예: '#FF00AA')
+ */
+export function getContrastBlendColor(r, g, b) {
+  // ═══ ★ 여기서 수치를 직접 조절하세요 ★ ═══
+  const DEAD_ZONE_LOW  = 25;   // L 데드존 하한 (0~50 사이)
+  const DEAD_ZONE_HIGH = 75;   // L 데드존 상한 (50~100 사이)
+  const PUSH_MARGIN    = 10;   // 데드존 밖으로 밀어내는 여유값
+  const MIN_SATURATION = 20;   // 결과 색상의 최소 채도 (0~100)
+  // ═══════════════════════════════════════════
+
+  const bg = rgbToHsl(r, g, b);
+
+  // H: 보색 반전 (+180도)
+  const newH = (bg.h + 180) % 360;
+
+  // S: 반전 + 최소 채도 보장
+  const newS = Math.max(MIN_SATURATION, 100 - bg.s);
+
+  // L: 반전
+  let newL = 100 - bg.l;
+
+  // L이 데드존(회색 영역)에 진입하면 가장 가까운 바깥으로 밀어냄
+  if (newL >= DEAD_ZONE_LOW && newL <= DEAD_ZONE_HIGH) {
+    const mid = (DEAD_ZONE_LOW + DEAD_ZONE_HIGH) / 2;
+    if (newL < mid) {
+      // 어두운 쪽으로 밀어냄
+      newL = DEAD_ZONE_LOW - PUSH_MARGIN;
+    } else {
+      // 밝은 쪽으로 밀어냄
+      newL = DEAD_ZONE_HIGH + PUSH_MARGIN;
+    }
+  }
+
+  // 최종 클램프 (0~100)
+  newL = Math.max(0, Math.min(100, newL));
+
+  const result = hslToRgb(newH, newS, newL);
+  return rgbToHex(result.r, result.g, result.b);
+}
+
+/**
  * Returns #000 or #fff depending on the luminance of the given RGB color.
+ * (레거시 호환용 — 새로운 코드에서는 getContrastBlendColor 사용 권장)
  */
 export function getContrastColor(r, g, b) {
   const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
   return (yiq >= 128) ? '#000000' : '#ffffff';
 }
-
-/**
- * RGB 색상의 대비가 높은 HSL 보색을 계산하여 CSS HSL 문자열로 반환합니다.
- * H(Hue)는 180도 회전(보색), S(Saturation)는 반전합니다.
- * L(Lightness)은 기본 반전하되, 중간 영역(30% ~ 70%)에 속하면 밖으로 밀어냅니다.
- * 
- * @param {number} r - Red (0-255)
- * @param {number} g - Green (0-255)
- * @param {number} b - Blue (0-255)
- * @returns {string} css hsl() color string
- */
-export function getHSLContrastColor(r, g, b) {
-  if (r === undefined || g === undefined || b === undefined) {
-    return '#ffffff';
-  }
-
-  const hsl = rgbToHsl(r, g, b);
-
-  // Hue 반전 (180도 보색)
-  const hContrast = (hsl.h + 180) % 360;
-
-  // Saturation 반전 (가독성 최소 채도 30% 보정)
-  let sContrast = 100 - hsl.s;
-  if (sContrast < 30) {
-    sContrast = 30;
-  }
-
-  // Lightness: 원본 배경 명도 기준으로 방향 결정
-  // 배경이 어두우면 → 밝은 텍스트, 배경이 밝으면 → 어두운 텍스트
-  let lContrast;
-  if (hsl.l < 50) {
-    lContrast = 85; // 어두운 배경 → 밝은 텍스트
-  } else {
-    lContrast = 15; // 밝은 배경 → 어두운 텍스트
-  }
-
-  return `hsl(${hContrast}, ${sContrast}%, ${lContrast}%)`;
-}
-
 
 /**
  * RGB 객체를 CSS rgb() 문자열로 변환합니다.

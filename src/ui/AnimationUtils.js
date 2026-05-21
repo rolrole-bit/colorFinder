@@ -3,18 +3,20 @@
  * scrambleTypingEffect, animateValue, getContrastYIQ
  */
 
+import { getContrastBlendColor } from '../utils/ColorUtils.js';
 import { playScoreTickSound } from '../utils/SoundUtils.js';
 
 /**
- * 배경 밝기에 따라 검정/흰색 대비색 반환
+ * 배경 색상에 따른 HSL 기반 명도반전 컨트라스트 블렌딩 색상 반환
+ * → 내부적으로 ColorUtils.getContrastBlendColor() 호출
+ * → 튜닝은 ColorUtils.js 의 getContrastBlendColor 함수 내부 상수 조절
  * @param {number} r - Red (0-255)
  * @param {number} g - Green (0-255)
  * @param {number} b - Blue (0-255)
- * @returns {string} '#000000' 또는 '#FFFFFF'
+ * @returns {string} CSS hex color string
  */
 export const getContrastYIQ = (r, g, b) => {
-  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-  return (yiq >= 128) ? '#000000' : '#FFFFFF';
+  return getContrastBlendColor(r, g, b);
 };
 
 /**

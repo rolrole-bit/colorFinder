@@ -1,42 +1,36 @@
-# 작업 목적
-- DYE MASTER의 텍스트 대비색(명도 대비) 계산 공식을 단순 흑백(YIQ 기반 검정/흰색) 또는 단순 반전에서 HSL 공간의 지능형 보색 대비 공식으로 개선합니다.
-- 배경색이 중간 명도(회색 영역 또는 사용자가 지정한 "L의 붉은 영역")에 위치하여 글씨 명도가 겹쳐 가독성이 떨어지는 현상을 방지합니다.
-- H, S는 보색(반전)을 취하되, L(명도)이 중간 영역(30%~70%)에 들어갈 경우 이 영역 밖(어두운 영역 15% 이하 또는 밝은 영역 85% 이상)으로 밀어내어 가독성을 극대화합니다.
+# PLAN 1: 패션 매거진 스타일 결과 화면 개편 (Core)
 
-# 핵심 기능
-- `getHSLContrastColor(r, g, b)` 함수 구현
-  - RGB를 HSL로 변환
-  - H(Hue)는 180도 회전하여 보색 계산
-  - S(Saturation)는 반전 또는 가독성을 보완한 반전 계산
-  - L(Lightness)은 기본 반전(`100 - L`)을 취하되, 중간 명도 영역(30% ~ 70%)에 위치하면 `L <= 50`일 때는 더 낮게(예: 15%), `L > 50`일 때는 더 높게(예: 85%) 강제로 밀어내어 명도 가독성을 확보
-  - 변환된 HSL 값을 CSS `hsl()` 포맷 문자열로 변환하여 반환
-- 스코어보드(`ScoreboardView.js`), 결과화면(`ResultView.js`), 게임화면(`GameView.js`) 등 대비색이 필요한 곳에 기존 YIQ 함수 대신 새 HSL 대비 함수 적용
+## 작업 목적
+- 최종 결과 화면(ScoreboardView) 및 라운드 중간 결과 화면(ResultView)의 레이아웃을 고도로 정돈된 패션 매거진(Editorial Style) 느낌으로 개편하여 프리미엄한 비주얼 선사.
+- 하단 버튼이 랭킹 리스트를 덮어버리는 레이아웃 겹침(Clash) 버그 해결.
 
-# 입력과 출력
-- 입력: RGB 색상 값 (r, g, b) 각각 0~255
-- 출력: CSS hsl 색상 문자열 `hsl(H, S%, L%)`
+## 핵심 기능
+- **Editorial Typography**: 얇고 정갈한 서브 텍스트와 초거대 숫자 폰트의 극적 대비.
+- **Minimal Grid Border**: 잡지 레이아웃 느낌의 1px 세밀한 보더라인 단락 구분.
+- **Scroll Flow Button Section**: 버튼이 리스트 콘텐츠를 덮지 않도록 자연스러운 스크롤 영역 확보 및 하단 그라데이션 차단막 처리.
+- **Ranking Visual Redesign**: 배경 대비색(YIQ)을 완전히 상속받으면서도 가독성 높은 표 형태의 랭킹 카드 레이아웃.
 
-# 파일 구조
-수정 대상 파일:
-- [ColorUtils.js](file:///e:/AI/DYE_MASTER/colorFinder/src/utils/ColorUtils.js): 신규 HSL 대비색 함수 `getHSLContrastColor` 정의
-- [ResultView.js](file:///e:/AI/DYE_MASTER/colorFinder/src/ui/ResultView.js): 새 대비색 함수 적용
-- [ScoreboardView.js](file:///e:/AI/DYE_MASTER/colorFinder/src/ui/ScoreboardView.js): 새 대비색 함수 적용
-- [GameView.js](file:///e:/AI/DYE_MASTER/colorFinder/src/ui/GameView.js): 필요한 텍스트 대비색 영역에 적용
+## 입력과 출력
+- **입력**: 플레이어 최종 점수, 라운드별 점수 내역, 난이도 배율, 플레이어 랭킹, 게임별 랭킹 데이터.
+- **출력**: 패션 매거진 레이아웃이 적용된 깔끔하고 트렌디한 결과 화면.
 
-# 핵심 모듈
-- `ColorUtils.js` 내의 HSL/RGB 변환 유틸리티 활용 및 명도 밀어내기 알고리즘 구현
+## 파일 구조 (영향을 받는 파일)
+- [ScoreboardView.js](file:///e:/AI/DYE_MASTER/colorFinder/src/ui/ScoreboardView.js): 레이아웃 템플릿 개편, 버튼 영역 및 스크롤 영역 분리.
+- [index.css](file:///e:/AI/DYE_MASTER/colorFinder/src/index.css): `.magazine-overlay`, `.magazine-scoreboard`, `.rank-item`, `.magazine-start-btn` 관련 스타일 대대적 리팩토링.
 
-# 실행 흐름
-1. 각 뷰에서 배경색 결정
-2. 해당 배경색의 R, G, B를 기반으로 `getHSLContrastColor(r, g, b)` 호출
-3. 계산된 HSL 대비색 문자열을 스타일시트 또는 인라인 스타일의 `color` 값으로 설정
-4. 브라우저가 보색 및 명도 밀어내기가 적용된 텍스트를 렌더링
+## 실행 흐름
+1. CSS에서 랭킹 카드 및 점수 판의 구닥다리 테두리와 불필요한 마진 제거.
+2. 매거진 느낌의 얇고 심플한 그리드 라인 스타일 및 마진 확보용 스페이서 배치.
+3. JS 템플릿 내의 버튼 겹침을 방지하기 위해 랭킹 리스트 하단에 충분한 Padding-bottom 부여 및 컨테이너 스크롤 처리.
+4. YIQ 텍스트 대비색이 버튼에도 명확하게 적용되도록 스타일 수정.
 
-# 에러 처리
-- R, G, B 값이 유효하지 않거나 undefined인 경우 안전하게 기본 대비색(흰색 또는 검은색)을 반환하는 Fallback 로직 설계
+## 에러 처리
+- 플레이어 랭킹이나 게임별 랭킹 데이터가 빈 배열일 때의 폴백(Fallback) 메시지 디자인 유지.
 
-# 테스트 전략
-- 수동 테스트: 다양한 RGB 색상(파스텔톤, 중간 명도의 핑크/연두색, 아주 어두운 색, 아주 밝은 색)을 직접 선택하여 텍스트 가독성을 확인하고 명도 밀어내기 동작 여부 검증
+## 테스트 전략
+- 랭킹 데이터가 5개 꽉 찼을 때와 본인 등수가 추가로 덧붙여졌을 때 화면 아래로 튀어나가지 않고 자연스럽게 스크롤 되며 버튼이 가리지 않는지 확인.
 
-# 완료 기준
-- 중간 명도(예: 핑크, 연두색 등 L=50% 부근) 배경 위에서 텍스트 색상이 회색빛이 아닌, 채도가 살아있는 뚜렷한 대비색(명도가 85% 이상이거나 15% 이하인 보색)으로 표시되는 것 확인
+## 완료 기준
+- 최종 결과 화면의 텍스트가 절대 겹치지 않음.
+- 랭킹 표가 잡지 레이아웃처럼 깔끔하게 1px 실선으로 정렬됨.
+- 버튼의 위치가 랭킹의 글자들을 가리는 현상이 없음.

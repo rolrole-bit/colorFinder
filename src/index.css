@@ -246,7 +246,7 @@ input[type="text"]:focus {
 .dropdown-item {
   padding: 1rem 1.5rem;
   cursor: pointer;
-  color: inherit;
+  color: #000;
   font-family: 'Paperlogy', sans-serif;
   font-weight: 500;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -259,6 +259,7 @@ input[type="text"]:focus {
 
 .dropdown-item:hover, .dropdown-item.active {
   background: rgba(0, 0, 0, 0.05);
+  color: #000;
 }
 
 .radio-group {
@@ -735,7 +736,11 @@ input[type="range"]::-webkit-slider-thumb:active {
   letter-spacing: -0.02em;
   margin-bottom: max(2vh, 1rem);
   text-align: left;
-  color: #000;
+  
+  color: #fff !important;
+  mix-blend-mode: difference;
+  filter: contrast(1000%) saturate(300%) brightness(150%);
+  
   background: none;
   -webkit-background-clip: unset;
   -webkit-text-fill-color: initial;
@@ -776,8 +781,8 @@ input[type="text"].minimal-input {
   width: 100%;
   background: transparent !important;
   border: none !important;
-  border-bottom: 2px solid currentColor;
-  color: inherit;
+  border-bottom: 2px solid #fff !important;
+  color: #fff !important;
   font-family: 'Paperlogy', 'Inter', sans-serif;
   font-size: clamp(1rem, 3vh, 1.5rem);
   padding: max(1vh, 0.5rem) 0;
@@ -785,6 +790,8 @@ input[type="text"].minimal-input {
   outline: none;
   transition: border-color 0.3s;
   border-radius: 0 !important;
+  mix-blend-mode: difference;
+  filter: contrast(1000%) saturate(300%) brightness(150%);
 }
 
 input[type="text"].minimal-input::placeholder {
@@ -792,6 +799,7 @@ input[type="text"].minimal-input::placeholder {
 }
 
 input[type="text"].minimal-input:focus {
+  border-bottom-color: #fff !important;
   box-shadow: none !important;
 }
 
@@ -845,7 +853,9 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-family: 'Paperlogy', sans-serif;
   font-weight: 300;
   font-size: clamp(0.9rem, 2vh, 1.2rem);
-  color: inherit;
+  color: #fff !important;
+  mix-blend-mode: difference;
+  filter: contrast(1000%) saturate(300%) brightness(150%);
   margin-bottom: max(1vh, 0.5rem);
 }
 
@@ -859,7 +869,9 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-family: 'Paperlogy', sans-serif;
   font-weight: 400;
   font-size: clamp(0.9rem, 2.5vh, 1.2rem);
-  color: inherit;
+  color: #fff !important;
+  mix-blend-mode: difference;
+  filter: contrast(1000%) saturate(300%) brightness(150%);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -872,7 +884,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   -webkit-appearance: none;
   width: 18px;
   height: 18px;
-  border: 1px solid currentColor;
+  border: 1px solid #000;
   border-radius: 50%;
   outline: none;
   transition: all 0.2s;
@@ -882,7 +894,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 }
 
 .radio-group.clean input[type="radio"]:checked {
-  border-color: currentColor;
+  border-color: #000;
 }
 
 .radio-group.clean input[type="radio"]:checked::after {
@@ -893,7 +905,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   transform: translate(-50%, -50%);
   width: 8px;
   height: 8px;
-  background: currentColor;
+  background: #000;
   border-radius: 50%;
 }
 
@@ -1040,7 +1052,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-family: 'Paperlogy', sans-serif;
   font-weight: 300;
   font-size: clamp(0.9rem, 2vh, 1.2rem);
-  color: inherit;
+  color: #000;
   margin-bottom: max(1vh, 0.5rem);
 }
 
@@ -1054,7 +1066,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-family: 'Paperlogy', sans-serif;
   font-weight: 400;
   font-size: clamp(0.9rem, 2.5vh, 1.2rem);
-  color: inherit;
+  color: #000;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1067,7 +1079,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   -webkit-appearance: none;
   width: 18px;
   height: 18px;
-  border: 1px solid currentColor;
+  border: 1px solid #000;
   border-radius: 50%;
   outline: none;
   transition: all 0.2s;
@@ -1077,7 +1089,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 }
 
 .radio-group.clean input[type="radio"]:checked {
-  border-color: currentColor;
+  border-color: #000;
 }
 
 .radio-group.clean input[type="radio"]:checked::after {
@@ -1088,7 +1100,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   transform: translate(-50%, -50%);
   width: 8px;
   height: 8px;
-  background: currentColor;
+  background: #000;
   border-radius: 50%;
 }
 
@@ -1124,7 +1136,6 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   background: #ffffff !important;
   color: #000000 !important;
   mix-blend-mode: difference;
-  filter: contrast(1000%) saturate(300%) brightness(150%);
 }
 
 .magazine-start-btn:not(:disabled):hover {
