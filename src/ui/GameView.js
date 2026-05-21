@@ -417,10 +417,25 @@ export function renderGameView(container, nav) {
             subTextEl.textContent = rgbToHex(currentDisplayedRGB.r, currentDisplayedRGB.g, currentDisplayedRGB.b);
           }
           
-          // 애니메이션 중에도 실시간 HSL 콘트라스트 보정 알고리즘
-          const curContrast = getHSLContrastColor(currentDisplayedRGB.r, currentDisplayedRGB.g, currentDisplayedRGB.b);
+          // 애니메이션 중에도 실시간 콘트라스트 보정 알고리즘 (0.5초 동안 매 프레임 보간된 컬러로 계산)
+          const curInvertedR = 255 - currentDisplayedRGB.r;
+          const curInvertedG = 255 - currentDisplayedRGB.g;
+          const curInvertedB = 255 - currentDisplayedRGB.b;
           
-          submitBtn.style.backgroundColor = curContrast;
+          const curTextYiq = ((currentDisplayedRGB.r * 299) + (currentDisplayedRGB.g * 587) + (currentDisplayedRGB.b * 114)) / 1000;
+          let curBgR, curBgG, curBgB;
+          if (curTextYiq >= 128) {
+            const factor = 0.35;
+            curBgR = Math.round(curInvertedR * factor);
+            curBgG = Math.round(curInvertedG * factor);
+            curBgB = Math.round(curInvertedB * factor);
+          } else {
+            curBgR = Math.round(curInvertedR + (255 - curInvertedR) * 0.65);
+            curBgG = Math.round(curInvertedG + (255 - curInvertedG) * 0.65);
+            curBgB = Math.round(curInvertedB + (255 - curInvertedB) * 0.65);
+          }
+          
+          submitBtn.style.backgroundColor = `rgb(${curBgR}, ${curBgG}, ${curBgB})`;
           submitBtn.style.color = `rgb(${currentDisplayedRGB.r}, ${currentDisplayedRGB.g}, ${currentDisplayedRGB.b})`;
           
           if (progress < 1) hexAnimFrame = requestAnimationFrame(animate);
