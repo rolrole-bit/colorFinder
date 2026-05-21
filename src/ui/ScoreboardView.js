@@ -238,7 +238,27 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
         <button id="share-close-btn" style="width:100%; margin-top:0.8rem; padding:0.8rem; border:none; border-radius:12px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.6); font-size:0.9rem; cursor:pointer; font-family:'Paperlogy',sans-serif; transition:all 0.2s;">닫기</button>
       </div>
     </div>
+    
+    <!-- 지옥 난이도 도전 모달 (2900점 이상) -->
+    <div id="hell-challenge-modal" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.75); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); justify-content:center; align-items:center;">
+      <div style="position:relative; max-width:420px; width:90%; animation: shareCardPop 0.4s ease-out;">
+        <div style="text-align:center; padding:3rem 2.5rem; border:1px solid rgba(255,60,60,0.3); border-radius:24px; box-shadow:0 0 60px rgba(255,0,0,0.2), 0 20px 60px rgba(0,0,0,0.4); position:relative; overflow:hidden; background:rgba(20,0,0,0.85);">
+          <div style="position:absolute; inset:0; background:radial-gradient(ellipse at center, rgba(255,0,0,0.08) 0%, transparent 70%); z-index:0;"></div>
+          <div style="position:relative; z-index:1;">
+            <div style="font-size:3.5rem; margin-bottom:1rem; filter: drop-shadow(0 0 10px rgba(255,0,0,0.5));">🔥</div>
+            <div style="font-size:1.6rem; font-weight:900; color:#ff4444; letter-spacing:2px; margin-bottom:0.5rem; text-shadow:0 0 20px rgba(255,0,0,0.4);">지옥 난이도 해금!</div>
+            <div style="font-size:0.95rem; color:rgba(255,255,255,0.75); line-height:1.8; margin-bottom:2rem; word-break:keep-all;">
+              축하합니다! <span style="font-weight:800; color:#fff;">${state.score.toLocaleString()}점</span>을 달성하셨습니다.<br>
+              <span style="color:#ff6666; font-weight:700;">지옥 난이도</span>에 도전할 수 있습니다.<br>
+              <span style="font-size:0.8rem; opacity:0.5;">(기억 시간: 0.1~0.2초 / 배율: ×1.25~1.30)</span>
+            </div>
+            <button id="hell-challenge-close" style="width:100%; padding:1rem; border:none; border-radius:14px; background:linear-gradient(135deg, #ff4444, #cc0000); color:#fff; font-size:1rem; font-weight:800; cursor:pointer; font-family:'Paperlogy',sans-serif; letter-spacing:1px; transition:all 0.2s; box-shadow:0 4px 20px rgba(255,0,0,0.3);">확인</button>
+          </div>
+        </div>
+      </div>
+    </div>
   `;
+
 
   // 한줄평 페이드 인
   requestAnimationFrame(() => {
@@ -250,6 +270,19 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
 
   // 점수 애니메이션
   const animatedScoreFinal = container.querySelector('.animated-score');
+
+  /**
+   * 점수 애니메이션 완료 후 2900점 이상이면 지옥 도전 모달 표시
+   */
+  function showHellModalIfQualified() {
+    if (state.score >= 2900 && state.difficulty !== 'Hell') {
+      setTimeout(() => {
+        const modal = document.getElementById('hell-challenge-modal');
+        if (modal) modal.style.display = 'flex';
+      }, 600);
+    }
+  }
+
   if (animatedScoreFinal) {
     const finalTarget = parseInt(animatedScoreFinal.getAttribute('data-target'));
     const baseTotal = state.roundResults.reduce((acc, r) => acc + r.score, 0);
@@ -264,12 +297,29 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
         setTimeout(() => {
           animatedScoreFinal.parentElement.classList.add('anim-score-impact');
           playScoreImpactSound();
-          animateValue(animatedScoreFinal, baseTotal, finalTarget, 1000, true, true);
+          animateValue(animatedScoreFinal, baseTotal, finalTarget, 1000, true, true).then(() => {
+            showHellModalIfQualified();
+          });
         }, 800);
       });
     } else {
-      animateValue(animatedScoreFinal, 0, finalTarget, 1200, true, true);
+      animateValue(animatedScoreFinal, 0, finalTarget, 1200, true, true).then(() => {
+        showHellModalIfQualified();
+      });
     }
+  }
+
+  // 지옥 도전 모달 이벤트 바인딩
+  const hellModal = document.getElementById('hell-challenge-modal');
+  if (hellModal) {
+    document.getElementById('hell-challenge-close').addEventListener('click', () => {
+      hellModal.style.display = 'none';
+    });
+    hellModal.addEventListener('click', (e) => {
+      if (e.target.id === 'hell-challenge-modal') {
+        hellModal.style.display = 'none';
+      }
+    });
   }
 
   // 다시 하기

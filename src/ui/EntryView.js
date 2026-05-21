@@ -68,7 +68,7 @@ export function renderEntryView(container, nav) {
             <label><input type="radio" name="difficulty" value="Easy"> ${getDifficultyName("Easy")} (${getDifficultyTime("Easy") / 1000}초) &times;${getDifficultyMultiplier("Easy").toFixed(1)}</label>
             <label><input type="radio" name="difficulty" value="Normal" checked> ${getDifficultyName("Normal")} (${getDifficultyTime("Normal") / 1000}초) &times;${getDifficultyMultiplier("Normal").toFixed(1)}</label>
             <label><input type="radio" name="difficulty" value="Hard"> ${getDifficultyName("Hard")} (${getDifficultyTime("Hard") / 1000}초) &times;${getDifficultyMultiplier("Hard").toFixed(1)}</label>
-            ${localStorage.getItem('hell_unlocked') === 'true' ? `<label style="color: #ff4444; font-weight: 800; text-shadow: 0 0 5px rgba(255,0,0,0.5);"><input type="radio" name="difficulty" value="Hell"> ${getDifficultyName("Hell")} (0.2~0.3초) &times;1.25~1.30</label>` : ''}
+            ${localStorage.getItem('hell_unlocked') === 'true' ? `<label style="color: #ff4444; font-weight: 800; text-shadow: 0 0 5px rgba(255,0,0,0.5);"><input type="radio" name="difficulty" value="Hell"> ${getDifficultyName("Hell")} (0.1~0.2초) &times;1.25~1.30</label>` : ''}
           </div>
         </div>
         <button class="btn magazine-start-btn" id="start-btn" style="--btn-color: ${btnStyle.textColor}; --btn-border: ${btnStyle.borderColor}; --btn-bg: ${btnStyle.glassBg}; --btn-hover-bg: ${btnStyle.hoverBg};" disabled>START</button>

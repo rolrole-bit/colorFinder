@@ -47,8 +47,8 @@ const VALID_PHASES = ["ENTRY", "MEMORIZE", "GUESS", "INTERIM", "SCOREBOARD"];
 
 export function getDifficultyTime(diff) {
   if (diff === "Hell") {
-    // 0.2초 ~ 0.3초 (200 ~ 300ms)
-    return Math.floor(Math.random() * 100) + 200;
+    // 0.1초 ~ 0.2초 (100 ~ 200ms)
+    return Math.floor(Math.random() * 100) + 100;
   }
   return DIFFICULTY_TIME[diff] || 2000;
 }
