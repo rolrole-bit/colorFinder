@@ -736,22 +736,14 @@ input[type="range"]::-webkit-slider-thumb:active {
   letter-spacing: -0.02em;
   margin-bottom: max(2vh, 1rem);
   text-align: left;
-  mix-blend-mode: difference;
   
-  /* Animated Gradient Text */
-  background: linear-gradient(
-    45deg,
-    #ffb3ba,
-    #ffdfba,
-    #ffffba,
-    #baffc9,
-    #bae1ff
-  );
-  background-size: 300% 300%;
-  animation: gradientText 15s ease infinite;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  color: #fff !important;
+  mix-blend-mode: difference;
+  filter: contrast(500%) brightness(150%);
+  
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: initial;
 }
 
 @keyframes gradientText {
@@ -799,6 +791,7 @@ input[type="text"].minimal-input {
   transition: border-color 0.3s;
   border-radius: 0 !important;
   mix-blend-mode: difference;
+  filter: contrast(500%) brightness(150%);
 }
 
 input[type="text"].minimal-input::placeholder {
@@ -860,7 +853,9 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-family: 'Paperlogy', sans-serif;
   font-weight: 300;
   font-size: clamp(0.9rem, 2vh, 1.2rem);
-  color: #000;
+  color: #fff !important;
+  mix-blend-mode: difference;
+  filter: contrast(500%) brightness(150%);
   margin-bottom: max(1vh, 0.5rem);
 }
 
@@ -874,7 +869,9 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-family: 'Paperlogy', sans-serif;
   font-weight: 400;
   font-size: clamp(0.9rem, 2.5vh, 1.2rem);
-  color: #000;
+  color: #fff !important;
+  mix-blend-mode: difference;
+  filter: contrast(500%) brightness(150%);
   cursor: pointer;
   display: flex;
   align-items: center;
