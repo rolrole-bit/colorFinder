@@ -737,9 +737,8 @@ input[type="range"]::-webkit-slider-thumb:active {
   margin-bottom: max(2vh, 1rem);
   text-align: left;
   
-  color: #fff !important;
-  mix-blend-mode: difference;
-  filter: contrast(1000%) saturate(300%) brightness(150%);
+  /* ═══ JS 기반 대비색 — mix-blend-mode: difference 사용 금지 (filter와 결합시 무효) ═══ */
+  color: rgba(0, 0, 0, 0.85) !important;
   
   background: none;
   -webkit-background-clip: unset;
@@ -781,8 +780,8 @@ input[type="text"].minimal-input {
   width: 100%;
   background: transparent !important;
   border: none !important;
-  border-bottom: 2px solid #fff !important;
-  color: #fff !important;
+  border-bottom: 2px solid rgba(0,0,0,0.5) !important;
+  color: rgba(0, 0, 0, 0.85) !important;
   font-family: 'Paperlogy', 'Inter', sans-serif;
   font-size: clamp(1rem, 3vh, 1.5rem);
   padding: max(1vh, 0.5rem) 0;
@@ -790,8 +789,6 @@ input[type="text"].minimal-input {
   outline: none;
   transition: border-color 0.3s;
   border-radius: 0 !important;
-  mix-blend-mode: difference;
-  filter: contrast(1000%) saturate(300%) brightness(150%);
 }
 
 input[type="text"].minimal-input::placeholder {
@@ -799,7 +796,7 @@ input[type="text"].minimal-input::placeholder {
 }
 
 input[type="text"].minimal-input:focus {
-  border-bottom-color: #fff !important;
+  border-bottom-color: rgba(0,0,0,0.8) !important;
   box-shadow: none !important;
 }
 
@@ -853,9 +850,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-family: 'Paperlogy', sans-serif;
   font-weight: 300;
   font-size: clamp(0.9rem, 2vh, 1.2rem);
-  color: #fff !important;
-  mix-blend-mode: difference;
-  filter: contrast(1000%) saturate(300%) brightness(150%);
+  color: rgba(0, 0, 0, 0.7) !important;
   margin-bottom: max(1vh, 0.5rem);
 }
 
@@ -869,9 +864,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   font-family: 'Paperlogy', sans-serif;
   font-weight: 400;
   font-size: clamp(0.9rem, 2.5vh, 1.2rem);
-  color: #fff !important;
-  mix-blend-mode: difference;
-  filter: contrast(1000%) saturate(300%) brightness(150%);
+  color: rgba(0, 0, 0, 0.75) !important;
   cursor: pointer;
   display: flex;
   align-items: center;
