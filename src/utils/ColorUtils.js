@@ -95,10 +95,9 @@ export function calculateScore(target, user) {
  */
 export function getContrastBlendColor(r, g, b) {
   // ═══ ★ 여기서 수치를 직접 조절하세요 ★ ═══
-  const DEAD_ZONE_LOW = 10;   // L 데드존 하한 (0~50 사이)
-  const DEAD_ZONE_HIGH = 80;   // L 데드존 상한 (50~100 사이)
-  const PUSH_MARGIN = 10;   // 데드존 밖으로 밀어내는 여유값
-  const MIN_SATURATION = 0;   // 결과 색상의 최소 채도 (0~100)
+  const LIGHT_THRESHOLD = 15;  // 밝은 배경 → 텍스트 명도 상한 (0에 가까울수록 어두움)
+  const DARK_THRESHOLD  = 90;  // 어두운 배경 → 텍스트 명도 하한 (100에 가까울수록 밝음)
+  const MIN_SATURATION  = 10;  // 결과 색상의 최소 채도 (0~100)
   // ═══════════════════════════════════════════
 
   const bg = rgbToHsl(r, g, b);
@@ -109,19 +108,14 @@ export function getContrastBlendColor(r, g, b) {
   // S: 반전 + 최소 채도 보장
   const newS = Math.max(MIN_SATURATION, 100 - bg.s);
 
-  // L: 반전
-  let newL = 100 - bg.l;
-
-  // L이 데드존(회색 영역)에 진입하면 가장 가까운 바깥으로 밀어냄
-  if (newL >= DEAD_ZONE_LOW && newL <= DEAD_ZONE_HIGH) {
-    const mid = (DEAD_ZONE_LOW + DEAD_ZONE_HIGH) / 2;
-    if (newL < mid) {
-      // 어두운 쪽으로 밀어냄
-      newL = DEAD_ZONE_LOW - PUSH_MARGIN;
-    } else {
-      // 밝은 쪽으로 밀어냄
-      newL = DEAD_ZONE_HIGH + PUSH_MARGIN;
-    }
+  // L: 배경 밝기에 따라 강제 방향 결정
+  //    밝은 배경(L>50) → 반드시 어두운 텍스트
+  //    어두운 배경(L≤50) → 반드시 밝은 텍스트
+  let newL;
+  if (bg.l > 50) {
+    newL = LIGHT_THRESHOLD;  // 밝은 배경 → 어두운 글자
+  } else {
+    newL = DARK_THRESHOLD;   // 어두운 배경 → 밝은 글자
   }
 
   // 최종 클램프 (0~100)

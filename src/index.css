@@ -679,7 +679,7 @@ input[type="range"]::-webkit-slider-thumb:active {
 .magazine-score {
   font-size: clamp(5rem, 18vw, 20rem);
   font-weight: 800;
-  color: #fff;
+  color: inherit;  /* JS 인라인 color를 상속받음 — #fff 하드코딩 금지 */
   line-height: 0.9;
   text-align: center;
   flex-shrink: 0;
