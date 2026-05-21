@@ -733,14 +733,14 @@ input[type="range"]::-webkit-slider-thumb:active {
   visibility: visible !important;
   opacity: 1 !important;
   font-family: 'Paperlogy', sans-serif !important;
-  font-weight: 800 !important;
-  font-size: clamp(3rem, 10vh, 10vw) !important;
-  line-height: 0.9 !important;
-  letter-spacing: -0.02em !important;
-  margin-bottom: max(2vh, 1rem) !important;
+  font-weight: 900 !important;
+  font-size: clamp(4.5rem, 12vh, 12vw) !important;
+  line-height: 0.8 !important;
+  letter-spacing: -0.05em !important;
+  margin-bottom: max(3vh, 1.5rem) !important;
   text-align: left !important;
-  color: #111111 !important;
-  -webkit-text-fill-color: #111111 !important;
+  color: #023d16 !important;
+  -webkit-text-fill-color: #023d16 !important;
   background: none !important;
   -webkit-background-clip: border-box !important;
   background-clip: border-box !important;
@@ -950,8 +950,10 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   }
   
   .magazine-title {
-    font-size: 16vw;
-    margin-bottom: 2rem;
+    font-size: 18vw !important;
+    margin-bottom: 1.5rem !important;
+    line-height: 0.8 !important;
+    letter-spacing: -0.05em !important;
   }
   
   input[type="text"].minimal-input {
@@ -1144,8 +1146,10 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   }
   
   .magazine-title {
-    font-size: 16vw;
-    margin-bottom: 2rem;
+    font-size: 18vw !important;
+    margin-bottom: 1.5rem !important;
+    line-height: 0.8 !important;
+    letter-spacing: -0.05em !important;
   }
   
   input[type="text"].minimal-input {
