@@ -112,14 +112,10 @@ export async function renderScoreBoardView(container, appliedMultiplier = 1.0, n
   const leftContrast = getContrastYIQ(initLeftColor.r, initLeftColor.g, initLeftColor.b);
   const rightContrast = getContrastYIQ(initRightColor.r, initRightColor.g, initRightColor.b);
 
-  // 버튼 배경 대비색 (좌우 전체 라운드 평균)
-  const allLeftAvg = leftColors.reduce((acc, c) => ({ r: acc.r + c.r, g: acc.g + c.g, b: acc.b + c.b }), { r: 0, g: 0, b: 0 });
-  const allRightAvg = rightColors.reduce((acc, c) => ({ r: acc.r + c.r, g: acc.g + c.g, b: acc.b + c.b }), { r: 0, g: 0, b: 0 });
-  const avgBg = {
-    r: Math.round((allLeftAvg.r / leftColors.length + allRightAvg.r / rightColors.length) / 2),
-    g: Math.round((allLeftAvg.g / leftColors.length + allRightAvg.g / rightColors.length) / 2),
-    b: Math.round((allLeftAvg.b / leftColors.length + allRightAvg.b / rightColors.length) / 2)
-  };
+  // 버튼 위치(화면 하단 약 95% 지점)의 실제 보간된 색상을 사용
+  const btnLeftColor = interpolateGradient(leftColors, 0.95);
+  const btnRightColor = interpolateGradient(rightColors, 0.95);
+  const avgBg = getAverageColor(btnLeftColor, btnRightColor);
   const btnStyle = getButtonContrastStyle(avgBg);
 
   let targetGradient = targetRGB;

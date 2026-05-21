@@ -11,6 +11,7 @@ import { startSession as startServerSession } from '../core/ServerAPI.js';
 import { initAudio, playReadySound } from '../utils/SoundUtils.js';
 import { startSession, startDevToolsDetection } from '../utils/AntiCheat.js';
 import { scrambleTypingEffect } from './AnimationUtils.js';
+import { getButtonContrastStyle } from '../utils/ColorUtils.js';
 
 /**
  * 엔트리 화면 렌더링
@@ -20,6 +21,8 @@ import { scrambleTypingEffect } from './AnimationUtils.js';
  * @param {function} nav.setServerSession - 서버 세션 상태 설정
  */
 export function renderEntryView(container, nav) {
+  // 엔트리 배경은 항상 밝은 톤(mesh gradient)이므로 밝은 기준의 평균색을 사용
+  const btnStyle = getButtonContrastStyle({ r: 245, g: 240, b: 245 });
   container.innerHTML = `
     <div class="bg-tapes-container" id="entry-bg">
       <div class="entry-bg-mesh"></div>
@@ -67,7 +70,7 @@ export function renderEntryView(container, nav) {
             ${localStorage.getItem('hell_unlocked') === 'true' ? `<label style="color: #ff4444; font-weight: 800; text-shadow: 0 0 5px rgba(255,0,0,0.5);"><input type="radio" name="difficulty" value="Hell"> ${getDifficultyName("Hell")} (0.2~0.3초) &times;1.25~1.30</label>` : ''}
           </div>
         </div>
-        <button class="btn magazine-start-btn" id="start-btn" disabled>START</button>
+        <button class="btn magazine-start-btn" id="start-btn" style="--btn-color: ${btnStyle.textColor}; --btn-border: ${btnStyle.borderColor}; --btn-bg: ${btnStyle.glassBg}; --btn-hover-bg: ${btnStyle.hoverBg};" disabled>START</button>
       </div>
     </div>
   `;
