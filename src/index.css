@@ -171,7 +171,7 @@ body {
   animation: fadeOut 0.4s ease-in forwards;
 }
 
-h1:not(.magazine-title), h2, h3 {
+h1, h2, h3 {
   margin-bottom: 1rem;
   font-weight: 700;
   background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
@@ -179,7 +179,7 @@ h1:not(.magazine-title), h2, h3 {
   -webkit-text-fill-color: transparent;
 }
 
-h1:not(.magazine-title) {
+h1 {
   font-size: 2rem;
   text-align: center;
   margin-bottom: 2rem;
@@ -729,23 +729,21 @@ input[type="range"]::-webkit-slider-thumb:active {
 
 
 .magazine-title {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  font-family: 'Paperlogy', sans-serif !important;
-  font-weight: 900 !important;
-  font-size: clamp(4.5rem, 12vh, 12vw) !important;
-  line-height: 0.8 !important;
-  letter-spacing: -0.05em !important;
-  margin-bottom: max(3vh, 1.5rem) !important;
-  text-align: left !important;
-  color: #023d16 !important;
-  -webkit-text-fill-color: #023d16 !important;
-  background: none !important;
-  -webkit-background-clip: border-box !important;
-  background-clip: border-box !important;
-  mix-blend-mode: normal !important;
-  filter: none !important;
+  font-family: 'Paperlogy', sans-serif;
+  font-weight: 800;
+  font-size: clamp(3rem, 10vh, 10vw);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  margin-bottom: max(2vh, 1rem);
+  text-align: left;
+  
+  color: #fff !important;
+  mix-blend-mode: difference;
+  filter: contrast(1000%) saturate(300%) brightness(150%);
+  
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: initial;
 }
 
 @keyframes gradientText {
@@ -950,10 +948,8 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   }
   
   .magazine-title {
-    font-size: 18vw !important;
-    margin-bottom: 1.5rem !important;
-    line-height: 0.8 !important;
-    letter-spacing: -0.05em !important;
+    font-size: 16vw;
+    margin-bottom: 2rem;
   }
   
   input[type="text"].minimal-input {
@@ -1146,10 +1142,8 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   }
   
   .magazine-title {
-    font-size: 18vw !important;
-    margin-bottom: 1.5rem !important;
-    line-height: 0.8 !important;
-    letter-spacing: -0.05em !important;
+    font-size: 16vw;
+    margin-bottom: 2rem;
   }
   
   input[type="text"].minimal-input {
