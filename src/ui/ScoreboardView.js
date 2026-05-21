@@ -13,7 +13,7 @@ import { playBonusBounceSound, playScoreImpactSound } from '../utils/SoundUtils.
 import { getContrastYIQ, animateValue } from './AnimationUtils.js';
 import { getScoreComment } from '../utils/ScoreComment.js';
 import { bindShareEvents } from './ShareManager.js';
-import { fireCenterConfetti } from '../utils/ConfettiUtils.js';
+import { fireCenterConfetti, fireSideConfetti } from '../utils/ConfettiUtils.js';
 
 /**
  * 최종 스코어보드 화면 렌더링

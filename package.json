@@ -8,6 +8,7 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
+    "build": "node tools/build.js",
     "lint:css": "node src/test/css-harness.js"
   },
   "dependencies": {
