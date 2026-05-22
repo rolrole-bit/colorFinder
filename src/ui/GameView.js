@@ -122,6 +122,7 @@ export function renderGameView(container, nav) {
           <div class="dials-container">
             <!-- H 다이얼 (색상) -->
             <div class="dial-wrapper" id="dial-h-wrapper">
+              <div class="dial-indicator-arrow" id="dial-h-arrow">▼</div>
               <div style="position: relative; width: 100%; display: flex; justify-content: center;">
                 <div class="dial-knob" id="dial-h">
                   <div class="dial-wheel" id="dial-wheel-h"></div>
@@ -129,11 +130,11 @@ export function renderGameView(container, nav) {
                 <div class="dial-value" id="dial-h-value"></div>
                 ${getTutSvg(0)}
               </div>
-              <div class="dial-indicator-arrow" id="dial-h-arrow">▲</div>
             </div>
             
             <!-- S 다이얼 (채도) -->
             <div class="dial-wrapper" id="dial-s-wrapper">
+              <div class="dial-indicator-arrow" id="dial-s-arrow">▼</div>
               <div style="position: relative; width: 100%; display: flex; justify-content: center;">
                 <div class="dial-knob" id="dial-s">
                   <div class="dial-wheel" id="dial-wheel-s"></div>
@@ -141,11 +142,11 @@ export function renderGameView(container, nav) {
                 <div class="dial-value" id="dial-s-value"></div>
                 ${getTutSvg(1)}
               </div>
-              <div class="dial-indicator-arrow" id="dial-s-arrow">▲</div>
             </div>
             
             <!-- B 다이얼 (명도) -->
             <div class="dial-wrapper" id="dial-b-wrapper">
+              <div class="dial-indicator-arrow" id="dial-b-arrow">▼</div>
               <div style="position: relative; width: 100%; display: flex; justify-content: center;">
                 <div class="dial-knob" id="dial-b">
                   <div class="dial-wheel" id="dial-wheel-b"></div>
@@ -153,7 +154,6 @@ export function renderGameView(container, nav) {
                 <div class="dial-value" id="dial-b-value"></div>
                 ${getTutSvg(2)}
               </div>
-              <div class="dial-indicator-arrow" id="dial-b-arrow">▲</div>
             </div>
           </div>
         </div>

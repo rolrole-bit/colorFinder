@@ -1170,14 +1170,14 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 }
 
 .dial-indicator-arrow {
-  font-size: clamp(0.7rem, 1.2vw, 0.95rem);
+  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
   color: #ffffff;
-  margin-top: -0.2rem;
+  margin-bottom: -0.3rem;
   z-index: 10;
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
-  transform-origin: bottom center;
+  transform-origin: top center;
   transition: transform 0.05s ease-out;
   text-shadow: 0 1px 4px rgba(0,0,0,0.6);
 }
