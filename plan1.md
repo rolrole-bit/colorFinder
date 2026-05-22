@@ -1,44 +1,46 @@
-# Plan 1: Antigravity IDE 업데이트 오류 해결 계획
+# Plan 1: DYE MASTER 런처 한글 깨짐 해결 및 창 크기 최적화 계획
 
 ## 1. 작업 목적
-Antigravity IDE 업데이트 도중 발생한 `CreateProcess 실패 (코드 2: 지정된 파일을 찾을 수 없습니다)` 에러 및 업데이트 프로세스 실패 문제를 해결하여 IDE를 정상 구동 가능한 상태로 복구한다.
+- 사용자가 실행한 `launcher.hta`(DYE MASTER 서버 런처)의 한글 깨짐 현상을 해결하여 가독성을 정상화한다.
+- 런처 실행 창이 불필요하게 크게 실행되는 문제를 해결하여, 콘텐츠 크기에 맞는 콤팩트하고 미려한 크기로 조정한다.
 
 ## 2. 핵심 기능
-- **프로세스 진단**: Antigravity IDE와 관련된 실행 중인 프로세스를 감지하고 종료하여 파일 잠금 문제를 방지한다.
-- **파일 복구**: `_` 임시 디렉토리에 격리되어 있는 Antigravity IDE 실행 파일 및 종속성 라이브러리들을 원래 설치 경로(`C:\Users\j.rhee\AppData\Local\Programs\Antigravity IDE`)로 안전하게 이동/복원한다.
-- **실행 확인**: 복구된 `Antigravity IDE.exe`를 구동하여 정상 동작 여부를 확인한다.
+- **인코딩 정상화**: HTML 헤더에 UTF-8 인코딩 메타 태그(`charset=utf-8`) 및 최신 렌더링 엔진 호환 태그(`X-UA-Compatible`)를 명시한다.
+- **BOM(Byte Order Mark) 적용**: HTA 엔진(`mshta.exe`)이 파일을 UTF-8로 올바르게 읽을 수 있도록 파일 포맷을 UTF-8 with BOM으로 저장한다.
+- **창 크기 최적화**: 런처 실행 시 화면 크기를 적절하게(예: 760px x 450px) 재조정하고 모니터 중앙에 배치하는 스크립트를 추가한다.
 
 ## 3. 입력과 출력
 - **입력**: 
-  - 사용자 환경의 프로세스 상태 정보
-  - `C:\Users\j.rhee\AppData\Local\Programs\Antigravity IDE\_` 경로의 파일 목록
+  - 한글이 깨지고 크기가 비정상적으로 큰 기존 `launcher.hta` 파일.
 - **출력**: 
-  - 원래 설치 경로로 복구 완료된 파일 구조
-  - 프로세스 종료 및 파일 이동 처리 결과 로그
+  - 한글이 정상 표시되며, 화면 중앙에 콤팩트한 크기(760x450)로 실행되는 수정된 `launcher.hta`.
+  - 배포용 ZIP 파일 내에 포함될 업데이트된 런처.
 
 ## 4. 파일 구조
-이 작업은 코딩 프로젝트가 아닌 시스템 복구 작업이므로, 복구 스크립트는 임시로 작성하여 실행하거나 명령어로 직접 수행한다.
-- 임시 복구 스크립트: `e:\AI\DYE_MASTER\colorFinder\tools\restore_ide.ps1` (필요 시 작성)
+- 대상 파일: `e:\AI\DYE_MASTER\colorFinder\launcher.hta`
+- 빌드 도구: `e:\AI\DYE_MASTER\colorFinder\tools\build.js` (런처 변경 사항을 반영해 ZIP 재생성 필요)
 
 ## 5. 핵심 모듈
-- **프로세스 확인 및 종료 모듈**: PowerShell `Get-Process` 및 `Stop-Process` 명령어 사용.
-- **파일 이동 모듈**: PowerShell `Move-Item` 또는 `Robocopy` 사용.
+- **HTA 프론트엔드**: HTML, CSS, JavaScript (ActiveX 기반 WScript.Shell 활용).
+- **창 크기 조절 모듈**: `window.resizeTo` 및 `window.moveTo` 스크립트.
 
 ## 6. 실행 흐름
-1. 실행 중인 `Antigravity` 프로세스 검사.
-2. 실행 중인 프로세스가 있다면 안전하게 종료.
-3. `C:\Users\j.rhee\AppData\Local\Programs\Antigravity IDE\_` 내부의 모든 파일 및 폴더를 상위 폴더로 이동.
-4. 이동 완료 후 빈 `_` 디렉토리 삭제.
-5. 복구된 `Antigravity IDE.exe` 실행 테스트.
+1. `launcher.hta` 파일을 분석하여 최적 크기 계산 (카드 3개 너비: 3 * 220px + 여백 = 약 760px).
+2. `launcher.hta` 내 `<head>` 최상단에 메타 태그 추가.
+3. `launcher.hta` 로딩 시 창 크기를 `760x450`으로 변경하고 화면 중앙으로 정렬하는 자바스크립트 코드 작성.
+4. 파일 저장 시 UTF-8 BOM 인코딩을 명시적으로 적용.
+5. 빌드 스크립트(`tools/build.js`)를 실행하여 배포 ZIP 파일에 변경된 런처를 반영.
+6. 런처를 실행하여 정상 작동 여부 검증.
 
 ## 7. 에러 처리
-- **파일 잠김 에러**: 프로세스가 종료되지 않아 파일 이동이 실패할 경우, 프로세스 강제 종료(`-Force`)를 재시도하거나 사용자에게 재부팅 후 실행을 안내한다.
-- **권한 부족 에러**: 이동 권한이 부족한 경우 관리자 권한으로의 승격 또는 안내 메시지를 출력한다.
+- **인코딩 문제 재발**: BOM이 유실되지 않도록 Node.js 파일 쓰기 시 UTF-8 BOM(`\ufeff`) 문자를 붙여서 작성.
+- **창 크기 오류**: 사용자의 모니터 해상도가 매우 낮을 경우를 대비해 스크린 해상도를 초과하지 않도록 안전 장치 마련.
 
 ## 8. 테스트 전략
-- 복원 후 `C:\Users\j.rhee\AppData\Local\Programs\Antigravity IDE\Antigravity IDE.exe` 파일이 존재하는지 검증한다.
-- 프로세스를 실행하여 에러 없이 구동되는지 확인한다.
+- `launcher.hta`를 로컬에서 직접 실행하여 창 크기와 한글 가독성 육안 검증.
+- 런처 내 "개발 서버", "배포 서버" 및 "빌드" 버튼이 정상 작동하는지 동작 확인.
 
 ## 9. 완료 기준
-- `Antigravity IDE.exe`가 원래 설치 경로에 존재함.
-- IDE가 실행되었을 때 "지정된 파일을 찾을 수 없습니다" 에러가 발생하지 않고 정상 실행됨.
+- `launcher.hta` 실행 시 한글이 정상적으로 출력됨.
+- 창 크기가 760px x 450px 내외의 적절한 비율로 실행되고 화면 중앙에 배치됨.
+- 빌드 후 생성된 배포 ZIP 내의 `launcher.hta`도 정상 업데이트됨.

@@ -1,5 +1,7 @@
-<html>
+﻿<html>
 <head>
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta charset="utf-8">
 <title>DYE MASTER Launcher</title>
 <HTA:APPLICATION
   ID="DyeMasterLauncher"
@@ -30,6 +32,10 @@ h1 { font-size:2rem; font-weight:900; letter-spacing:4px; margin-bottom:0.3rem; 
 .bottom { position:absolute; bottom:1rem; font-size:0.65rem; color:#334155; }
 </style>
 <script>
+// 창 크기를 760x460으로 축소하고 중앙 정렬
+window.resizeTo(760, 460);
+window.moveTo((screen.width - 760) / 2, (screen.height - 460) / 2);
+
 var shell = new ActiveXObject("WScript.Shell");
 var fso = new ActiveXObject("Scripting.FileSystemObject");
 var scriptDir = (function() {
