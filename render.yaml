@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: dye-master
+    runtime: node
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: node server/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8080
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: TRUST_PROXY
+        value: "true"
+      - key: MAX_SESSIONS
+        value: "1000"
+      - key: MAX_RANKINGS
+        value: "1000"

@@ -18,6 +18,7 @@ import compression from 'compression';
 import helmet from 'helmet';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { networkInterfaces } from 'os';
 import { cleanupSessions } from './db.js';
 import { rateLimit, blockServerDirectory } from './utils/security.js';
 
@@ -102,16 +103,18 @@ app.use(express.json({ limit: '100kb' }));
 app.use(blockServerDirectory);
 
 // ═══════════════════════════════════════════
-// [SECURITY] 5. CORS (.env 기반 화이트리스트)
+// [SECURITY] 5. CORS (.env 기반 화이트리스트 / 와일드카드)
 // ═══════════════════════════════════════════
 
-const allowedOrigins = (process.env.CORS_ORIGINS || `http://localhost:${PORT}`)
-  .split(',')
-  .map(s => s.trim());
+const corsOrigins = (process.env.CORS_ORIGINS || `http://localhost:${PORT}`).trim();
+const allowAll = corsOrigins === '*';
+const allowedOrigins = allowAll ? [] : corsOrigins.split(',').map(s => s.trim());
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) {
+  if (allowAll) {
+    res.header('Access-Control-Allow-Origin', '*');
+  } else if (origin && allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
   }
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -238,12 +241,17 @@ setInterval(() => {
 // ═══════════════════════════════════════════
 
 app.listen(PORT, '0.0.0.0', () => {
+  // 네트워크 IP 동적 감지
+  const nets = Object.values(networkInterfaces()).flat();
+  const localIP = nets?.find(n => n?.family === 'IPv4' && !n.internal)?.address;
+  const ipLine = localIP ? `\n  ║   http://${localIP}:${PORT}  (LAN)${' '.repeat(Math.max(0, 16 - localIP.length))}║` : '';
+
   console.log(`
   ╔══════════════════════════════════════════════╗
   ║   🎨 DYE MASTER Server v3.0 (Production)    ║
-  ║   http://localhost:${PORT}                     ║
-  ║   http://10.28.42.23:${PORT}  (내부망)         ║
+  ║   http://localhost:${PORT}                     ║${ipLine}
   ║   Helmet: ✅  dotenv: ✅  RateLimit: ✅       ║
+  ║   CORS: ${allowAll ? '* (전체 허용)' : allowedOrigins.length + '개 화이트리스트'}${' '.repeat(Math.max(0, allowAll ? 22 : 17 - String(allowedOrigins.length).length))}║
   ╚══════════════════════════════════════════════╝
   `);
 });

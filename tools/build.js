@@ -50,13 +50,18 @@ console.log('[2/6] 파일 복사...');
 const copyTargets = [
   'src',
   'server',
+  'deploy',
   'index.html',
   'package.json',
   'package-lock.json',
   'start.bat',
   'INSTALL_GUIDE.md',
+  'DEPLOY_GUIDE.md',
   '.env.example',
-  'launcher.hta'
+  'launcher.hta',
+  'render.yaml',
+  'Dockerfile',
+  '.dockerignore'
 ];
 
 for (const target of copyTargets) {
