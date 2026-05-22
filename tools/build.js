@@ -54,7 +54,9 @@ const copyTargets = [
   'package.json',
   'package-lock.json',
   'start.bat',
-  'INSTALL_GUIDE.md'
+  'INSTALL_GUIDE.md',
+  '.env.example',
+  'launcher.hta'
 ];
 
 for (const target of copyTargets) {
@@ -71,7 +73,8 @@ for (const target of copyTargets) {
 // 배포에 불필요한 파일/폴더 제거
 const removeFromDist = [
   'src/test',
-  'src/report-tabs.js'
+  'src/report-tabs.js',
+  'server/data'   // 서버 내부 data 폴더 제거 (프로젝트 루트 data/ 사용)
 ];
 for (const target of removeFromDist) {
   const p = join(DIST, target);
@@ -85,6 +88,13 @@ for (const target of removeFromDist) {
 mkdirSync(join(DIST, 'data'), { recursive: true });
 writeFileSync(join(DIST, 'data', 'rankings.json'), '[]', 'utf-8');
 console.log('  ✓ data/rankings.json (초기화)');
+
+// install.bat 복사 (루트에 배치)
+const installSrc = join(ROOT, 'tools', 'install.bat');
+if (existsSync(installSrc)) {
+  cpSync(installSrc, join(DIST, 'install.bat'));
+  console.log('  ✓ install.bat (원클릭 설치)');
+}
 
 // ═══════════════════════════════════════════
 // 3. EntryView.js에서 DEV START 버튼 제거
@@ -137,10 +147,77 @@ writeFileSync(join(DIST, '.env'), envContent, 'utf-8');
 console.log('  ✓ .env (production 기본값)');
 
 // ═══════════════════════════════════════════
-// 6. ZIP 압축
+// 6. 고객용 README.md 생성
 // ═══════════════════════════════════════════
 
-console.log('[6/6] ZIP 압축...');
+console.log('[6/7] README.md 생성...');
+const readmeContent = `# 🎨 DYE MASTER v${version}
+
+색상 매칭 게임 — 당신의 색감을 증명하세요!
+
+## 빠른 시작 (Quick Start)
+
+### 방법 1. 원클릭 설치 (권장)
+\`install.bat\` 파일을 더블클릭하면 자동으로 설치 및 실행됩니다.
+
+### 방법 2. 수동 설치
+\`\`\`
+1. Node.js LTS를 설치합니다 (https://nodejs.org)
+2. 이 폴더에서 CMD를 열고 실행합니다:
+   npm install --production
+3. 서버를 시작합니다:
+   start.bat 더블클릭  또는  node server/index.js
+4. 브라우저에서 접속합니다:
+   http://localhost:8080
+\`\`\`
+
+## 상세 설치 가이드
+INSTALL_GUIDE.md 파일을 참조하세요.
+
+## 주요 기능
+- 🎮 색상 매칭 게임 (4단계 난이도: Easy / Normal / Hard / Hell)
+- 🏆 서버 기반 실시간 랭킹 시스템
+- 🛡️ 안티치트 + 서버 점수 검증
+- 📱 모바일 반응형 UI
+- 🔗 점수 공유 (OG 메타 태그)
+
+## 파일 구조
+\`\`\`
+DYE_MASTER/
+├── install.bat        ← 원클릭 설치 스크립트
+├── start.bat          ← 서버 시작 스크립트
+├── launcher.hta       ← GUI 런처 (더블클릭)
+├── index.html         ← 메인 페이지
+├── .env               ← 환경 설정 (포트, CORS 등)
+├── .env.example       ← 환경 설정 예시
+├── INSTALL_GUIDE.md   ← 상세 설치/운영 가이드
+├── src/               ← 프론트엔드 소스
+├── server/            ← 백엔드 서버
+└── data/              ← 랭킹 데이터
+\`\`\`
+
+## 기술 스택
+- **Frontend**: Vanilla JS (ES Modules), CSS3
+- **Backend**: Node.js + Express
+- **Database**: JSON 파일 기반 (별도 DB 불필요)
+- **Security**: Helmet.js, Rate Limiting, Anti-Cheat
+
+## 시스템 요구 사항
+- Windows 10 이상
+- Node.js v18+ (LTS 권장)
+- 포트 8080 (변경 가능)
+
+---
+DYE MASTER v${version} | Build ${dateStr}
+`;
+writeFileSync(join(DIST, 'README.md'), readmeContent, 'utf-8');
+console.log('  ✓ README.md (고객용)');
+
+// ═══════════════════════════════════════════
+// 7. ZIP 압축 (README.md 포함)
+// ═══════════════════════════════════════════
+
+console.log('[7/7] ZIP 압축...');
 const zipName = `DYE_MASTER_v${version}_${dateStr}.zip`;
 const zipPath = join(ROOT, zipName);
 
@@ -177,6 +254,6 @@ console.log(`
   ║  배포 방법:                           ║
   ║  1. dist/ 폴더에서 npm install       ║
   ║  2. node server/index.js             ║
-  ║  또는 start.bat 실행                  ║
+  ║  또는 start.bat / install.bat 실행    ║
   ╚══════════════════════════════════════╝
 `);
