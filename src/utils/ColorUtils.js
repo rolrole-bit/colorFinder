@@ -41,27 +41,38 @@ export function rgbToLab(r, g, b) {
 }
 
 /**
- * 두 RGB 색상 간의 정확도를 RGB 유클리드 거리 기반으로 점수를 계산합니다.
+ * 두 RGB 색상 간의 정확도를 HSL 가중치 기반으로 점수를 계산합니다.
  * 
- * 공식: score = round(1000 × (1 - diff / maxDiff))
- *   - diff    = √((tR-uR)² + (tG-uG)² + (tB-uB)²)
- *   - maxDiff = √(255²+255²+255²) ≈ 441.67
- *   - 완전 일치 → 1000점, 최대 차이(흑↔백) → 0점
+ * 가중치: 색상(H) 60%, 채도(S) 20%, 명도(L) 20%
+ *   - H(색상): 원형 거리 사용 (0~360°, 최대 차이 180°)
+ *   - S(채도): 절대 차이 (0~100)
+ *   - L(명도): 절대 차이 (0~100)
+ *   - score = round(1000 × (1 - (0.6×hDiff + 0.2×sDiff + 0.2×lDiff)))
+ *   - 완전 일치 → 1000점, 최대 차이 → 0점
  * 
  * @param {{r: number, g: number, b: number}} target - 목표 색상
  * @param {{r: number, g: number, b: number}} user - 유저가 선택한 색상
  * @returns {number} 0 ~ 1000 (정수)
  */
 export function calculateScore(target, user) {
-  const MAX_DIFF = Math.sqrt(255 * 255 + 255 * 255 + 255 * 255); // ≈ 441.67
+  const tHsl = rgbToHsl(target.r, target.g, target.b);
+  const uHsl = rgbToHsl(user.r, user.g, user.b);
 
-  const diff = Math.sqrt(
-    Math.pow(target.r - user.r, 2) +
-    Math.pow(target.g - user.g, 2) +
-    Math.pow(target.b - user.b, 2)
-  );
+  // H: 원형 거리 (0~180 → 0~1 정규화)
+  let hDiff = Math.abs(tHsl.h - uHsl.h);
+  if (hDiff > 180) hDiff = 360 - hDiff;
+  const hNorm = hDiff / 180;
 
-  const score = Math.round(1000 * (1 - diff / MAX_DIFF));
+  // S: 절대 차이 (0~100 → 0~1 정규화)
+  const sNorm = Math.abs(tHsl.s - uHsl.s) / 100;
+
+  // L: 절대 차이 (0~100 → 0~1 정규화)
+  const lNorm = Math.abs(tHsl.l - uHsl.l) / 100;
+
+  // 가중 합산: H 60%, S 20%, L 20%
+  const weightedDiff = 0.6 * hNorm + 0.2 * sNorm + 0.2 * lNorm;
+
+  const score = Math.round(1000 * (1 - weightedDiff));
   return Math.max(0, Math.min(1000, score));
 }
 

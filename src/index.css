@@ -1148,7 +1148,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 /* 다이얼별 그라데이션 테마 */
 #dial-wheel-h {
   background: conic-gradient(
-    from 180deg,
+    from 0deg,
     #ff0000 0%,
     #ffff00 17%,
     #00ff00 33%,
@@ -1161,12 +1161,12 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
 
 #dial-wheel-s {
   /* JS에서 현재 Hue값 기준으로 동적 갱신 예정 */
-  background: conic-gradient(from 180deg, #808080, #ff0000);
+  background: conic-gradient(from 0deg, #808080, #ff0000);
 }
 
 #dial-wheel-b {
   /* 명도는 검정 -> 원색 -> 흰색 */
-  background: conic-gradient(from 180deg, #000000, #ff0000, #ffffff);
+  background: conic-gradient(from 0deg, #000000, #ff0000, #ffffff);
 }
 
 .dial-indicator-arrow {
@@ -1177,7 +1177,7 @@ input.minimal-input:not(:placeholder-shown) + .custom-placeholder {
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
-  transform-origin: top center;
+  transform-origin: center 30%;
   transition: transform 0.05s ease-out;
   text-shadow: 0 1px 4px rgba(0,0,0,0.6);
 }

@@ -448,12 +448,12 @@ export function renderGameView(container, nav) {
       // 채도(S) 및 명도(B) 다이얼의 휠 그라데이션 동적 업데이트
       const sWheel = document.getElementById('dial-wheel-s');
       if (sWheel) {
-        sWheel.style.background = `conic-gradient(from 180deg, hsl(${currentH}, 0%, 50%) 0%, hsl(${currentH}, 100%, 50%) 100%)`;
+        sWheel.style.background = `conic-gradient(from 0deg, hsl(${currentH}, 0%, 50%) 0%, hsl(${currentH}, 100%, 50%) 100%)`;
       }
 
       const bWheel = document.getElementById('dial-wheel-b');
       if (bWheel) {
-        bWheel.style.background = `conic-gradient(from 180deg, #000000 0%, hsl(${currentH}, ${currentS}%, 50%) 50%, #ffffff 100%)`;
+        bWheel.style.background = `conic-gradient(from 0deg, #000000 0%, hsl(${currentH}, ${currentS}%, 50%) 50%, #ffffff 100%)`;
       }
 
       // 하단 다이얼 수치 뱃지를 컬러 서클로 표현 (소수점으로 인한 CSS 파싱 오류 방지를 위해 반올림)
